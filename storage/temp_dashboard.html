@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="rYWjZUheEiStMksf1JIAl3x5Py1nGkMM2MXG9NUA">
+
+    <title>Dashboard Ikhtisar Pendidikan - Pendidikan Ansuh | Yayasan Rumah Harapan</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="preload" as="style" href="http://pendidikan-ansuh.test/build/assets/app-Bq46VpJY.css" /><link rel="modulepreload" as="script" href="http://pendidikan-ansuh.test/build/assets/app-BvRk9kiK.js" /><link rel="stylesheet" href="http://pendidikan-ansuh.test/build/assets/app-Bq46VpJY.css" /><script type="module" src="http://pendidikan-ansuh.test/build/assets/app-BvRk9kiK.js"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', var(--font-sans, system-ui, sans-serif);
+        }
+    </style>
+<script id="browser-logger-active">
+(function() {
+    const ENDPOINT = 'http://pendidikan-ansuh.test/_boost/browser-logs';
+    const logQueue = [];
+    let flushTimeout = null;
+    const captureTypes = ["error","warning","info","log","debug","table"];
+
+    console.log('?? Browser logger active (MCP server detected). Posting to: ' + ENDPOINT);
+
+    // Store original console methods
+    const originalConsole = {
+        log: console.log,
+        debug: console.debug,
+        info: console.info,
+        error: console.error,
+        warn: console.warn,
+        table: console.table
+    };
+
+    // Walk own enumerable keys so JSON.stringify cannot auto-invoke a proxy fake toJSON (e.g. Livewire's `$wire`) and fire a real request.
+    function toSafeValue(value, seen) {
+        if (value === null || typeof value !== 'object') {
+            return value;
+        }
+        if (value instanceof Error) {
+            return { name: value.name, message: value.message, stack: value.stack };
+        }
+        // Date has no own enumerable keys, so the walk below would collapse it to {}.
+        if (value instanceof Date) {
+            return value.toISOString();
+        }
+        if (seen.has(value)) {
+            return '[Circular]';
+        }
+        seen.add(value);
+        if (Array.isArray(value)) {
+            return value.map((item) => toSafeValue(item, seen));
+        }
+        const plain = {};
+        for (const key of Object.keys(value)) {
+            if (key === 'toJSON') continue;
+            try {
+                plain[key] = toSafeValue(value[key], seen);
+            } catch (e) {
+                plain[key] = '[Unreadable]';
+            }
+        }
+        return plain;
+    }
+
+    // Helper to safely stringify values
+    function safeStringify(obj) {
+        return JSON.stringify(toSafeValue(obj, new WeakSet()));
+    }
+
+    // Normalize log type for consistency (e.g., 'warn' to 'warning')
+    function normalizeType(type) {
+        return type === 'warn' ? 'warning' : type;
+    }
+
+    // Determine if a log type should be captured based on configured levels
+    function shouldCapture(type) {
+        return captureTypes.includes(normalizeType(type));
+    }
+
+    // Batch and send logs
+    function flushLogs() {
+        if (logQueue.length === 0) return;
+
+        const batch = logQueue.splice(0, logQueue.length);
+
+        fetch(ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ logs: batch })
+        }).catch(err => {
+            // Silently fail to avoid infinite loops
+            originalConsole.error('Failed to send logs:', err);
+        });
+    }
+
+    // Debounced flush (100ms)
+    function scheduleFlush() {
+        if (flushTimeout) clearTimeout(flushTimeout);
+        flushTimeout = setTimeout(flushLogs, 100);
+    }
+
+    // Intercept console methods
+    ['log', 'debug', 'info', 'error', 'warn', 'table'].forEach(method => {
+        console[method] = function(...args) {
+            // Call original method
+            originalConsole[method].apply(console, args);
+
+            // Capture log data
+            try {
+                if (!shouldCapture(method)) {
+                    return;
+                }
+
+                logQueue.push({
+                    type: method,
+                    timestamp: new Date().toISOString(),
+                    data: args.map(arg => {
+                        try {
+                            return typeof arg === 'object' ? JSON.parse(safeStringify(arg)) : arg;
+                        } catch (e) {
+                            return String(arg);
+                        }
+                    }),
+                    url: window.location.href,
+                    userAgent: navigator.userAgent
+                });
+
+                scheduleFlush();
+            } catch (e) {
+                // Fail silently
+            }
+        };
+    });
+
+    // Global error handlers for uncaught errors
+    const originalOnError = window.onerror;
+    window.onerror = function boostErrorHandler(errorMsg, url, lineNumber, colNumber, error) {
+        try {
+            if (shouldCapture('error')) {
+                logQueue.push({
+                    type: 'uncaught_error',
+                    timestamp: new Date().toISOString(),
+                    data: [{
+                        message: errorMsg,
+                        filename: url,
+                        lineno: lineNumber,
+                        colno: colNumber,
+                        error: error ? {
+                            name: error.name,
+                            message: error.message,
+                            stack: error.stack
+                        } : null
+                    }],
+                    url: window.location.href,
+                    userAgent: navigator.userAgent
+                });
+
+                scheduleFlush();
+            }
+
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Call original handler if it exists
+        if (originalOnError && typeof originalOnError === 'function') {
+            return originalOnError(errorMsg, url, lineNumber, colNumber, error);
+        }
+
+        // Let the error continue to propagate
+        return false;
+    }
+    window.addEventListener('error', (event) => {
+        try {
+            if (!shouldCapture('error')) {
+                return false;
+            }
+
+            logQueue.push({
+                type: 'window_error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: event.message,
+                    filename: event.filename,
+                    lineno: event.lineno,
+                    colno: event.colno,
+                    error: event.error ? {
+                        name: event.error.name,
+                        message: event.error.message,
+                        stack: event.error.stack
+                    } : null
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Let the error continue to propagate
+        return false;
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+        try {
+            if (!shouldCapture('error')) {
+                return false;
+            }
+
+            logQueue.push({
+                type: 'error',
+                timestamp: new Date().toISOString(),
+                data: [{
+                    message: 'Unhandled Promise Rejection',
+                    reason: toSafeValue(event.reason, new WeakSet())
+                }],
+                url: window.location.href,
+                userAgent: navigator.userAgent
+            });
+
+            scheduleFlush();
+        } catch (e) {
+            // Fail silently
+        }
+
+        // Let the rejection continue to propagate
+        return false;
+    });
+
+    // Flush on page unload
+    window.addEventListener('beforeunload', () => {
+        if (logQueue.length > 0) {
+            navigator.sendBeacon(ENDPOINT, JSON.stringify({ logs: logQueue }));
+        }
+    });
+})();
+</script>
+</head>
+<body class="h-full bg-[#f8faf9] text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+
+    <div class="min-h-screen flex">
+        
+        
+        <div id="sidebar-overlay" 
+             onclick="toggleSidebar(false)"
+             class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs hidden transition-opacity lg:hidden"
+             aria-hidden="true"></div>
+
+        
+        <aside id="sidebar" 
+       class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-emerald-100 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full lg:static shadow-sm lg:shadow-none"
+       aria-label="Sidebar Navigasi">
+    
+    
+    <div class="h-20 px-6 flex items-center justify-between border-b border-emerald-50 bg-gradient-to-r from-emerald-50/60 to-white">
+        <a href="http://pendidikan-ansuh.test" class="flex items-center gap-3 group">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-600/25 group-hover:scale-105 transition-transform duration-200">
+                
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-lg text-slate-800 tracking-tight leading-none group-hover:text-emerald-700 transition-colors">Pendidikan Ansuh</span>
+                    <span class="inline-block w-2 h-2 rounded-full bg-orange-500"></span>
+                </div>
+                <span class="text-xs text-emerald-700 font-medium tracking-wide mt-1">Yayasan Rumah Harapan</span>
+            </div>
+        </a>
+
+        
+        <button type="button" 
+                onclick="toggleSidebar(false)"
+                class="lg:hidden p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                aria-label="Tutup Menu">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    
+    <div class="px-6 pt-4 pb-2">
+        <div class="px-3 py-1.5 rounded-xl bg-emerald-50/80 border border-emerald-100/80 flex items-center justify-between text-xs font-medium text-emerald-800">
+            <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Divisi Pendidikan Anak Asuh
+            </span>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-200">2026/2027</span>
+        </div>
+    </div>
+
+    
+    <div class="flex-1 overflow-y-auto px-4 py-3 space-y-6 scrollbar-thin scrollbar-thumb-emerald-200">
+        
+        <div>
+            <div class="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                Menu Utama
+            </div>
+            <nav class="space-y-1">
+                
+                <a href="http://pendidikan-ansuh.test" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all duration-150 bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+
+                
+                <a href="http://pendidikan-ansuh.test/asrama" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <span>Data Asrama</span>
+                </a>
+
+                
+                <a href="http://pendidikan-ansuh.test/anak-asuh" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span>Data Anak Asuh</span>
+                </a>
+            </nav>
+        </div>
+
+        
+        <div>
+            <div class="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                Kurikulum & Diniyah
+            </div>
+            <nav class="space-y-1">
+                
+                <a href="#evaluasi-diniyah" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                    <span>Evaluasi Diniyah</span>
+                </a>
+
+                
+                <a href="#hafalan-quran" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <span>Hafalan Al-Qur'an</span>
+                </a>
+
+                
+                <a href="#hafalan-hadis" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Hafalan Hadis</span>
+                </a>
+
+                
+                <a href="#pengetahuan-diniyah" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    <span>Pengetahuan Diniyah</span>
+                </a>
+            </nav>
+        </div>
+
+        
+        <div>
+            <div class="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                Kesejahteraan & Asrama
+            </div>
+            <nav class="space-y-1">
+                
+                <a href="#kesehatan-anak" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span>Kesehatan Anak</span>
+                </a>
+
+                
+                <a href="#kasus-pembinaan" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>Kasus & Pembinaan</span>
+                </a>
+
+                
+                <a href="#laporan" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Laporan</span>
+                </a>
+
+                
+                <a href="#pengaturan" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>Pengaturan</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    
+    <div class="p-4 border-t border-emerald-100 bg-emerald-50/40">
+        <div class="p-3 rounded-xl bg-white border border-emerald-100/90 shadow-2xs">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs">
+                    YH
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-slate-800 truncate">Rumah Harapan Pusat</p>
+                    <p class="text-[11px] text-slate-400 truncate">Sistem v1.0 • 2026</p>
+                </div>
+                <div class="w-2 h-2 rounded-full bg-emerald-500" title="Koneksi Aman"></div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+        
+        <div class="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
+            
+            
+            <header class="sticky top-0 z-30 h-16 sm:h-20 bg-white/95 backdrop-blur-md border-b border-emerald-100/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-all">
+    
+    
+    <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+        
+        <button type="button" 
+                onclick="toggleSidebar(true)" 
+                class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 shrink-0"
+                aria-label="Buka Menu Navigasi">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+
+        
+        <h1 class="text-base sm:text-lg lg:text-xl font-bold text-slate-900 tracking-tight truncate">
+            Dashboard
+        </h1>
+    </div>
+
+    
+    <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+        <div class="flex items-center gap-2.5 sm:gap-3 px-2.5 sm:px-3.5 py-1.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80">
+            
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shadow-emerald-600/20 shrink-0">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                            </div>
+
+            
+            <div class="text-left leading-tight hidden min-[360px]:block">
+                <span class="block text-xs sm:text-sm font-bold text-slate-800 truncate max-w-[110px] sm:max-w-[150px]">
+                    Admin
+                </span>
+                <span class="block text-[10px] sm:text-[11px] font-medium text-emerald-700 truncate max-w-[110px] sm:max-w-[150px]">
+                    Pengurus
+                </span>
+            </div>
+        </div>
+    </div>
+
+</header>
+
+            
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-7xl w-full mx-auto">
+                <div class="space-y-6 sm:space-y-8">
+
+    
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-800 text-white p-6 sm:p-8 shadow-xl shadow-emerald-950/10">
+        
+        <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-emerald-500/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute right-1/4 -bottom-20 w-72 h-72 rounded-full bg-orange-500/15 blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div class="max-w-2xl space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-emerald-100">
+                    <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+                    <span>Periode Evaluasi: Oktober 2026 (Semester Ganjil)</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                    Assalamu’alaikum, Ust. Ahmad Fauzi, S.Pd.I
+                </h2>
+                <p class="text-sm sm:text-base text-emerald-100/90 leading-relaxed">
+                    Selamat datang di Portal Monitoring Pendidikan Anak Asuh Yayasan Rumah Harapan. Pantau perkembangan hafalan, kedisiplinan ibadah, serta evaluasi diniyah seluruh asrama secara real-time.
+                </p>
+            </div>
+
+            
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+                <button type="button" 
+                        onclick="alert('Fitur Form Input Evaluasi Diniyah Baru siap diintegrasikan pada modul berikutnya.')"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-orange-500/30 transition-all cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Input Evaluasi Baru</span>
+                </button>
+
+                <button type="button" 
+                        onclick="window.print()"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs sm:text-sm font-medium border border-white/20 backdrop-blur-md transition-all cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span>Cetak / Ekspor Rekap</span>
+                </button>
+            </div>
+        </div>
+
+        
+        <div class="mt-6 pt-5 border-t border-emerald-600/40 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+            <div>
+                <span class="text-emerald-200/80 block">Tahun Ajaran:</span>
+                <span class="font-bold text-white text-sm">2026/2027</span>
+            </div>
+            <div>
+                <span class="text-emerald-200/80 block">Cabang Aktif Terdata:</span>
+                <span class="font-bold text-white text-sm">6 Asrama Cabang</span>
+            </div>
+            <div>
+                <span class="text-emerald-200/80 block">Total Anak Asuh Terbina:</span>
+                <span class="font-bold text-white text-sm">248 Santri / Anak</span>
+            </div>
+            <div>
+                <span class="text-emerald-200/80 block">Status Sistem:</span>
+                <span class="font-bold text-emerald-300 flex items-center gap-1.5 text-sm">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    Sinkronisasi Normal
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        
+        
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-emerald-100/90 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div class="flex items-start justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                        Total Anak Asuh
+                    </span>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-extrabold text-slate-900 tracking-tight">248</span>
+                        <span class="text-xs font-semibold text-slate-500">Anak</span>
+                    </div>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span class="text-emerald-700 font-medium flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 9.586 14.586 6H12z" clip-rule="evenodd" />
+                    </svg>
+                    +12 anak (Tahun ini)
+                </span>
+                <span class="text-slate-400">Tersebar di 6 Asrama</span>
+            </div>
+        </div>
+
+        
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-emerald-100/90 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div class="flex items-start justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                        Total Cabang
+                    </span>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-extrabold text-slate-900 tracking-tight">6</span>
+                        <span class="text-xs font-semibold text-slate-500">Cabang Aktif</span>
+                    </div>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span class="text-teal-700 font-medium">Jawa Barat, DIY, Jawa Timur</span>
+                <span class="px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 font-semibold text-[11px]">100% Beroperasi</span>
+            </div>
+        </div>
+
+        
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-emerald-100/90 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div class="flex items-start justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                        Distribusi Jenjang Pendidikan
+                    </span>
+                    <div class="flex items-baseline gap-3">
+                        <span class="text-sm font-semibold text-slate-600">
+                            SD: <strong class="text-emerald-700 text-base">82</strong>
+                        </span>
+                        <span class="text-slate-300">•</span>
+                        <span class="text-sm font-semibold text-slate-600">
+                            SMP: <strong class="text-teal-700 text-base">96</strong>
+                        </span>
+                        <span class="text-slate-300">•</span>
+                        <span class="text-sm font-semibold text-slate-600">
+                            SMA: <strong class="text-orange-600 text-base">70</strong>
+                        </span>
+                    </div>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                    </svg>
+                </div>
+            </div>
+
+            
+            <div class="mt-3">
+                <div class="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden flex">
+                    <div style="width: 33%" class="h-full bg-emerald-500" title="SD: 82 Anak (33%)"></div>
+                    <div style="width: 39%" class="h-full bg-teal-500" title="SMP: 96 Anak (39%)"></div>
+                    <div style="width: 28%" class="h-full bg-orange-400" title="SMA: 70 Anak (28%)"></div>
+                </div>
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> SD (33%)</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-teal-500"></span> SMP (39%)</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-400"></span> SMA (28%)</span>
+            </div>
+        </div>
+
+        
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-emerald-100/90 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div class="flex items-start justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                        Evaluasi Diniyah Bulan Berjalan
+                    </span>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-extrabold text-emerald-700 tracking-tight">
+                            91.9%
+                        </span>
+                        <span class="text-xs font-medium text-slate-500">Selesai</span>
+                    </div>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+
+            
+            <div class="mt-3">
+                <div class="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden">
+                    <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500" style="width: 91.9%"></div>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span class="text-slate-600 font-medium">228 dari 248 anak telah dievaluasi</span>
+                <span class="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md">Bulan Oktober</span>
+            </div>
+        </div>
+
+        
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-emerald-100/90 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div class="flex items-start justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                        Target Hafalan Tercapai
+                    </span>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-extrabold text-orange-600 tracking-tight">
+                            78.2%
+                        </span>
+                        <span class="text-xs font-medium text-slate-500">Tuntas</span>
+                    </div>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+            </div>
+
+            
+            <div class="mt-3">
+                <div class="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden">
+                    <div class="h-full rounded-full bg-gradient-to-r from-orange-400 to-amber-500 transition-all duration-500" style="width: 78.2%"></div>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span class="text-slate-600 font-medium">194 anak memenuhi target juz</span>
+                <span class="text-orange-700 font-semibold bg-orange-50 px-2 py-0.5 rounded-md">Al-Qur'an & Hadis</span>
+            </div>
+        </div>
+
+        
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-orange-200/80 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden group bg-gradient-to-b from-orange-50/20 to-white">
+            <div class="flex items-start justify-between">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-orange-700/80 block mb-1">
+                        Evaluasi Belum Lengkap
+                    </span>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-extrabold text-orange-600 tracking-tight">
+                            20
+                        </span>
+                        <span class="text-xs font-semibold text-slate-500">Anak Menunggu</span>
+                    </div>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <p class="text-xs text-slate-600">
+                    Sebagian besar berasal dari Cabang Surabaya (8 anak) dan Cabang Depok (3 anak).
+                </p>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-orange-100 flex items-center justify-between text-xs">
+                <span class="text-orange-700 font-bold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+                    Perhatian Pengurus
+                </span>
+                <a href="#tindak-lanjut" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 underline decoration-emerald-300">
+                    Kirim Pengingat ?
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
+        
+        
+        <div class="lg:col-span-2 space-y-4">
+            <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm overflow-hidden">
+                
+                
+                <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-emerald-50/40 via-white to-white">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+                                Tabel Ringkasan Cabang Yayasan Rumah Harapan
+                            </h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Status pemantauan pendidikan, sebaran jenjang, dan capaian hafalan di 6 asrama cabang.
+                        </p>
+                    </div>
+
+                    
+                    <div class="flex items-center gap-2.5">
+                        <div class="relative">
+                            <input type="text" 
+                                   id="branchSearchInput"
+                                   onkeyup="filterBranches()"
+                                   placeholder="Filter nama cabang..." 
+                                   class="text-xs pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+
+                        <select id="statusFilterSelect" 
+                                onchange="filterBranches()"
+                                class="text-xs px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                            <option value="all">Semua Status</option>
+                            <option value="Lengkap">Lengkap</option>
+                            <option value="Berjalan">Berjalan</option>
+                            <option value="Belum Lengkap">Belum Lengkap</option>
+                        </select>
+                    </div>
+                </div>
+
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse" id="branchesTable">
+                        <thead>
+                            <tr class="bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100">
+                                <th class="py-3.5 px-4 sm:px-6">Nama Cabang & Penanggung Jawab</th>
+                                <th class="py-3.5 px-4 text-center">Total Anak</th>
+                                <th class="py-3.5 px-4">Sebaran Jenjang</th>
+                                <th class="py-3.5 px-4">Capaian Hafalan</th>
+                                <th class="py-3.5 px-4 text-center">Nilai Diniyah</th>
+                                <th class="py-3.5 px-4 text-center">Status Evaluasi</th>
+                                <th class="py-3.5 px-4 sm:px-6 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-xs">
+                                                        <tr class="hover:bg-emerald-50/40 transition-colors branch-row" data-name="cabang bandung (pusat)" data-status="Lengkap">
+                                
+                                
+                                <td class="py-4 px-4 sm:px-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">
+                                            Ba
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-slate-900 block leading-tight text-xs sm:text-sm">
+                                                Cabang Bandung (Pusat)
+                                            </span>
+                                            <span class="text-[11px] text-slate-500 block mt-0.5">
+                                                Ust. H. Ridwan Kamil, S.Sos.I
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800 text-sm">
+                                    52
+                                    <span class="text-[10px] text-slate-400 font-normal block">Anak</span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center gap-1.5 text-[11px]">
+                                        <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-100" title="Sekolah Dasar">
+                                            SD: 16
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 font-semibold border border-teal-100" title="Sekolah Menengah Pertama">
+                                            SMP: 20
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-semibold border border-orange-100" title="Sekolah Menengah Atas">
+                                            SMA: 16
+                                        </span>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="w-32 space-y-1">
+                                        <div class="flex items-center justify-between text-[11px]">
+                                            <span class="font-semibold text-slate-700">84%</span>
+                                            <span class="text-slate-400">Target</span>
+                                        </div>
+                                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                                            <div class="h-full rounded-full bg-emerald-500"
+                                                 style="width: 84%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800">
+                                    <span class="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-mono text-xs">
+                                        88.5
+                                    </span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center">
+                                                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            Lengkap
+                                        </span>
+                                                                    </td>
+
+                                
+                                <td class="py-4 px-4 sm:px-6 text-right">
+                                    <button type="button" 
+                                            onclick="alert('Membuka detail Cabang Bandung (Pusat) (Penanggung Jawab: Ust. H. Ridwan Kamil, S.Sos.I)')"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-100/70 border border-emerald-200 transition-colors cursor-pointer">
+                                        <span>Detail</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                                                        <tr class="hover:bg-emerald-50/40 transition-colors branch-row" data-name="cabang bogor" data-status="Lengkap">
+                                
+                                
+                                <td class="py-4 px-4 sm:px-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">
+                                            Bo
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-slate-900 block leading-tight text-xs sm:text-sm">
+                                                Cabang Bogor
+                                            </span>
+                                            <span class="text-[11px] text-slate-500 block mt-0.5">
+                                                Ust. Muhammad Ilham, M.Pd
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800 text-sm">
+                                    44
+                                    <span class="text-[10px] text-slate-400 font-normal block">Anak</span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center gap-1.5 text-[11px]">
+                                        <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-100" title="Sekolah Dasar">
+                                            SD: 14
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 font-semibold border border-teal-100" title="Sekolah Menengah Pertama">
+                                            SMP: 18
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-semibold border border-orange-100" title="Sekolah Menengah Atas">
+                                            SMA: 12
+                                        </span>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="w-32 space-y-1">
+                                        <div class="flex items-center justify-between text-[11px]">
+                                            <span class="font-semibold text-slate-700">81%</span>
+                                            <span class="text-slate-400">Target</span>
+                                        </div>
+                                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                                            <div class="h-full rounded-full bg-emerald-500"
+                                                 style="width: 81%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800">
+                                    <span class="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-mono text-xs">
+                                        86.0
+                                    </span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center">
+                                                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            Lengkap
+                                        </span>
+                                                                    </td>
+
+                                
+                                <td class="py-4 px-4 sm:px-6 text-right">
+                                    <button type="button" 
+                                            onclick="alert('Membuka detail Cabang Bogor (Penanggung Jawab: Ust. Muhammad Ilham, M.Pd)')"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-100/70 border border-emerald-200 transition-colors cursor-pointer">
+                                        <span>Detail</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                                                        <tr class="hover:bg-emerald-50/40 transition-colors branch-row" data-name="cabang depok" data-status="Berjalan">
+                                
+                                
+                                <td class="py-4 px-4 sm:px-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">
+                                            De
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-slate-900 block leading-tight text-xs sm:text-sm">
+                                                Cabang Depok
+                                            </span>
+                                            <span class="text-[11px] text-slate-500 block mt-0.5">
+                                                Ust. Farhan Al-Ghifari, S.Pd
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800 text-sm">
+                                    38
+                                    <span class="text-[10px] text-slate-400 font-normal block">Anak</span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center gap-1.5 text-[11px]">
+                                        <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-100" title="Sekolah Dasar">
+                                            SD: 12
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 font-semibold border border-teal-100" title="Sekolah Menengah Pertama">
+                                            SMP: 16
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-semibold border border-orange-100" title="Sekolah Menengah Atas">
+                                            SMA: 10
+                                        </span>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="w-32 space-y-1">
+                                        <div class="flex items-center justify-between text-[11px]">
+                                            <span class="font-semibold text-slate-700">76%</span>
+                                            <span class="text-slate-400">Target</span>
+                                        </div>
+                                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                                            <div class="h-full rounded-full bg-teal-500"
+                                                 style="width: 76%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800">
+                                    <span class="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-mono text-xs">
+                                        83.2
+                                    </span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center">
+                                                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                                            <svg class="w-3 h-3 text-amber-600 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                            </svg>
+                                            Berjalan (89%)
+                                        </span>
+                                                                    </td>
+
+                                
+                                <td class="py-4 px-4 sm:px-6 text-right">
+                                    <button type="button" 
+                                            onclick="alert('Membuka detail Cabang Depok (Penanggung Jawab: Ust. Farhan Al-Ghifari, S.Pd)')"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-100/70 border border-emerald-200 transition-colors cursor-pointer">
+                                        <span>Detail</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                                                        <tr class="hover:bg-emerald-50/40 transition-colors branch-row" data-name="cabang sukabumi" data-status="Berjalan">
+                                
+                                
+                                <td class="py-4 px-4 sm:px-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">
+                                            Su
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-slate-900 block leading-tight text-xs sm:text-sm">
+                                                Cabang Sukabumi
+                                            </span>
+                                            <span class="text-[11px] text-slate-500 block mt-0.5">
+                                                Ustadzah Nurul Hidayati, S.Ag
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800 text-sm">
+                                    42
+                                    <span class="text-[10px] text-slate-400 font-normal block">Anak</span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center gap-1.5 text-[11px]">
+                                        <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-100" title="Sekolah Dasar">
+                                            SD: 18
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 font-semibold border border-teal-100" title="Sekolah Menengah Pertama">
+                                            SMP: 14
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-semibold border border-orange-100" title="Sekolah Menengah Atas">
+                                            SMA: 10
+                                        </span>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="w-32 space-y-1">
+                                        <div class="flex items-center justify-between text-[11px]">
+                                            <span class="font-semibold text-slate-700">73%</span>
+                                            <span class="text-slate-400">Target</span>
+                                        </div>
+                                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                                            <div class="h-full rounded-full bg-teal-500"
+                                                 style="width: 73%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800">
+                                    <span class="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-mono text-xs">
+                                        81.7
+                                    </span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center">
+                                                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                                            <svg class="w-3 h-3 text-amber-600 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                            </svg>
+                                            Berjalan (85%)
+                                        </span>
+                                                                    </td>
+
+                                
+                                <td class="py-4 px-4 sm:px-6 text-right">
+                                    <button type="button" 
+                                            onclick="alert('Membuka detail Cabang Sukabumi (Penanggung Jawab: Ustadzah Nurul Hidayati, S.Ag)')"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-100/70 border border-emerald-200 transition-colors cursor-pointer">
+                                        <span>Detail</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                                                        <tr class="hover:bg-emerald-50/40 transition-colors branch-row" data-name="cabang yogyakarta" data-status="Lengkap">
+                                
+                                
+                                <td class="py-4 px-4 sm:px-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">
+                                            Yo
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-slate-900 block leading-tight text-xs sm:text-sm">
+                                                Cabang Yogyakarta
+                                            </span>
+                                            <span class="text-[11px] text-slate-500 block mt-0.5">
+                                                Ust. Dwi Prasetyo, S.Th.I
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800 text-sm">
+                                    36
+                                    <span class="text-[10px] text-slate-400 font-normal block">Anak</span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center gap-1.5 text-[11px]">
+                                        <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-100" title="Sekolah Dasar">
+                                            SD: 10
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 font-semibold border border-teal-100" title="Sekolah Menengah Pertama">
+                                            SMP: 14
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-semibold border border-orange-100" title="Sekolah Menengah Atas">
+                                            SMA: 12
+                                        </span>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="w-32 space-y-1">
+                                        <div class="flex items-center justify-between text-[11px]">
+                                            <span class="font-semibold text-slate-700">80%</span>
+                                            <span class="text-slate-400">Target</span>
+                                        </div>
+                                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                                            <div class="h-full rounded-full bg-emerald-500"
+                                                 style="width: 80%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800">
+                                    <span class="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-mono text-xs">
+                                        85.8
+                                    </span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center">
+                                                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            Lengkap
+                                        </span>
+                                                                    </td>
+
+                                
+                                <td class="py-4 px-4 sm:px-6 text-right">
+                                    <button type="button" 
+                                            onclick="alert('Membuka detail Cabang Yogyakarta (Penanggung Jawab: Ust. Dwi Prasetyo, S.Th.I)')"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-100/70 border border-emerald-200 transition-colors cursor-pointer">
+                                        <span>Detail</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                                                        <tr class="hover:bg-emerald-50/40 transition-colors branch-row" data-name="cabang surabaya" data-status="Belum Lengkap">
+                                
+                                
+                                <td class="py-4 px-4 sm:px-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">
+                                            Su
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-slate-900 block leading-tight text-xs sm:text-sm">
+                                                Cabang Surabaya
+                                            </span>
+                                            <span class="text-[11px] text-slate-500 block mt-0.5">
+                                                Ust. Syahrul Ramadhan, Lc
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800 text-sm">
+                                    36
+                                    <span class="text-[10px] text-slate-400 font-normal block">Anak</span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="flex items-center gap-1.5 text-[11px]">
+                                        <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-100" title="Sekolah Dasar">
+                                            SD: 12
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 font-semibold border border-teal-100" title="Sekolah Menengah Pertama">
+                                            SMP: 14
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-semibold border border-orange-100" title="Sekolah Menengah Atas">
+                                            SMA: 10
+                                        </span>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4">
+                                    <div class="w-32 space-y-1">
+                                        <div class="flex items-center justify-between text-[11px]">
+                                            <span class="font-semibold text-slate-700">68%</span>
+                                            <span class="text-slate-400">Target</span>
+                                        </div>
+                                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                                            <div class="h-full rounded-full bg-orange-400"
+                                                 style="width: 68%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center font-bold text-slate-800">
+                                    <span class="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-mono text-xs">
+                                        79.4
+                                    </span>
+                                </td>
+
+                                
+                                <td class="py-4 px-4 text-center">
+                                                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-orange-100 text-orange-800 border border-orange-200">
+                                            <svg class="w-3 h-3 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                            Belum Lengkap
+                                        </span>
+                                                                    </td>
+
+                                
+                                <td class="py-4 px-4 sm:px-6 text-right">
+                                    <button type="button" 
+                                            onclick="alert('Membuka detail Cabang Surabaya (Penanggung Jawab: Ust. Syahrul Ramadhan, Lc)')"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-100/70 border border-emerald-200 transition-colors cursor-pointer">
+                                        <span>Detail</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                                                    </tbody>
+                    </table>
+                </div>
+
+                
+                <div class="p-4 px-6 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+                    <div>
+                        Menampilkan <strong>6 Cabang Asrama</strong> Yayasan Rumah Harapan
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span> 3 Cabang Lengkap
+                        <span class="text-slate-300">•</span>
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500"></span> 2 Cabang Berjalan
+                        <span class="text-slate-300">•</span>
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-orange-500"></span> 1 Cabang Belum Lengkap
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
+        <div class="space-y-6">
+            
+            
+            <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm p-5 sm:p-6 space-y-5">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Target Kurikulum Diniyah</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Semester Ganjil 2026/2027</p>
+                    </div>
+                    <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                        90%
+                    </span>
+                </div>
+
+                <div class="space-y-4">
+                                        <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-slate-800">Hafalan Al-Qur&#039;an</span>
+                            <span class="font-extrabold text-emerald-700">78%</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Target minimal 1 juz per semester per anak</p>
+                        
+                        
+                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                            <div class="h-full rounded-full bg-emerald-600"
+                                 style="width: 78%"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-400 block">194 anak on-track, 54 anak perlu bimbingan</span>
+                    </div>
+                                        <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-slate-800">Hafalan Hadis Arbain</span>
+                            <span class="font-extrabold text-emerald-700">72%</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Target 15-20 hadis per semester</p>
+                        
+                        
+                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                            <div class="h-full rounded-full bg-amber-500"
+                                 style="width: 72%"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-400 block">178 anak lulus ujian setoran hadis</span>
+                    </div>
+                                        <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-slate-800">Pengetahuan Diniyah (Fiqih &amp; Aqidah)</span>
+                            <span class="font-extrabold text-emerald-700">89%</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Materi standar kurikulum Rumah Harapan</p>
+                        
+                        
+                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                            <div class="h-full rounded-full bg-teal-500"
+                                 style="width: 89%"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-400 block">Nilai rata-rata seluruh cabang 84.1</span>
+                    </div>
+                                        <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-slate-800">Disiplin Ibadah &amp; Sholat Berjamaah</span>
+                            <span class="font-extrabold text-emerald-700">96%</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Pemantauan buku mutabaah harian</p>
+                        
+                        
+                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                            <div class="h-full rounded-full bg-orange-500"
+                                 style="width: 96%"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-400 block">Konsistensi tinggi di 6 asrama</span>
+                    </div>
+                                    </div>
+
+                <div class="pt-3 border-t border-slate-100">
+                    <a href="#kurikulum" class="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 text-emerald-800 text-xs font-semibold transition-colors">
+                        <span>Lihat Rincian Silabus & Target</span>
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            
+            <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm p-5 sm:p-6 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse"></span>
+                        <h3 class="text-base font-bold text-slate-900">Aktivitas Terkini</h3>
+                    </div>
+                    <span class="text-[11px] text-slate-400 font-medium">Hari ini</span>
+                </div>
+
+                <div class="space-y-3.5">
+                                        <div class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div class="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center mt-0.5
+                            bg-emerald-100 text-emerald-700
+                            
+                            
+                            
+                            
+                        ">
+                                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                                                    </div>
+
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-slate-800 leading-snug">
+                                Setoran Hafalan Juz 29 tuntas oleh 4 anak
+                            </p>
+                            <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
+                                <span class="font-medium text-emerald-700">Cabang Bandung</span>
+                                <span>•</span>
+                                <span>Ust. Ridwan Kamil</span>
+                            </div>
+                        </div>
+
+                        <span class="text-[10px] text-slate-400 shrink-0 font-medium">
+                            25 menit lalu
+                        </span>
+                    </div>
+                                        <div class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div class="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center mt-0.5
+                            
+                            bg-teal-100 text-teal-700
+                            
+                            
+                            
+                        ">
+                                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                                    </div>
+
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-slate-800 leading-snug">
+                                Input 18 lembar evaluasi diniyah bulanan
+                            </p>
+                            <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
+                                <span class="font-medium text-emerald-700">Cabang Bogor</span>
+                                <span>•</span>
+                                <span>Ust. Muhammad Ilham</span>
+                            </div>
+                        </div>
+
+                        <span class="text-[10px] text-slate-400 shrink-0 font-medium">
+                            1 jam lalu
+                        </span>
+                    </div>
+                                        <div class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div class="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center mt-0.5
+                            
+                            
+                            bg-rose-100 text-rose-700
+                            
+                            
+                        ">
+                                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                                    </div>
+
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-slate-800 leading-snug">
+                                Pemeriksaan kesehatan rutin &amp; imunisasi
+                            </p>
+                            <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
+                                <span class="font-medium text-emerald-700">Cabang Depok</span>
+                                <span>•</span>
+                                <span>dr. Amalia (Tim Medis)</span>
+                            </div>
+                        </div>
+
+                        <span class="text-[10px] text-slate-400 shrink-0 font-medium">
+                            3 jam lalu
+                        </span>
+                    </div>
+                                        <div class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div class="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center mt-0.5
+                            
+                            
+                            
+                            bg-amber-100 text-amber-700
+                            
+                        ">
+                                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                                    </div>
+
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-slate-800 leading-snug">
+                                Munaqasyah Hadis Arbain nomor 1-20
+                            </p>
+                            <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
+                                <span class="font-medium text-emerald-700">Cabang Yogyakarta</span>
+                                <span>•</span>
+                                <span>Ust. Dwi Prasetyo</span>
+                            </div>
+                        </div>
+
+                        <span class="text-[10px] text-slate-400 shrink-0 font-medium">
+                            5 jam lalu
+                        </span>
+                    </div>
+                                        <div class="flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div class="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center mt-0.5
+                            
+                            
+                            
+                            
+                            bg-orange-100 text-orange-700
+                        ">
+                                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                                    </div>
+
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-slate-800 leading-snug">
+                                Sesi konseling motivasi belajar &amp; adab asrama
+                            </p>
+                            <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
+                                <span class="font-medium text-emerald-700">Cabang Sukabumi</span>
+                                <span>•</span>
+                                <span>Ustadzah Nurul H.</span>
+                            </div>
+                        </div>
+
+                        <span class="text-[10px] text-slate-400 shrink-0 font-medium">
+                            Kemarin, 16:30
+                        </span>
+                    </div>
+                                    </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+    function filterBranches() {
+        const query = document.getElementById('branchSearchInput').value.toLowerCase();
+        const status = document.getElementById('statusFilterSelect').value;
+        const rows = document.querySelectorAll('.branch-row');
+
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name');
+            const rowStatus = row.getAttribute('data-status');
+
+            const matchesQuery = name.includes(query);
+            const matchesStatus = (status === 'all') || (rowStatus === status);
+
+            if (matchesQuery && matchesStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+</script>
+            </main>
+
+            
+            <footer class="mt-auto border-t border-emerald-100/60 bg-white/70 py-4 px-6 text-center text-xs text-slate-500">
+                <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+                    <p>© 2026 <strong class="text-emerald-800">Yayasan Rumah Harapan</strong> — Divisi Pendidikan Anak Asuh.</p>
+                    <div class="flex items-center gap-4 text-[11px] text-slate-400">
+                        <span>Portal Pendidikan v1.0</span>
+                        <span>•</span>
+                        <span class="text-emerald-600 font-medium">Sistem Terintegrasi Asrama</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    
+    <script>
+        function toggleSidebar(open) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (open) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                overlay.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden', 'lg:overflow-auto');
+            }
+        }
+
+        function toggleDropdown(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const isHidden = el.classList.contains('hidden');
+            
+            // Tutup dropdown lain yang terbuka
+            document.querySelectorAll('#notif-menu, #profile-menu').forEach(item => {
+                if (item.id !== id) item.classList.add('hidden');
+            });
+
+            if (isHidden) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // Tutup dropdown saat klik di luar area
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#notification-wrapper') && !e.target.closest('#profile-wrapper')) {
+                const notif = document.getElementById('notif-menu');
+                const profile = document.getElementById('profile-menu');
+                if (notif) notif.classList.add('hidden');
+                if (profile) profile.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+
