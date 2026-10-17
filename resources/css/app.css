@@ -9,10 +9,3 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-@media (min-width: 1280px) {
-    .filter-bar-anak-asuh {
-        display: grid !important;
-        grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) auto auto !important;
-    }
-}
-

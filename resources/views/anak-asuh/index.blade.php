@@ -51,9 +51,9 @@
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Total Anak Asuh</span>
             <div class="flex items-baseline gap-2">
                 <span class="text-2xl sm:text-3xl font-extrabold text-slate-900">{{ $stats['total'] }}</span>
-                <span class="text-xs text-slate-500">Santri</span>
+                <span class="text-xs text-slate-500">Anak Asuh</span>
             </div>
-            <span class="text-[11px] text-slate-400 block mt-2">Seluruh santri terdaftar</span>
+            <span class="text-[11px] text-slate-400 block mt-2">Seluruh anak asuh terdaftar</span>
         </div>
 
         {{-- Anak Aktif --}}
@@ -71,7 +71,7 @@
             <span class="text-[11px] font-bold uppercase tracking-wider text-orange-700 block mb-1">Anak Nonaktif</span>
             <div class="flex items-baseline gap-2">
                 <span class="text-2xl sm:text-3xl font-extrabold text-orange-600">{{ $stats['nonaktif'] }}</span>
-                <span class="text-xs text-slate-500">Santri</span>
+                <span class="text-xs text-slate-500">Anak Asuh</span>
             </div>
             <span class="text-[11px] text-orange-600/80 block mt-2">Alumni / Tidak aktif</span>
         </div>
@@ -97,13 +97,13 @@
     {{-- Panel Pencarian, Filter & Tabel --}}
     <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm overflow-hidden">
         
-        {{-- Formulir Filter & Pencarian --}}
+        {{-- Formulir Filter & Pencarian Responsif --}}
         <div class="p-4 sm:p-5 border-b border-slate-100 bg-gradient-to-r from-emerald-50/30 via-white to-white">
             <form method="GET" action="{{ route('anak-asuh.index') }}" 
-                  class="grid grid-cols-1 sm:grid-cols-2 filter-bar-anak-asuh gap-2.5 sm:gap-3 items-center">
+                  class="flex flex-col lg:flex-row lg:items-center gap-3">
                 
-                {{-- 1. Input Pencarian --}}
-                <div class="sm:col-span-2 xl:col-span-1 min-w-0">
+                {{-- 1. Input Pencarian (Fleksibel melebar) --}}
+                <div class="flex-1 min-w-[220px]">
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -118,71 +118,71 @@
                     </div>
                 </div>
 
-                {{-- 2. Filter Asrama --}}
-                <div class="min-w-0">
-                    <select name="asrama_id" 
-                            class="w-full h-11 px-3.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-slate-800 border border-slate-200 focus:border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer truncate">
-                        <option value="" {{ empty($asramaId) ? 'selected' : '' }}>Semua Asrama</option>
-                        @foreach($asramas as $asramaOption)
-                            <option value="{{ $asramaOption->id }}" {{ (string)$asramaId === (string)$asramaOption->id ? 'selected' : '' }}>
-                                {{ $asramaOption->nama_asrama }} ({{ $asramaOption->kode_asrama }})
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                {{-- Kumpulan Dropdown Filter & Aksi (Responsif: 2 kolom di mobile/tablet, 1 baris di desktop) --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:flex xl:items-center gap-2.5 sm:gap-3">
+                    {{-- 2. Filter Asrama --}}
+                    <div class="min-w-[170px]">
+                        <select name="asrama_id" 
+                                class="w-full h-11 px-3.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-slate-800 border border-slate-200 focus:border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer truncate">
+                            <option value="" {{ empty($asramaId) ? 'selected' : '' }}>Semua Asrama</option>
+                            @foreach($asramas as $asramaOption)
+                                <option value="{{ $asramaOption->id }}" {{ (string)$asramaId === (string)$asramaOption->id ? 'selected' : '' }}>
+                                    {{ $asramaOption->nama_asrama }} ({{ $asramaOption->kode_asrama }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                {{-- 3. Filter Jenjang --}}
-                <div class="min-w-0">
-                    <select name="jenjang" 
-                            class="w-full h-11 px-3.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-slate-800 border border-slate-200 focus:border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer">
-                        <option value="" {{ empty($jenjang) ? 'selected' : '' }}>Semua Jenjang</option>
-                        <option value="SD" {{ $jenjang === 'SD' ? 'selected' : '' }}>SD / MI</option>
-                        <option value="SMP" {{ $jenjang === 'SMP' ? 'selected' : '' }}>SMP / MTs</option>
-                        <option value="SMA" {{ $jenjang === 'SMA' ? 'selected' : '' }}>SMA / MA</option>
-                    </select>
-                </div>
+                    {{-- 3. Filter Jenjang --}}
+                    <div class="min-w-[140px]">
+                        <select name="jenjang" 
+                                class="w-full h-11 px-3.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-slate-800 border border-slate-200 focus:border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer">
+                            <option value="" {{ empty($jenjang) ? 'selected' : '' }}>Semua Jenjang</option>
+                            <option value="SD" {{ $jenjang === 'SD' ? 'selected' : '' }}>SD / MI</option>
+                            <option value="SMP" {{ $jenjang === 'SMP' ? 'selected' : '' }}>SMP / MTs</option>
+                            <option value="SMA" {{ $jenjang === 'SMA' ? 'selected' : '' }}>SMA / MA</option>
+                        </select>
+                    </div>
 
-                {{-- 4. Filter Status --}}
-                <div class="min-w-0">
-                    <select name="status" 
-                            class="w-full h-11 px-3.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-slate-800 border border-slate-200 focus:border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer">
-                        <option value="" {{ empty($status) ? 'selected' : '' }}>Semua Status</option>
-                        <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Hanya Aktif</option>
-                        <option value="nonaktif" {{ $status === 'nonaktif' ? 'selected' : '' }}>Hanya Nonaktif</option>
-                    </select>
-                </div>
+                    {{-- 4. Filter Status --}}
+                    <div class="min-w-[135px]">
+                        <select name="status" 
+                                class="w-full h-11 px-3.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-slate-800 border border-slate-200 focus:border-emerald-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer">
+                            <option value="" {{ empty($status) ? 'selected' : '' }}>Semua Status</option>
+                            <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Hanya Aktif</option>
+                            <option value="nonaktif" {{ $status === 'nonaktif' ? 'selected' : '' }}>Hanya Nonaktif</option>
+                        </select>
+                    </div>
 
-                {{-- 5. Tombol Terapkan --}}
-                <div>
-                    <button type="submit" 
-                            class="w-full h-11 inline-flex items-center justify-center gap-1.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs sm:text-sm font-semibold shadow-xs transition-all whitespace-nowrap cursor-pointer"
-                            title="Terapkan Pencarian & Filter">
-                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                        </svg>
-                        <span>Terapkan</span>
-                    </button>
-                </div>
+                    {{-- 5. Tombol Aksi: Terapkan & Reset (Bersebelahan rapi) --}}
+                    <div class="sm:col-span-2 md:col-span-3 xl:col-auto flex items-center gap-2">
+                        <button type="submit" 
+                                class="flex-1 xl:flex-none h-11 inline-flex items-center justify-center gap-2 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs sm:text-sm font-semibold shadow-xs transition-all whitespace-nowrap cursor-pointer"
+                                title="Terapkan Pencarian & Filter">
+                            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            <span>Terapkan</span>
+                        </button>
 
-                {{-- 6. Tombol Reset (muncul hanya jika ada filter aktif) --}}
-                @if($cari !== '' || !empty($asramaId) || $jenjang !== '' || $status !== '')
-                <div>
-                    <a href="{{ route('anak-asuh.index') }}" 
-                       class="w-full h-11 inline-flex items-center justify-center gap-1.5 px-4 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 hover:border-rose-200 text-xs sm:text-sm font-semibold transition-colors whitespace-nowrap"
-                       title="Reset Seluruh Filter">
-                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        <span>Reset</span>
-                    </a>
+                        @if($cari !== '' || !empty($asramaId) || $jenjang !== '' || $status !== '')
+                        <a href="{{ route('anak-asuh.index') }}" 
+                           class="h-11 inline-flex items-center justify-center gap-1.5 px-3.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 hover:border-rose-200 text-xs sm:text-sm font-semibold transition-colors whitespace-nowrap"
+                           title="Reset Seluruh Filter">
+                            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span>Reset</span>
+                        </a>
+                        @endif
+                    </div>
                 </div>
-                @endif
             </form>
         </div>
 
         {{-- Tabel Daftar Anak Asuh --}}
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm border-collapse">
+            <table class="w-full text-left text-xs sm:text-sm border-collapse min-w-[760px] lg:min-w-full">
                 <thead>
                     <tr class="border-b border-slate-100 bg-slate-50/70 text-slate-500 text-[11px] font-bold uppercase tracking-wider">
                         <th class="py-3.5 px-4 sm:px-6 whitespace-nowrap">Nomor Induk</th>
@@ -275,33 +275,33 @@
                             @endif
                         </td>
 
-                        {{-- Aksi (Edit & Toggle Status) --}}
+                        {{-- Aksi (Edit & Toggle Status: sejajar dan rapi) --}}
                         <td class="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
-                            <div class="flex items-center justify-end gap-2">
+                            <div class="inline-flex items-center justify-end gap-2">
                                 {{-- Tombol Edit --}}
                                 <a href="{{ route('anak-asuh.edit', $anak) }}" 
-                                   class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 border border-emerald-200 transition-colors"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-white hover:bg-emerald-50 border border-emerald-200 shadow-2xs transition-colors"
                                    title="Edit Data Anak Asuh">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                     <span>Edit</span>
                                 </a>
 
                                 {{-- Tombol Toggle Status (Aktif / Nonaktif via PATCH) --}}
-                                <form method="POST" action="{{ route('anak-asuh.toggle-status', $anak) }}" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin mengubah status anak asuh {{ $anak->nama_lengkap }} menjadi {{ $anak->status_aktif ? 'NONAKTIF' : 'AKTIF' }}?')">
+                                <form method="POST" action="{{ route('anak-asuh.toggle-status', $anak) }}" class="inline-flex m-0" onsubmit="return confirm('Apakah Anda yakin ingin mengubah status anak asuh {{ $anak->nama_lengkap }} menjadi {{ $anak->status_aktif ? 'NONAKTIF' : 'AKTIF' }}?')">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" 
-                                            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold {{ $anak->status_aktif ? 'text-orange-700 hover:bg-orange-50 border border-orange-200' : 'text-emerald-700 hover:bg-emerald-50 border border-emerald-200' }} transition-colors"
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer shadow-2xs {{ $anak->status_aktif ? 'text-orange-700 bg-white hover:bg-orange-50 border border-orange-200' : 'text-emerald-700 bg-white hover:bg-emerald-50 border border-emerald-200' }} transition-colors"
                                             title="{{ $anak->status_aktif ? 'Nonaktifkan Anak Asuh' : 'Aktifkan Anak Asuh' }}">
                                         @if($anak->status_aktif)
-                                            <svg class="w-3.5 h-3.5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <svg class="w-3.5 h-3.5 text-orange-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                             </svg>
                                             <span>Nonaktifkan</span>
                                         @else
-                                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
                                             <span>Aktifkan</span>

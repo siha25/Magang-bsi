@@ -2,10 +2,25 @@
 
 namespace Tests\Feature;
 
+use App\Models\AnakAsuh;
+use App\Models\Asrama;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config([
+            'database.default' => 'mysql',
+            'database.connections.mysql.database' => 'laravel',
+            'database.connections.mysql.host' => '127.0.0.1',
+            'database.connections.mysql.port' => env('DB_PORT', '3306'),
+            'database.connections.mysql.username' => env('DB_USERNAME', 'root'),
+            'database.connections.mysql.password' => env('DB_PASSWORD', ''),
+        ]);
+    }
+
     /**
      * Memastikan halaman dashboard dapat diakses dan menampilkan komponen utama.
      */
@@ -21,51 +36,57 @@ class DashboardTest extends TestCase
     }
 
     /**
-     * Memastikan ke-11 menu sidebar tersedia pada tampilan.
+     * Memastikan menu navigasi sidebar utama tersedia pada tampilan.
      */
-    public function test_all_eleven_sidebar_menus_are_rendered(): void
+    public function test_sidebar_menus_are_rendered(): void
     {
         $response = $this->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('1. Dashboard');
-        $response->assertSee('2. Data Cabang');
-        $response->assertSee('3. Data Anak Asuh');
-        $response->assertSee('4. Evaluasi Diniyah');
-        $response->assertSee("5. Hafalan Al-Qur'an", false);
-        $response->assertSee('6. Hafalan Hadis');
-        $response->assertSee('7. Pengetahuan Diniyah');
-        $response->assertSee('8. Kesehatan Anak');
-        $response->assertSee('9. Kasus & Pembinaan', false);
-        $response->assertSee('10. Laporan');
-        $response->assertSee('11. Pengaturan');
+        $response->assertSee('Dashboard');
+        $response->assertSee('Data Asrama');
+        $response->assertSee('Data Anak Asuh');
+        $response->assertSee('Evaluasi Diniyah');
+        $response->assertSee("Hafalan Al-Qur'an", false);
+        $response->assertSee('Hafalan Hadis');
+        $response->assertSee('Pengetahuan Diniyah');
+        $response->assertSee('Kesehatan Anak');
+        $response->assertSee('Kasus & Pembinaan', false);
+        $response->assertSee('Laporan');
+        $response->assertSee('Pengaturan');
     }
 
     /**
-     * Memastikan kartu statistik utama dan data ringkasan cabang dirender dengan benar.
+     * Memastikan statistik utama dan tabel asrama menggunakan data nyata database serta istilah Asrama.
      */
-    public function test_statistics_and_branches_table_are_displayed(): void
+    public function test_statistics_and_asrama_table_use_real_database_data(): void
     {
+        $totalAsrama = Asrama::count();
+        $totalAnak = AnakAsuh::count();
+
         $response = $this->get('/');
 
         $response->assertStatus(200);
 
-        // Statistik
-        $response->assertSee('248'); // Total anak
-        $response->assertSee('Total Cabang');
-        $response->assertSee('SD: <strong class="text-emerald-700 text-base">82</strong>', false);
-        $response->assertSee('SMP: <strong class="text-teal-700 text-base">96</strong>', false);
-        $response->assertSee('SMA: <strong class="text-orange-600 text-base">70</strong>', false);
-        $response->assertSee('91.9%');
-        $response->assertSee('78.2%');
-        $response->assertSee('20');
+        // Memastikan istilah 'Total Asrama' digunakan, bukan 'Total Cabang'
+        $response->assertSee('Total Asrama');
+        $response->assertDontSee('Total Cabang');
 
-        // Tabel Cabang
-        $response->assertSee('Cabang Bandung (Pusat)');
-        $response->assertSee('Cabang Bogor');
-        $response->assertSee('Cabang Depok');
-        $response->assertSee('Cabang Sukabumi');
-        $response->assertSee('Cabang Yogyakarta');
-        $response->assertSee('Cabang Surabaya');
+        // Memastikan angka statistik sesuai database
+        $response->assertSee((string) $totalAsrama);
+        $response->assertSee((string) $totalAnak);
+
+        // Memastikan tabel ringkasan asrama menggunakan istilah Asrama
+        $response->assertSee('Tabel Ringkasan Asrama Yayasan Rumah Harapan');
+        $response->assertDontSee('Tabel Ringkasan Cabang');
+
+        // Memastikan tidak ada klaim palsu dan angka dummy evaluasi
+        $response->assertDontSee('Sinkronisasi Normal');
+        $response->assertDontSee('secara real-time');
+        $response->assertDontSee('91.9%');
+        $response->assertDontSee('78.2%');
+
+        // Memastikan status 'Belum tersedia' muncul secara informatif
+        $response->assertSee('Belum tersedia');
     }
 }

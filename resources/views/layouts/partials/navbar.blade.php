@@ -21,19 +21,8 @@
 {{-- Topbar / Header Minimalis Pendidikan Ansuh --}}
 <header class="sticky top-0 z-30 h-16 sm:h-20 bg-white/95 backdrop-blur-md border-b border-emerald-100/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-all">
     
-    {{-- Sisi Kiri: Tombol Toggle Sidebar Mobile & Judul Halaman Dinamis --}}
-    <div class="flex items-center gap-3 sm:gap-4 min-w-0">
-        {{-- Tombol Toggle Sidebar (Khusus Mobile / Layar Kecil) --}}
-        <button type="button" 
-                onclick="toggleSidebar(true)" 
-                class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 shrink-0"
-                aria-label="Buka Menu Navigasi">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
-
-        {{-- Judul Halaman Aktif --}}
+    {{-- Sisi Kiri: Judul Halaman Dinamis (Tanpa elemen atau tombol yang tidak semestinya) --}}
+    <div class="flex items-center min-w-0">
         <h1 class="text-base sm:text-lg lg:text-xl font-bold text-slate-900 tracking-tight truncate">
             {{ $headerTitle }}
         </h1>

@@ -53,6 +53,7 @@ class HeaderTest extends TestCase
         $this->assertStringNotContainsString('profile-menu', $headerHtml);
         $this->assertStringNotContainsString('Keluar dari Sistem', $headerHtml);
         $this->assertStringNotContainsString('Aktif Online', $headerHtml);
+        $this->assertStringNotContainsString('close', strtolower($headerHtml));
     }
 
     /**

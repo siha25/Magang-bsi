@@ -18,7 +18,7 @@
             Tambah Anak Asuh Baru
         </h2>
         <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Daftarkan santri anak asuh baru untuk dibina di asrama Yayasan Rumah Harapan.
+            Daftarkan anak asuh baru untuk dibina di asrama Yayasan Rumah Harapan.
         </p>
     </div>
 
@@ -42,7 +42,7 @@
     {{-- Formulir Tambah Anak Asuh --}}
     <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm overflow-hidden">
         <div class="p-5 sm:p-8 border-b border-slate-100 bg-gradient-to-r from-emerald-50/40 via-white to-white">
-            <h3 class="text-base font-bold text-slate-900">Biodata Pokok Santri / Anak Asuh</h3>
+            <h3 class="text-base font-bold text-slate-900">Biodata Pokok Anak Asuh</h3>
             <p class="text-xs text-slate-500 mt-0.5">Pastikan nomor induk unik dan asrama yang dipilih valid.</p>
         </div>
 
@@ -249,7 +249,7 @@
                 <textarea id="catatan" 
                           name="catatan" 
                           rows="3" 
-                          placeholder="Catatan riwayat khusus, kondisi kesehatan, atau latar belakang santri..." 
+                          placeholder="Catatan riwayat khusus, kondisi kesehatan, atau latar belakang anak asuh..." 
                           class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-slate-900 border @error('catatan') border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 @else border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20 @enderror rounded-xl focus:outline-none focus:ring-2 transition-all">{{ old('catatan') }}</textarea>
                 @error('catatan')
                     <p class="text-xs text-rose-600 font-medium">{{ $message }}</p>
