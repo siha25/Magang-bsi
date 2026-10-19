@@ -84,4 +84,14 @@ class Asrama extends Model
     {
         return $this->hasMany(AnakAsuh::class, 'asrama_id');
     }
+
+    /**
+     * Relasi ke data pengguna (pengurus/admin) yang bertugas di asrama ini.
+     *
+     * @return HasMany<User, $this>
+     */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'asrama_id');
+    }
 }

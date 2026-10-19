@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Tests\TestCase;
 
 class AnakAsuhUiTest extends TestCase
 {
+    protected ?User $testUser = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -17,6 +20,15 @@ class AnakAsuhUiTest extends TestCase
             'database.connections.mysql.username' => env('DB_USERNAME', 'root'),
             'database.connections.mysql.password' => env('DB_PASSWORD', ''),
         ]);
+
+        $this->testUser = new User([
+            'id' => 9999,
+            'name' => 'Admin Anak Asuh',
+            'email' => 'admin_anakasuh@example.com',
+            'role' => User::ROLE_ADMIN_PUSAT,
+            'status_aktif' => true,
+        ]);
+        $this->actingAs($this->testUser);
     }
 
     /**

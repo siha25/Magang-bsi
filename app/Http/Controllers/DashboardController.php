@@ -20,11 +20,12 @@ class DashboardController extends Controller
             'tahun_ajaran' => '2026/2027',
         ];
 
+        $currentUser = auth()->user();
         $pengurus = [
-            'nama' => 'Ust. Ahmad Fauzi, S.Pd.I',
-            'jabatan' => 'Koordinator Divisi Pendidikan',
+            'nama' => $currentUser ? $currentUser->name : 'Pengurus',
+            'jabatan' => $currentUser ? ($currentUser->isAdminPusat() ? 'Administrator Pusat' : ($currentUser->isAdminAsrama() ? 'Administrator Asrama' : 'Pimpinan / Koordinator')) : 'Pengurus',
             'yayasan' => 'Yayasan Rumah Harapan',
-            'email' => 'ahmad.fauzi@rumahharapan.org',
+            'email' => $currentUser ? $currentUser->email : 'pengurus@rumahharapan.org',
             'avatar' => null,
             'status' => 'Aktif Bertugas',
         ];
