@@ -14,6 +14,13 @@ use Illuminate\Support\Facades\Validator;
 class CreateAdminPusatCommand extends Command
 {
     /**
+     * Alias perintah Artisan alternatif.
+     *
+     * @var list<string>
+     */
+    protected $aliases = ['siha:create-admin'];
+
+    /**
      * Execute the console command.
      */
     public function handle(): int
