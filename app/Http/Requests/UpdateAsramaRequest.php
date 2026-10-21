@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateAsramaRequest extends FormRequest
 {
@@ -13,7 +12,7 @@ class UpdateAsramaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->isAdminPusat() ?? false;
     }
 
     /**
@@ -23,10 +22,7 @@ class UpdateAsramaRequest extends FormRequest
      */
     public function rules(): array
     {
-        $asramaId = $this->route('asrama')?->id;
-
         return [
-            'kode_asrama' => ['required', 'string', 'max:30', Rule::unique('asrama', 'kode_asrama')->ignore($asramaId)],
             'nama_asrama' => ['required', 'string', 'max:255'],
             'wilayah' => ['nullable', 'string', 'max:100'],
             'alamat' => ['nullable', 'string', 'max:1000'],
@@ -44,9 +40,6 @@ class UpdateAsramaRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'kode_asrama.required' => 'Kode asrama wajib diisi.',
-            'kode_asrama.unique' => 'Kode asrama sudah digunakan oleh asrama lain.',
-            'kode_asrama.max' => 'Kode asrama tidak boleh melebihi 30 karakter.',
             'nama_asrama.required' => 'Nama asrama wajib diisi.',
             'nama_asrama.max' => 'Nama asrama tidak boleh melebihi 255 karakter.',
             'nomor_telepon.max' => 'Nomor telepon tidak boleh melebihi 30 karakter.',

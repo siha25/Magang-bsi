@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAsramaRequest;
 use App\Http\Requests\UpdateAsramaRequest;
 use App\Models\Asrama;
+use App\Services\AsramaCodeGenerator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AsramaController extends Controller
 {
@@ -16,6 +19,10 @@ class AsramaController extends Controller
      */
     public function index(Request $request): View
     {
+        if (Auth::user()?->isAdminCabang()) {
+            abort(403, 'Admin Cabang tidak memiliki izin untuk mengelola data asrama.');
+        }
+
         $cari = $request->string('cari')->trim()->toString();
         $status = $request->string('status')->trim()->toString();
         $wilayah = $request->string('wilayah')->trim()->toString();
@@ -67,18 +74,28 @@ class AsramaController extends Controller
      */
     public function create(): View
     {
+        abort_unless(Auth::user()?->isAdminPusat(), 403, 'Hanya Admin Pusat yang dapat menambah asrama.');
+
         return view('asrama.create');
     }
 
     /**
      * Menyimpan data asrama baru ke database.
      */
-    public function store(StoreAsramaRequest $request): RedirectResponse
+    public function store(StoreAsramaRequest $request, AsramaCodeGenerator $codeGenerator): RedirectResponse
     {
+        abort_unless(Auth::user()?->isAdminPusat(), 403, 'Hanya Admin Pusat yang dapat menambah asrama.');
+
         $validated = $request->validated();
         $validated['status_aktif'] = $request->boolean('status_aktif', true);
 
-        $asrama = Asrama::create($validated);
+        $asrama = DB::transaction(function () use ($validated, $codeGenerator): Asrama {
+            $asrama = new Asrama($validated);
+            $asrama->kode_asrama = $codeGenerator->next();
+            $asrama->save();
+
+            return $asrama;
+        });
 
         return redirect()
             ->route('asrama.index')
@@ -90,6 +107,8 @@ class AsramaController extends Controller
      */
     public function edit(Asrama $asrama): View
     {
+        abort_unless(Auth::user()?->isAdminPusat(), 403, 'Hanya Admin Pusat yang dapat mengedit asrama.');
+
         return view('asrama.edit', compact('asrama'));
     }
 
@@ -98,6 +117,8 @@ class AsramaController extends Controller
      */
     public function update(UpdateAsramaRequest $request, Asrama $asrama): RedirectResponse
     {
+        abort_unless(Auth::user()?->isAdminPusat(), 403, 'Hanya Admin Pusat yang dapat memperbarui asrama.');
+
         $validated = $request->validated();
         $validated['status_aktif'] = $request->boolean('status_aktif', false);
 
@@ -113,6 +134,8 @@ class AsramaController extends Controller
      */
     public function toggleStatus(Asrama $asrama): RedirectResponse
     {
+        abort_unless(Auth::user()?->isAdminPusat(), 403, 'Hanya Admin Pusat yang dapat mengubah status asrama.');
+
         $statusBaru = ! $asrama->status_aktif;
         $asrama->update(['status_aktif' => $statusBaru]);
 

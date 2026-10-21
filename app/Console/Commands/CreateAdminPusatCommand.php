@@ -24,6 +24,13 @@ class CreateAdminPusatCommand extends Command
     protected $description = 'Membuat akun Administrator Pusat (Admin Pusat) pertama secara interaktif dan aman';
 
     /**
+     * Alias perintah Artisan alternatif.
+     *
+     * @var list<string>
+     */
+    protected $aliases = ['siha:create-admin'];
+
+    /**
      * Execute the console command.
      */
     public function handle(): int

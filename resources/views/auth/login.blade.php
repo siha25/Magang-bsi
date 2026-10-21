@@ -17,23 +17,30 @@
         body {
             font-family: 'Plus Jakarta Sans', var(--font-sans, system-ui, sans-serif);
         }
+        .login-card-container {
+            width: 100%;
+            max-width: 460px;
+        }
     </style>
 </head>
-<body class="min-h-screen w-full bg-[#f8faf9] flex flex-col justify-center items-center p-4 sm:p-6 text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+<body class="min-h-screen w-full bg-[#f8faf9] flex items-center justify-center p-4 sm:p-6 text-slate-800 antialiased selection:bg-emerald-600 selection:text-white">
 
-    <div class="w-full max-w-[460px] mx-auto">
+    <div class="w-full max-w-[460px] mx-auto my-auto login-card-container" style="max-width: 460px;">
         {{-- Satu Kartu Login Terpadu --}}
         <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8">
             
             {{-- Header: Logo, Nama Aplikasi, Yayasan & Judul Masuk --}}
             <div class="text-center mb-6">
-                <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 items-center justify-center text-white shadow-xs shadow-emerald-600/20 mb-3">
+                <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 items-center justify-center text-white shadow-xs shadow-emerald-600/20 mb-3.5">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                 </div>
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Pendidikan Ansuh</h1>
-                <p class="text-xs sm:text-sm font-semibold text-emerald-700 mt-0.5">Yayasan Rumah Harapan</p>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center justify-center gap-1.5">
+                    <span>Pendidikan Ansuh</span>
+                    <span class="inline-block w-2 h-2 rounded-full bg-orange-500"></span>
+                </h1>
+                <p class="text-xs sm:text-sm font-semibold text-emerald-700 mt-1">Yayasan Rumah Harapan</p>
                 <p class="text-xs text-slate-500 mt-2 font-medium">Masuk Akun Pengurus</p>
             </div>
 
@@ -85,7 +92,7 @@
                                required 
                                value="{{ old('email') }}"
                                placeholder="nama@rumahharapan.org" 
-                               class="w-full h-11 pl-10 pr-3.5 rounded-xl border text-sm text-slate-800 transition-colors focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 {{ $errors->has('email') ? 'border-rose-300 bg-rose-50/20' : 'border-slate-200 bg-slate-50/50 hover:border-slate-300' }}">
+                               class="w-full h-11 pl-10 pr-3.5 rounded-xl border text-sm text-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 {{ $errors->has('email') ? 'border-rose-300 bg-rose-50/20' : 'border-slate-200 bg-slate-50/50 hover:border-slate-300' }}">
                     </div>
                 </div>
 
@@ -106,10 +113,10 @@
                                autocomplete="current-password" 
                                required 
                                placeholder="••••••••" 
-                               class="w-full h-11 pl-10 pr-10 rounded-xl border text-sm text-slate-800 transition-colors focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 {{ $errors->has('password') ? 'border-rose-300 bg-rose-50/20' : 'border-slate-200 bg-slate-50/50 hover:border-slate-300' }}">
+                               class="w-full h-11 pl-10 pr-10 rounded-xl border text-sm text-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 {{ $errors->has('password') ? 'border-rose-300 bg-rose-50/20' : 'border-slate-200 bg-slate-50/50 hover:border-slate-300' }}">
                         <button type="button" 
                                 onclick="togglePasswordVisibility()" 
-                                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer focus:outline-hidden"
+                                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer focus:outline-none"
                                 aria-label="Tampilkan atau sembunyikan kata sandi">
                             <svg id="eye-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -124,12 +131,12 @@
 
                 {{-- Checkbox Remember Me --}}
                 <div class="pt-0.5">
-                    <label for="remember" class="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <label for="remember" class="inline-flex items-center gap-2 cursor-pointer select-none group">
                         <input type="checkbox" 
                                name="remember" 
                                id="remember"
                                class="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500/20 focus:ring-offset-0 transition cursor-pointer">
-                        <span class="text-xs text-slate-600">Ingat saya pada perangkat ini</span>
+                        <span class="text-xs text-slate-600 group-hover:text-slate-800 transition-colors">Ingat saya pada perangkat ini</span>
                     </label>
                 </div>
 
