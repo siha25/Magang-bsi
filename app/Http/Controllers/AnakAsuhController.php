@@ -17,20 +17,29 @@ class AnakAsuhController extends Controller
      */
     public function index(Request $request): View
     {
+        $this->authorize('viewAny', AnakAsuh::class);
+
         $cari = $request->string('cari')->trim()->toString();
         $asramaId = $request->input('asrama_id');
         $jenjang = $request->string('jenjang')->trim()->toString();
         $status = $request->string('status')->trim()->toString();
+        $isAdminCabang = $request->user()->isAdminCabang();
+        $assignedAsramaId = $isAdminCabang ? $request->user()->asrama_id : null;
 
         $query = AnakAsuh::query()->with('asrama');
+
+        if ($isAdminCabang) {
+            $asramaId = $assignedAsramaId;
+            $query->where('asrama_id', $assignedAsramaId ?? 0);
+        }
 
         if ($cari !== '') {
             $query->search($cari);
         }
 
-        if (! empty($asramaId)) {
+        if (! empty($asramaId) && ! $isAdminCabang) {
             $query->where('asrama_id', $asramaId);
-        } else {
+        } elseif (! $isAdminCabang) {
             $asramaId = '';
         }
 
@@ -50,16 +59,23 @@ class AnakAsuhController extends Controller
 
         $anakAsuhs = $query->latest()->paginate(10)->withQueryString();
 
+        $statsQuery = AnakAsuh::query()->when(
+            $isAdminCabang,
+            fn ($query) => $query->where('asrama_id', $assignedAsramaId ?? 0)
+        );
         $stats = [
-            'total' => AnakAsuh::count(),
-            'aktif' => AnakAsuh::where('status_aktif', true)->count(),
-            'nonaktif' => AnakAsuh::where('status_aktif', false)->count(),
-            'total_sd' => AnakAsuh::where('jenjang_pendidikan', 'SD')->count(),
-            'total_smp' => AnakAsuh::where('jenjang_pendidikan', 'SMP')->count(),
-            'total_sma' => AnakAsuh::where('jenjang_pendidikan', 'SMA')->count(),
+            'total' => (clone $statsQuery)->count(),
+            'aktif' => (clone $statsQuery)->where('status_aktif', true)->count(),
+            'nonaktif' => (clone $statsQuery)->where('status_aktif', false)->count(),
+            'total_sd' => (clone $statsQuery)->where('jenjang_pendidikan', 'SD')->count(),
+            'total_smp' => (clone $statsQuery)->where('jenjang_pendidikan', 'SMP')->count(),
+            'total_sma' => (clone $statsQuery)->where('jenjang_pendidikan', 'SMA')->count(),
         ];
 
-        $asramas = Asrama::orderBy('nama_asrama')->get(['id', 'nama_asrama', 'kode_asrama']);
+        $asramas = Asrama::query()
+            ->when($isAdminCabang, fn ($query) => $query->where('id', $assignedAsramaId ?? 0))
+            ->orderBy('nama_asrama')
+            ->get(['id', 'nama_asrama', 'kode_asrama']);
 
         return view('anak-asuh.index', compact(
             'anakAsuhs',
@@ -77,7 +93,8 @@ class AnakAsuhController extends Controller
      */
     public function create(): View
     {
-        // Hanya asrama dengan status aktif yang diizinkan untuk pendaftaran baru
+        $this->authorize('create', AnakAsuh::class);
+
         $asramas = Asrama::where('status_aktif', true)
             ->orderBy('nama_asrama')
             ->get();
@@ -90,6 +107,8 @@ class AnakAsuhController extends Controller
      */
     public function store(StoreAnakAsuhRequest $request): RedirectResponse
     {
+        $this->authorize('create', AnakAsuh::class);
+
         $validated = $request->validated();
         $validated['status_aktif'] = $request->boolean('status_aktif', true);
 
@@ -105,7 +124,8 @@ class AnakAsuhController extends Controller
      */
     public function edit(AnakAsuh $anakAsuh): View
     {
-        // Mengizinkan asrama aktif DAN asrama yang sedang terhubung pada anak asuh ini
+        $this->authorize('update', $anakAsuh);
+
         $asramas = Asrama::where('status_aktif', true)
             ->orWhere('id', $anakAsuh->asrama_id)
             ->orderBy('nama_asrama')
@@ -119,6 +139,8 @@ class AnakAsuhController extends Controller
      */
     public function update(UpdateAnakAsuhRequest $request, AnakAsuh $anakAsuh): RedirectResponse
     {
+        $this->authorize('update', $anakAsuh);
+
         $validated = $request->validated();
         $validated['status_aktif'] = $request->boolean('status_aktif', false);
 
@@ -134,6 +156,8 @@ class AnakAsuhController extends Controller
      */
     public function toggleStatus(AnakAsuh $anakAsuh): RedirectResponse
     {
+        $this->authorize('update', $anakAsuh);
+
         $statusBaru = ! $anakAsuh->status_aktif;
         $anakAsuh->update(['status_aktif' => $statusBaru]);
 

@@ -21,7 +21,6 @@ class Asrama extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'kode_asrama',
         'nama_asrama',
         'wilayah',
         'alamat',
@@ -93,5 +92,15 @@ class Asrama extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class, 'asrama_id');
+    }
+
+    /**
+     * Relasi ke kegiatan harian yang tercatat di asrama ini.
+     *
+     * @return HasMany<KegiatanHarian, $this>
+     */
+    public function kegiatanHarian(): HasMany
+    {
+        return $this->hasMany(KegiatanHarian::class, 'asrama_id');
     }
 }

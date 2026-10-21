@@ -5,32 +5,24 @@ namespace Tests\Feature;
 use App\Models\AnakAsuh;
 use App\Models\Asrama;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
 {
-    protected ?User $testUser = null;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-        config([
-            'database.default' => 'mysql',
-            'database.connections.mysql.database' => 'laravel',
-            'database.connections.mysql.host' => '127.0.0.1',
-            'database.connections.mysql.port' => env('DB_PORT', '3306'),
-            'database.connections.mysql.username' => env('DB_USERNAME', 'root'),
-            'database.connections.mysql.password' => env('DB_PASSWORD', ''),
-        ]);
 
-        $this->testUser = new User([
-            'id' => 9999,
+        $testUser = User::factory()->create([
             'name' => 'Admin Pengurus',
             'email' => 'admin_test@example.com',
             'role' => User::ROLE_ADMIN_PUSAT,
             'status_aktif' => true,
         ]);
-        $this->actingAs($this->testUser);
+        $this->actingAs($testUser);
     }
 
     /**

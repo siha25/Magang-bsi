@@ -21,6 +21,7 @@
             </p>
         </div>
 
+        @if(auth()->user()?->isAdminPusat())
         <div>
             <a href="{{ route('anak-asuh.create') }}" 
                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-xs sm:text-sm font-semibold shadow-md shadow-orange-500/25 transition-all">
@@ -30,6 +31,7 @@
                 <span>Tambah Anak Asuh</span>
             </a>
         </div>
+        @endif
     </div>
 
     {{-- Pesan Notifikasi Berhasil (Flash Message) --}}
@@ -192,7 +194,9 @@
                         <th class="py-3.5 px-4 text-center whitespace-nowrap">Jenjang</th>
                         <th class="py-3.5 px-4 text-center whitespace-nowrap">Kelas</th>
                         <th class="py-3.5 px-4 text-center whitespace-nowrap">Status</th>
-                        <th class="py-3.5 px-4 sm:px-6 text-right whitespace-nowrap">Aksi</th>
+                        @if(auth()->user()?->isAdminPusat())
+                            <th class="py-3.5 px-4 sm:px-6 text-right whitespace-nowrap">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
@@ -275,6 +279,7 @@
                             @endif
                         </td>
 
+                        @if(auth()->user()?->isAdminPusat())
                         {{-- Aksi (Edit & Toggle Status: sejajar dan rapi) --}}
                         <td class="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
                             <div class="inline-flex items-center justify-end gap-2">
@@ -310,10 +315,11 @@
                                 </form>
                             </div>
                         </td>
+                        @endif
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="py-12 px-6 text-center">
+                        <td colspan="{{ auth()->user()?->isAdminPusat() ? 8 : 7 }}" class="py-12 px-6 text-center">
                             <div class="max-w-md mx-auto space-y-3">
                                 <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
                                     <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -325,7 +331,11 @@
                                     @if($cari !== '' || !empty($asramaId) || $jenjang !== '' || $status !== '')
                                         Tidak ditemukan data anak asuh yang cocok dengan filter atau kata kunci pencarian Anda. Silakan coba kriteria lain atau reset filter.
                                     @else
-                                        Database anak asuh masih kosong karena tidak menggunakan data dummy. Silakan daftarkan anak asuh baru melalui tombol di bawah.
+                                        @if(auth()->user()?->isAdminPusat())
+                                            Database anak asuh masih kosong karena tidak menggunakan data dummy. Silakan daftarkan anak asuh baru melalui tombol di bawah.
+                                        @else
+                                            Belum ada data anak asuh untuk asrama ini.
+                                        @endif
                                     @endif
                                 </p>
                                 <div class="pt-2">
@@ -333,7 +343,7 @@
                                         <a href="{{ route('anak-asuh.index') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors">
                                             Reset Filter
                                         </a>
-                                    @else
+                                    @elseif(auth()->user()?->isAdminPusat())
                                         <a href="{{ route('anak-asuh.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold shadow-md shadow-orange-500/25 transition-all">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />

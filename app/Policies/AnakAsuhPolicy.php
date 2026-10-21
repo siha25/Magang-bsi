@@ -7,59 +7,46 @@ use App\Models\User;
 
 class AnakAsuhPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isAdminPusat() || $user->isAdminCabang() || $user->isPimpinanPusat();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, AnakAsuh $anakAsuh): bool
     {
+        if ($user->isAdminPusat() || $user->isPimpinanPusat()) {
+            return true;
+        }
+
+        if ($user->isAdminCabang()) {
+            return $user->asrama_id !== null && (int) $user->asrama_id === (int) $anakAsuh->asrama_id;
+        }
+
         return false;
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isAdminPusat();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, AnakAsuh $anakAsuh): bool
     {
-        return false;
+        return $user->isAdminPusat();
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, AnakAsuh $anakAsuh): bool
     {
-        return false;
+        return $user->isAdminPusat();
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
     public function restore(User $user, AnakAsuh $anakAsuh): bool
     {
-        return false;
+        return $user->isAdminPusat();
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
     public function forceDelete(User $user, AnakAsuh $anakAsuh): bool
     {
-        return false;
+        return $user->isAdminPusat();
     }
 }

@@ -10,19 +10,6 @@ use Tests\TestCase;
 
 class UserModelTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        config([
-            'database.default' => 'mysql',
-            'database.connections.mysql.database' => 'laravel',
-            'database.connections.mysql.host' => '127.0.0.1',
-            'database.connections.mysql.port' => env('DB_PORT', '3306'),
-            'database.connections.mysql.username' => env('DB_USERNAME', 'root'),
-            'database.connections.mysql.password' => env('DB_PASSWORD', ''),
-        ]);
-    }
-
     /**
      * Memastikan helper role pada User model bekerja sesuai peran.
      */

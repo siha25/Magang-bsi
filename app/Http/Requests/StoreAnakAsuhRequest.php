@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\AnakAsuh;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,7 @@ class StoreAnakAsuhRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('create', AnakAsuh::class) ?? false;
     }
 
     /**

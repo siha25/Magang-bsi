@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AnakAsuh;
 use App\Models\Asrama;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -13,6 +14,47 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
+        $currentUser = Auth::user();
+
+        if ($currentUser?->isAdminCabang()) {
+            $asramaList = Asrama::where('id', $currentUser->asrama_id)
+                ->withCount([
+                    'anakAsuh',
+                    'anakAsuh as sd_count' => function ($query): void {
+                        $query->whereRaw('UPPER(jenjang_pendidikan) = ?', ['SD']);
+                    },
+                    'anakAsuh as smp_count' => function ($query): void {
+                        $query->whereRaw('UPPER(jenjang_pendidikan) = ?', ['SMP']);
+                    },
+                    'anakAsuh as sma_count' => function ($query): void {
+                        $query->whereRaw('UPPER(jenjang_pendidikan) = ?', ['SMA']);
+                    },
+                ])->latest()->get();
+
+            $totalAsrama = $asramaList->count();
+            $asramaAktif = $asramaList->where('status_aktif', true)->count();
+            $totalAnak = AnakAsuh::where('asrama_id', $currentUser->asrama_id)->count();
+            $anakAktif = AnakAsuh::where('asrama_id', $currentUser->asrama_id)->where('status_aktif', true)->count();
+        } else {
+            $asramaList = Asrama::withCount([
+                'anakAsuh',
+                'anakAsuh as sd_count' => function ($query): void {
+                    $query->whereRaw('UPPER(jenjang_pendidikan) = ?', ['SD']);
+                },
+                'anakAsuh as smp_count' => function ($query): void {
+                    $query->whereRaw('UPPER(jenjang_pendidikan) = ?', ['SMP']);
+                },
+                'anakAsuh as sma_count' => function ($query): void {
+                    $query->whereRaw('UPPER(jenjang_pendidikan) = ?', ['SMA']);
+                },
+            ])->latest()->get();
+
+            $totalAsrama = Asrama::count();
+            $asramaAktif = Asrama::where('status_aktif', true)->count();
+            $totalAnak = AnakAsuh::count();
+            $anakAktif = AnakAsuh::where('status_aktif', true)->count();
+        }
+
         $periode = [
             'bulan' => 'Oktober',
             'tahun' => (string) date('Y'),
@@ -20,26 +62,19 @@ class DashboardController extends Controller
             'tahun_ajaran' => '2026/2027',
         ];
 
-        $currentUser = auth()->user();
         $pengurus = [
             'nama' => $currentUser ? $currentUser->name : 'Pengurus',
-            'jabatan' => $currentUser ? ($currentUser->isAdminPusat() ? 'Administrator Pusat' : ($currentUser->isAdminAsrama() ? 'Administrator Asrama' : 'Pimpinan / Koordinator')) : 'Pengurus',
+            'jabatan' => $currentUser ? (
+                $currentUser->isAdminPusat() ? 'Admin Pusat' : ($currentUser->isAdminCabang() ? 'Admin Cabang' : ($currentUser->isPimpinanPusat() ? 'Pimpinan Pusat' : 'Pengurus'))
+            ) : 'Pengurus',
             'yayasan' => 'Yayasan Rumah Harapan',
             'email' => $currentUser ? $currentUser->email : 'pengurus@rumahharapan.org',
             'avatar' => null,
             'status' => 'Aktif Bertugas',
         ];
 
-        // 1. Data Aktual Asrama dari Database
-        $totalAsrama = Asrama::count();
-        $asramaAktif = Asrama::where('status_aktif', true)->count();
-
-        // 2. Data Aktual Anak Asuh dari Database
-        $totalAnak = AnakAsuh::count();
-        $anakAktif = AnakAsuh::where('status_aktif', true)->count();
-
-        // 3. Distribusi Jenjang Pendidikan dari Database
         $jenjangCounts = AnakAsuh::selectRaw('UPPER(jenjang_pendidikan) as jenjang, count(*) as total')
+            ->when($currentUser?->isAdminCabang(), fn ($query) => $query->where('asrama_id', $currentUser->asrama_id))
             ->groupBy('jenjang')
             ->pluck('total', 'jenjang');
 
@@ -64,25 +99,9 @@ class DashboardController extends Controller
                 'smp_persen' => $smpPersen,
                 'sma_persen' => $smaPersen,
             ],
-            // Kompatibilitas mundur jika ada referensi total_cabang
             'total_cabang' => $totalAsrama,
         ];
 
-        // 4. Daftar Asrama Aktual beserta sebaran jenjang anak asuh
-        $asramaList = Asrama::withCount([
-            'anakAsuh',
-            'anakAsuh as sd_count' => function ($query): void {
-                $query->whereRaw('UPPER(jenjang_pendidikan) = ?', ['SD']);
-            },
-            'anakAsuh as smp_count' => function ($query): void {
-                $query->whereRaw('UPPER(jenjang_pendidikan) = ?', ['SMP']);
-            },
-            'anakAsuh as sma_count' => function ($query): void {
-                $query->whereRaw('UPPER(jenjang_pendidikan) = ?', ['SMA']);
-            },
-        ])->latest()->get();
-
-        // 5. Kategori Kurikulum (Belum tersedia data nyata di database)
         $targetKategori = [
             [
                 'judul' => "Hafalan Al-Qur'an",
@@ -106,7 +125,6 @@ class DashboardController extends Controller
             ],
         ];
 
-        // 6. Aktivitas Terkini (Kosong informatif sampai ada sumber data nyata)
         $aktivitasTerbaru = [];
 
         return view('dashboard', compact(

@@ -77,6 +77,15 @@
                     </svg>
                     <span>Data Anak Asuh</span>
                 </a>
+
+                {{-- Kegiatan Harian --}}
+                <a href="{{ route('kegiatan-harian.index') }}" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ request()->routeIs('kegiatan-harian.*') ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                    <svg class="w-5 h-5 {{ request()->routeIs('kegiatan-harian.*') ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>Kegiatan Harian</span>
+                </a>
             </nav>
         </div>
 
