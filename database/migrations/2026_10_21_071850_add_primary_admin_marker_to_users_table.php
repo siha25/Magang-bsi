@@ -12,40 +12,67 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $matchingUsers = DB::table('users')
-            ->whereRaw('LOWER(name) = ?', ['siti hasanah'])
-            ->whereRaw('LOWER(email) = ?', ['adminpusat1@gmail.com'])
-            ->get(['id', 'role', 'status_aktif']);
+        if (! Schema::hasTable('users')) {
+            throw new RuntimeException('Primary administrator migration requires the [users] table.');
+        }
 
-        if ($matchingUsers->count() !== 1) {
+        $primaryAdmin = DB::table('users')
+            ->where('id', 13)
+            ->first(['id', 'name', 'email', 'role', 'status_aktif']);
+
+        if ($primaryAdmin === null) {
+            throw new RuntimeException('Primary administrator migration requires account ID [13]. No account was found.');
+        }
+
+        $mismatchedFields = [];
+
+        if ((int) $primaryAdmin->id !== 13) {
+            $mismatchedFields[] = 'ID';
+        }
+
+        if (strcasecmp((string) $primaryAdmin->name, 'Siti Hasanah') !== 0) {
+            $mismatchedFields[] = 'name';
+        }
+
+        if (strcasecmp((string) $primaryAdmin->email, 'Adminpusat1@gmail.com') !== 0) {
+            $mismatchedFields[] = 'email';
+        }
+
+        if ($primaryAdmin->role !== 'admin_pusat') {
+            $mismatchedFields[] = 'role';
+        }
+
+        if (! (bool) $primaryAdmin->status_aktif) {
+            $mismatchedFields[] = 'active status';
+        }
+
+        if ($mismatchedFields !== []) {
             throw new RuntimeException(sprintf(
-                'Primary administrator migration requires exactly one Siti Hasanah account with the confirmed email; found %d.',
-                $matchingUsers->count(),
+                'Primary administrator migration stopped before schema changes: account ID [13] does not match the confirmed identity. Mismatched fields: %s.',
+                implode(', ', $mismatchedFields),
             ));
         }
 
-        $primaryAdmin = $matchingUsers->first();
-
-        if ($primaryAdmin->role !== 'admin_pusat' || ! (bool) $primaryAdmin->status_aktif) {
-            throw new RuntimeException('The confirmed primary administrator must have the admin_pusat role and an active account.');
-        }
-
         if (Schema::hasColumn('users', 'is_primary_admin')) {
-            throw new RuntimeException('Column [is_primary_admin] already exists; inspect the schema before retrying this migration.');
+            throw new RuntimeException(
+                'Column [is_primary_admin] already exists; inspect the schema and migration state for a partial or prior application before retrying.',
+            );
         }
 
         Schema::table('users', function (Blueprint $table): void {
             $table->boolean('is_primary_admin')->nullable();
-            $table->unique('is_primary_admin');
+            $table->unique('is_primary_admin', 'users_is_primary_admin_unique');
         });
 
         $updatedRows = DB::table('users')
-            ->where('id', $primaryAdmin->id)
+            ->where('id', 13)
             ->whereNull('is_primary_admin')
             ->update(['is_primary_admin' => true]);
 
         if ($updatedRows !== 1) {
-            throw new RuntimeException('Unable to mark exactly one confirmed primary administrator.');
+            throw new RuntimeException(
+                'Primary administrator schema was added, but account ID [13] was not marked. Inspect the schema and data before recovery; do not rerun this migration blindly.',
+            );
         }
     }
 
@@ -55,7 +82,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table): void {
-            $table->dropUnique(['is_primary_admin']);
+            $table->dropUnique('users_is_primary_admin_unique');
             $table->dropColumn('is_primary_admin');
         });
     }
