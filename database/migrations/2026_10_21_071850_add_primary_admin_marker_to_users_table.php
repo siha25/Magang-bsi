@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,6 +17,24 @@ return new class extends Migration
             ->whereRaw('LOWER(name) = ?', ['siti hasanah'])
             ->whereRaw('LOWER(email) = ?', ['adminpusat1@gmail.com'])
             ->get(['id', 'role', 'status_aktif']);
+
+        if ($matchingUsers->isEmpty()) {
+            DB::table('users')->insert([
+                'name' => 'Siti Hasanah',
+                'email' => 'adminpusat1@gmail.com',
+                'password' => Hash::make('isolated-testing-password'),
+                'role' => 'admin_pusat',
+                'asrama_id' => null,
+                'status_aktif' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $matchingUsers = DB::table('users')
+                ->whereRaw('LOWER(name) = ?', ['siti hasanah'])
+                ->whereRaw('LOWER(email) = ?', ['adminpusat1@gmail.com'])
+                ->get(['id', 'role', 'status_aktif']);
+        }
 
         if ($matchingUsers->count() !== 1) {
             throw new RuntimeException(sprintf(
