@@ -3,16 +3,26 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use Illuminate\Console\Attributes\Description;
-use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-#[Signature('user:create-admin-pusat')]
-#[Description('Membuat akun Administrator Pusat (Admin Pusat) pertama secara interaktif dan aman')]
 class CreateAdminPusatCommand extends Command
 {
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'user:create-admin-pusat';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Membuat akun Administrator Pusat (Admin Pusat) pertama secara interaktif dan aman';
+
     /**
      * Alias perintah Artisan alternatif.
      *

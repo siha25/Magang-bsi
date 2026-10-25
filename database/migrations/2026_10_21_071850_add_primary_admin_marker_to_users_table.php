@@ -13,6 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+<<<<<<< HEAD
         $matchingUsers = DB::table('users')
             ->whereRaw('LOWER(name) = ?', ['siti hasanah'])
             ->whereRaw('LOWER(email) = ?', ['adminpusat1@gmail.com'])
@@ -41,30 +42,28 @@ return new class extends Migration
                 'Primary administrator migration requires exactly one Siti Hasanah account with the confirmed email; found %d.',
                 $matchingUsers->count(),
             ));
+=======
+        if (! Schema::hasTable('users')) {
+            throw new RuntimeException('Primary administrator migration requires the [users] table.');
+>>>>>>> bc40987ffdf55dc72a252fac2b9349a4dccba0bb
         }
 
-        $primaryAdmin = $matchingUsers->first();
-
-        if ($primaryAdmin->role !== 'admin_pusat' || ! (bool) $primaryAdmin->status_aktif) {
-            throw new RuntimeException('The confirmed primary administrator must have the admin_pusat role and an active account.');
+        if (! Schema::hasColumn('users', 'is_primary_admin')) {
+            Schema::table('users', function (Blueprint $table): void {
+                $table->boolean('is_primary_admin')->nullable();
+                $table->unique('is_primary_admin', 'users_is_primary_admin_unique');
+            });
         }
 
-        if (Schema::hasColumn('users', 'is_primary_admin')) {
-            throw new RuntimeException('Column [is_primary_admin] already exists; inspect the schema before retrying this migration.');
-        }
+        $primaryAdmin = DB::table('users')
+            ->where('id', 13)
+            ->first(['id', 'name', 'email', 'role', 'status_aktif']);
 
-        Schema::table('users', function (Blueprint $table): void {
-            $table->boolean('is_primary_admin')->nullable();
-            $table->unique('is_primary_admin');
-        });
-
-        $updatedRows = DB::table('users')
-            ->where('id', $primaryAdmin->id)
-            ->whereNull('is_primary_admin')
-            ->update(['is_primary_admin' => true]);
-
-        if ($updatedRows !== 1) {
-            throw new RuntimeException('Unable to mark exactly one confirmed primary administrator.');
+        if ($primaryAdmin !== null) {
+            DB::table('users')
+                ->where('id', 13)
+                ->whereNull('is_primary_admin')
+                ->update(['is_primary_admin' => true]);
         }
     }
 
@@ -74,7 +73,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table): void {
-            $table->dropUnique(['is_primary_admin']);
+            $table->dropUnique('users_is_primary_admin_unique');
             $table->dropColumn('is_primary_admin');
         });
     }

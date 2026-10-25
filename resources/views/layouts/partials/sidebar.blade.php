@@ -1,4 +1,4 @@
-{{-- Sidebar Navigasi Admin Pendidikan Ansuh --}}
+{{-- Sidebar Navigasi Admin Pendidikan --}}
 <aside id="sidebar" 
        class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-emerald-100 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full lg:static shadow-sm lg:shadow-none"
        aria-label="Sidebar Navigasi">
@@ -14,7 +14,7 @@
             </div>
             <div class="flex flex-col">
                 <div class="flex items-center gap-1.5">
-                    <span class="font-bold text-lg text-slate-800 tracking-tight leading-none group-hover:text-emerald-700 transition-colors">Pendidikan Ansuh</span>
+                    <span class="font-bold text-lg text-slate-800 tracking-tight leading-none group-hover:text-emerald-700 transition-colors">Pendidikan</span>
                     <span class="inline-block w-2 h-2 rounded-full bg-orange-500"></span>
                 </div>
                 <span class="text-xs text-emerald-700 font-medium tracking-wide mt-1">Yayasan Rumah Harapan</span>
