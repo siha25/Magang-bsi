@@ -5,71 +5,72 @@
 @section('content')
 <div class="space-y-6 sm:space-y-8">
 
-    {{-- 1. BANNER SAMBUTAN & INFORMASI PERIODE --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-800 text-white p-6 sm:p-8 shadow-xl shadow-emerald-950/10">
-        {{-- Hiasan Latar Geometris Islami / Cahaya Lembut --}}
-        <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-emerald-500/20 blur-3xl pointer-events-none"></div>
-        <div class="absolute right-1/4 -bottom-20 w-72 h-72 rounded-full bg-orange-500/15 blur-3xl pointer-events-none"></div>
+{{-- ========== STYLE BANNER ========== --}}
+<style>
+    .banner{position:relative;overflow:hidden;border-radius:32px;color:#fff;padding:48px 56px;
+        background:
+            radial-gradient(ellipse 28% 55% at 76% 48%, rgba(217,119,6,.38) 0%, transparent 70%),
+            radial-gradient(ellipse 60% 70% at 12% 95%, #0a8a63 0%, transparent 70%),
+            radial-gradient(ellipse 50% 70% at 100% 100%, #033b3c 0%, transparent 70%),
+            linear-gradient(135deg,#064e3b 0%,#056a4c 50%,#044a3f 100%);
+        box-shadow:0 25px 50px -12px rgba(6,78,59,.35)}
+    .banner-inner{position:relative;z-index:1;display:flex;flex-direction:column;gap:28px;align-items:flex-start}
+    .banner-left{max-width:760px}
 
-        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div class="max-w-2xl space-y-2">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-emerald-100">
-                    <span class="w-2 h-2 rounded-full bg-orange-400"></span>
-                    <span>Periode Evaluasi: {{ $periode['bulan'] }} {{ $periode['tahun'] }} (Semester {{ $periode['semester'] }})</span>
-                </div>
-                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                    Assalamu’alaikum, {{ $pengurus['nama'] ?? 'Pengurus' }}
-                </h2>
-                <p class="text-sm sm:text-base text-emerald-100/90 leading-relaxed">
-                    Selamat datang di Portal Monitoring Pendidikan Anak Asuh Yayasan Rumah Harapan. Sistem informasi pengelolaan data asrama, pembinaan santri, dan rekapitulasi pendidikan anak asuh.
-                </p>
+    .pill{display:inline-flex;align-items:center;gap:10px;padding:8px 18px;border-radius:9999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);font-size:14px;font-weight:600;color:#d1fae5;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+    .pill i{width:10px;height:10px;border-radius:9999px;background:#f97316;display:inline-block}
+
+    .banner h2{font-size:clamp(28px,4vw,48px);font-weight:800;line-height:1.12;letter-spacing:-.02em;margin:20px 0 16px;color:#fff}
+    .banner p.desc{font-size:clamp(14px,1.6vw,19px);line-height:1.65;color:rgba(167,243,208,.85);margin:0}
+
+    .date-card{width:100%;padding:28px;border-radius:28px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 20px 40px -12px rgba(0,0,0,.3)}
+    .date-card .d{font-size:32px;font-weight:800;line-height:1.2;margin:0;color:#fff}
+    .date-card .status{margin-top:22px;padding-top:20px;border-top:1px solid rgba(255,255,255,.22);display:flex;align-items:center;gap:10px;font-size:17px;color:#d1fae5}
+    .date-card .status i{width:14px;height:14px;border-radius:9999px;background:#22e07a;box-shadow:0 0 12px #22e07a;display:inline-block}
+
+    /* DESKTOP: kartu tanggal di KANAN TENGAH */
+    @media (min-width:768px){
+        .banner{padding:72px 64px}
+        .banner-inner{flex-direction:row;align-items:center;justify-content:space-between;gap:40px}
+        .banner-left{flex:1}
+        .date-card{width:300px;flex-shrink:0}
+    }
+</style>
+
+{{-- ========== BANNER SAMBUTAN ========== --}}
+<div class="banner">
+    <div class="banner-inner">
+
+        {{-- Kiri: Sambutan --}}
+        <div class="banner-left">
+            <div class="pill">
+                <i></i>
+                <span>Periode Evaluasi: {{ $periode['bulan'] }} {{ $periode['tahun'] }} (Semester {{ $periode['semester'] }})</span>
             </div>
 
-            {{-- Tombol Tindakan Cepat (Quick Actions) --}}
-            <div class="flex flex-wrap items-center gap-3 shrink-0">
-                <a href="{{ route('anak-asuh.create') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-orange-500/30 transition-all cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>Tambah Anak Asuh</span>
-                </a>
+            <h2>Assalamu’alaikum, {{ $pengurus['nama'] ?? 'Admin Pusat Developer' }}</h2>
 
-                <a href="{{ route('asrama.create') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs sm:text-sm font-medium border border-white/20 backdrop-blur-md transition-all cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <span>Tambah Asrama</span>
-                </a>
+            <p class="desc">
+                Selamat datang di Portal Monitoring Pendidikan Anak Asuh Yayasan Rumah Harapan.
+                Sistem informasi pengelolaan data asrama, pembinaan santri, dan rekapitulasi pendidikan anak asuh.
+            </p>
+        </div>
+
+        {{-- Kanan tengah: Kartu Tanggal --}}
+        <div class="date-card">
+            <p class="d">{{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd,') }}</p>
+            <p class="d">{{ \Carbon\Carbon::now()->locale('id')->isoFormat('D MMMM') }}</p>
+            <p class="d">{{ \Carbon\Carbon::now()->locale('id')->isoFormat('YYYY') }}</p>
+
+            <div class="status">
+                <i></i>
+                <span>Aktif & Terhubung</span>
             </div>
         </div>
 
-        {{-- Ringkasan Mini Bar Bawah Banner (Faktual & Nyata dari Database) --}}
-        <div class="mt-6 pt-5 border-t border-emerald-600/40 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-            <div>
-                <span class="text-emerald-200/80 block">Tahun Ajaran:</span>
-                <span class="font-bold text-white text-sm">{{ $periode['tahun_ajaran'] }}</span>
-            </div>
-            <div>
-                <span class="text-emerald-200/80 block">Asrama Aktif Terdata:</span>
-                <span class="font-bold text-white text-sm">{{ $stats['asrama_aktif'] }} dari {{ $stats['total_asrama'] }} Asrama</span>
-            </div>
-            <div>
-                <span class="text-emerald-200/80 block">Total Anak Asuh Terbina:</span>
-                <span class="font-bold text-white text-sm">{{ $stats['total_anak'] }} Santri / Anak</span>
-            </div>
-            <div>
-                <span class="text-emerald-200/80 block">Anak Asuh Aktif:</span>
-                <span class="font-bold text-emerald-300 flex items-center gap-1.5 text-sm">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    {{ $stats['anak_aktif'] }} Santri Aktif
-                </span>
-            </div>
-        </div>
     </div>
-
-
+</div>
+    
     {{-- 2. KARTU STATISTIK UTAMA (6 KARTU STATISTIK DENGAN DATA NYATA & STATUS VALID) --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         

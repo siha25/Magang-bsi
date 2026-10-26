@@ -2,8 +2,6 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Attributes\Description;
-use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
@@ -12,10 +10,12 @@ use PDO;
 use RuntimeException;
 use Throwable;
 
-#[Signature('simpena:cleanup-dry-run')]
-#[Description('Simulasikan penghapusan data percobaan dan selalu rollback')]
 class CleanupDryRunCommand extends Command
 {
+    protected $signature = 'simpena:cleanup-dry-run';
+
+    protected $description = 'Simulasikan penghapusan data percobaan dan selalu rollback';
+
     private const USER_EXPECTATIONS = [
         57 => ['Pengguna Uji', 'user-6ad82b346e93b@example.com', 'admin_pusat', 0, null],
         58 => ['Pengguna Uji', 'user-6ad82b34ca839@example.com', 'admin_pusat', 1, null],

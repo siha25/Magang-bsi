@@ -17,14 +17,34 @@
         body {
             font-family: 'Plus Jakarta Sans', var(--font-sans, system-ui, sans-serif);
         }
+
+        #sidebar { transition: transform .3s ease, width .3s ease; }
+
+        @media (min-width: 1024px) {
+            #sidebar.is-collapsed { width: 5rem !important; overflow: hidden; }
+
+            /* sembunyikan semua teks */
+            #sidebar.is-collapsed span,
+            #sidebar.is-collapsed p,
+            #sidebar.is-collapsed .uppercase,
+            #sidebar.is-collapsed a .flex-col { display: none !important; }
+
+            /* sembunyikan badge divisi & footer */
+            #sidebar.is-collapsed > div:nth-child(2),
+            #sidebar.is-collapsed > div:last-child { display: none; }
+
+            /* logo dan ikon menu ke tengah */
+            #sidebar.is-collapsed > div:first-child { padding: 0; justify-content: center; }
+            #sidebar.is-collapsed nav a { justify-content: center; }
+        }
     </style>
 </head>
 <body class="h-full bg-[#f8faf9] text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
 
     <div class="min-h-screen flex">
-        
+
         {{-- Overlay untuk Sidebar Mobile --}}
-        <div id="sidebar-overlay" 
+        <div id="sidebar-overlay"
              onclick="toggleSidebar(false)"
              class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs hidden transition-opacity lg:hidden"
              aria-hidden="true"></div>
@@ -34,7 +54,7 @@
 
         {{-- Konten Utama Halaman --}}
         <div class="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
-            
+
             {{-- Komponen Navbar Atas --}}
             @include('layouts.partials.navbar')
 
@@ -59,46 +79,52 @@
 
     {{-- Script Interaktivitas Ringan (Vanilla JS) --}}
     <script>
-        function toggleSidebar(open) {
+        function toggleSidebar(force) {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
-            if (open) {
-                sidebar.classList.remove('-translate-x-full');
-                sidebar.classList.add('translate-x-0');
-                overlay.classList.remove('hidden');
-                document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
+            if (!sidebar) return;
+
+            if (window.innerWidth >= 1024) {
+                // Desktop: kecilkan jadi ikon saja / lebarkan
+                const collapse = (typeof force === 'boolean') ? !force : !sidebar.classList.contains('is-collapsed');
+                sidebar.classList.toggle('is-collapsed', collapse);
+                try { localStorage.setItem('sidebar-collapsed', collapse ? '1' : '0'); } catch (e) {}
             } else {
-                sidebar.classList.add('-translate-x-full');
-                sidebar.classList.remove('translate-x-0');
-                overlay.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden', 'lg:overflow-auto');
+                // Mobile: panel + overlay
+                const open = (typeof force === 'boolean') ? force : sidebar.classList.contains('-translate-x-full');
+                sidebar.classList.toggle('-translate-x-full', !open);
+                sidebar.classList.toggle('translate-x-0', open);
+                overlay.classList.toggle('hidden', !open);
+                document.body.classList.toggle('overflow-hidden', open);
             }
         }
+
+        // Ingat kondisi terakhir di desktop
+        (function () {
+            try {
+                if (window.innerWidth >= 1024 && localStorage.getItem('sidebar-collapsed') === '1') {
+                    document.getElementById('sidebar')?.classList.add('is-collapsed');
+                }
+            } catch (e) {}
+        })();
 
         function toggleDropdown(id) {
             const el = document.getElementById(id);
             if (!el) return;
             const isHidden = el.classList.contains('hidden');
-            
+
             // Tutup dropdown lain yang terbuka
-            document.querySelectorAll('#notif-menu, #profile-menu').forEach(item => {
+            document.querySelectorAll('#notif-menu, #user-menu').forEach(item => {
                 if (item.id !== id) item.classList.add('hidden');
             });
 
-            if (isHidden) {
-                el.classList.remove('hidden');
-            } else {
-                el.classList.add('hidden');
-            }
+            el.classList.toggle('hidden', !isHidden);
         }
 
-        // Tutup dropdown saat klik di luar area
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('#notification-wrapper') && !e.target.closest('#profile-wrapper')) {
-                const notif = document.getElementById('notif-menu');
-                const profile = document.getElementById('profile-menu');
-                if (notif) notif.classList.add('hidden');
-                if (profile) profile.classList.add('hidden');
+        // Tutup dropdown notifikasi saat klik di luar area
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('#notification-wrapper')) {
+                document.getElementById('notif-menu')?.classList.add('hidden');
             }
         });
     </script>
