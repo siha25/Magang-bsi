@@ -103,4 +103,14 @@ class Asrama extends Model
     {
         return $this->hasMany(KegiatanHarian::class, 'asrama_id');
     }
+
+    /**
+     * Relasi ke evaluasi diniyah / nilai ulangan di asrama ini.
+     *
+     * @return HasMany<EvaluasiDiniyah, $this>
+     */
+    public function evaluasiDiniyah(): HasMany
+    {
+        return $this->hasMany(EvaluasiDiniyah::class, 'asrama_id');
+    }
 }

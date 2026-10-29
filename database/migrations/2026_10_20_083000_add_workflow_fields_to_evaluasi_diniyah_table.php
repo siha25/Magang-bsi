@@ -6,14 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void 
-    {     
-        Schema::table("evaluasi_diniyah", function (Blueprint $table): void {
-            if (! Schema::hasColumn("evaluasi_diniyah", "asrama_id")) {
-                $table->foreignId("asrama_id")     
-                    ->after("id")
+    public function up(): void
+    {
+        Schema::table('evaluasi_diniyah', function (Blueprint $table): void {
+            if (! Schema::hasColumn('evaluasi_diniyah', 'asrama_id')) {
+                $table->foreignId('asrama_id')
+                    ->after('id')
                     ->nullable()
-                    ->constrained("asrama")        
+                    ->constrained('asrama')
                     ->cascadeOnDelete();
             }
         });
@@ -21,10 +21,10 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table("evaluasi_diniyah", function (Blueprint $table): void {
-            if (Schema::hasColumn("evaluasi_diniyah", "asrama_id")) {
-                $table->dropForeign(["asrama_id"]);
-                $table->dropColumn("asrama_id");
+        Schema::table('evaluasi_diniyah', function (Blueprint $table): void {
+            if (Schema::hasColumn('evaluasi_diniyah', 'asrama_id')) {
+                $table->dropForeign(['asrama_id']);
+                $table->dropColumn('asrama_id');
             }
         });
     }

@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'asrama_id', 'status_aktif'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable(['name', 'email', 'password', 'encrypted_password', 'role', 'asrama_id', 'status_aktif'])]
+#[Hidden(['password', 'remember_token', 'encrypted_password'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -45,9 +45,18 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'encrypted_password' => 'encrypted',
             'status_aktif' => 'boolean',
             'is_primary_admin' => 'boolean',
         ];
+    }
+
+    /**
+     * Dapatkan password asli (didekripsi) untuk keperluan bantuan lupa password oleh Admin Pusat.
+     */
+    public function getVisiblePasswordAttribute(): ?string
+    {
+        return $this->encrypted_password;
     }
 
     protected static function booted(): void

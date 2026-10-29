@@ -4,7 +4,9 @@ use App\Http\Controllers\AnakAsuhController;
 use App\Http\Controllers\AsramaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EvaluasiDiniyahController;
 use App\Http\Controllers\KegiatanHarianController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Rute Autentikasi Pengurus
@@ -46,5 +48,29 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/tambah', [KegiatanHarianController::class, 'create'])->name('create')->middleware('role:admin_pusat,admin_cabang');
         Route::post('/', [KegiatanHarianController::class, 'store'])->name('store')->middleware('role:admin_pusat,admin_cabang');
         Route::get('/{kegiatanHarian}', [KegiatanHarianController::class, 'show'])->name('show')->middleware('role:admin_pusat,admin_cabang,pimpinan_pusat');
+    });
+
+    // Modul Evaluasi Diniyah (Kurikulum & Ujian Santri)
+    Route::prefix('evaluasi-diniyah')->name('evaluasi-diniyah.')->group(function () {
+        Route::get('/', [EvaluasiDiniyahController::class, 'index'])->name('index')->middleware('role:admin_pusat,admin_cabang,pimpinan_pusat');
+        Route::get('/tambah', [EvaluasiDiniyahController::class, 'create'])->name('create')->middleware('role:admin_pusat,admin_cabang');
+        Route::post('/', [EvaluasiDiniyahController::class, 'store'])->name('store')->middleware('role:admin_pusat,admin_cabang');
+        Route::get('/asrama/{asramaId}/santri', [EvaluasiDiniyahController::class, 'getSantriByAsrama'])->name('santri-by-asrama')->middleware('role:admin_pusat,admin_cabang');
+        Route::get('/{evaluasiDiniyah}', [EvaluasiDiniyahController::class, 'show'])->name('show')->middleware('role:admin_pusat,admin_cabang,pimpinan_pusat');
+        Route::get('/{evaluasiDiniyah}/edit', [EvaluasiDiniyahController::class, 'edit'])->name('edit')->middleware('role:admin_pusat,admin_cabang');
+        Route::put('/{evaluasiDiniyah}', [EvaluasiDiniyahController::class, 'update'])->name('update')->middleware('role:admin_pusat,admin_cabang');
+        Route::delete('/{evaluasiDiniyah}', [EvaluasiDiniyahController::class, 'destroy'])->name('destroy')->middleware('role:admin_pusat,admin_cabang');
+    });
+
+    // Modul Pengelola Akun Pengguna (Khusus Admin Pusat)
+    Route::prefix('pengguna')->name('users.')->middleware('role:admin_pusat')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/tambah', [UserController::class, 'create'])->name('create');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [UserController::class, 'update'])->name('update');
+        Route::post('/{user}/reset-password', [UserController::class, 'resetPassword'])->name('reset-password');
+        Route::patch('/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle-status');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
     });
 });

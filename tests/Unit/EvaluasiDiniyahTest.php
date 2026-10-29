@@ -20,14 +20,18 @@ class EvaluasiDiniyahTest extends TestCase
             'jenis_evaluasi',
             'materi',
             'tanggal_evaluasi',
+            'nilai',
+            'predikat',
             'catatan_pengaju',
             'status',
-            'predikat',
             'catatan_revisi',
             'diajukan_oleh',
             'diajukan_pada',
             'dinilai_oleh',
             'dinilai_pada',
+            'bulan',
+            'tahun',
+            'semester',
         ], $evaluasi->getFillable());
         $this->assertSame('date', $evaluasi->getCasts()['tanggal_evaluasi']);
         $this->assertSame('datetime', $evaluasi->getCasts()['diajukan_pada']);

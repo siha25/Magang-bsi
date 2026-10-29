@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AnakAsuh;
 use App\Models\Asrama;
+use App\Models\EvaluasiDiniyah;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 
@@ -86,11 +87,17 @@ class DashboardController extends Controller
         $smpPersen = $totalAnak > 0 ? (int) round(($smpCount / $totalAnak) * 100) : 0;
         $smaPersen = $totalAnak > 0 ? (int) round(($smaCount / $totalAnak) * 100) : 0;
 
+        $evaluasiQuery = EvaluasiDiniyah::query()->byRole();
+        $evaluasiCount = $evaluasiQuery->count();
+        $evaluasiAvg = $evaluasiCount > 0 ? round((float) $evaluasiQuery->avg('nilai'), 1) : 0;
+
         $stats = [
             'total_asrama' => $totalAsrama,
             'asrama_aktif' => $asramaAktif,
             'total_anak' => $totalAnak,
             'anak_aktif' => $anakAktif,
+            'evaluasi_count' => $evaluasiCount,
+            'evaluasi_avg' => $evaluasiAvg,
             'jenjang' => [
                 'sd' => $sdCount,
                 'smp' => $smpCount,

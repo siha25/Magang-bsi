@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AnakAsuh extends Model
 {
@@ -95,5 +96,15 @@ class AnakAsuh extends Model
     public function getJenisKelaminLabelAttribute(): string
     {
         return $this->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan';
+    }
+
+    /**
+     * Relasi ke riwayat evaluasi diniyah / ulangan santri.
+     *
+     * @return HasMany<EvaluasiDiniyah, $this>
+     */
+    public function evaluasiDiniyah(): HasMany
+    {
+        return $this->hasMany(EvaluasiDiniyah::class, 'anak_asuh_id');
     }
 }
