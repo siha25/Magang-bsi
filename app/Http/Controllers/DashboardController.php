@@ -34,8 +34,8 @@ class DashboardController extends Controller
 
         // ─── Validasi & Ekstraksi Parameter Filter ────────────────────────────
         $filterBulanNum = (int) $request->input('bulan', (int) date('n'));
-        $filterTahun    = (int) $request->input('tahun', (int) date('Y'));
-        $filterJenjang  = $request->input('jenjang');
+        $filterTahun = (int) $request->input('tahun', (int) date('Y'));
+        $filterJenjang = $request->input('jenjang');
         $filterAsramaId = $request->input('asrama_id');
 
         if ($filterBulanNum < 1 || $filterBulanNum > 12) {
@@ -92,7 +92,7 @@ class DashboardController extends Controller
         $jenjangCounts = $anakBase->selectRaw('UPPER(jenjang_pendidikan) as jenjang, COUNT(*) as total')
             ->groupBy('jenjang')->pluck('total', 'jenjang');
 
-        $sdCount  = (int) ($jenjangCounts->get('SD') ?? 0);
+        $sdCount = (int) ($jenjangCounts->get('SD') ?? 0);
         $smpCount = (int) ($jenjangCounts->get('SMP') ?? 0);
         $smaCount = (int) ($jenjangCounts->get('SMA') ?? 0);
 
@@ -120,24 +120,24 @@ class DashboardController extends Controller
         }
 
         $totalEvaluasiPeriode = (clone $evalBase)->count();
-        $evalDisetujui        = (clone $evalBase)->where('status', EvaluasiDiniyah::STATUS_DISETUJUI)->count();
-        $evalPendingTotal     = (clone $evalBase)->where('status', EvaluasiDiniyah::STATUS_PENDING)->count();
+        $evalDisetujui = (clone $evalBase)->where('status', EvaluasiDiniyah::STATUS_DISETUJUI)->count();
+        $evalPendingTotal = (clone $evalBase)->where('status', EvaluasiDiniyah::STATUS_PENDING)->count();
 
         $persenEvaluasiSelesai = 0;
-        $evalStatusTeks        = 'Belum ada evaluasi untuk dihitung';
+        $evalStatusTeks = 'Belum ada evaluasi untuk dihitung';
         if ($totalEvaluasiPeriode > 0) {
             $persenEvaluasiSelesai = (int) round(($evalDisetujui / $totalEvaluasiPeriode) * 100);
-            $evalStatusTeks        = "{$evalDisetujui} dari {$totalEvaluasiPeriode} evaluasi selesai";
+            $evalStatusTeks = "{$evalDisetujui} dari {$totalEvaluasiPeriode} evaluasi selesai";
         }
 
         // ─── Grafik 1: Perkembangan Evaluasi 6 Bulan (Line Chart) ────────────
         $grafikPerkembanganLabels = [];
-        $grafikPerkembanganData   = [];
+        $grafikPerkembanganData = [];
         $refDate = Carbon::create($filterTahun, $filterBulanNum, 1);
 
         for ($i = 5; $i >= 0; $i--) {
-            $tgl    = $refDate->copy()->subMonths($i);
-            $bNama  = self::BULAN_LIST[(int) $tgl->format('n')];
+            $tgl = $refDate->copy()->subMonths($i);
+            $bNama = self::BULAN_LIST[(int) $tgl->format('n')];
             $bTahun = (int) $tgl->format('Y');
             $bShort = $tgl->locale('id')->isoFormat('MMM YY');
 
@@ -157,7 +157,7 @@ class DashboardController extends Controller
                 ->count();
 
             $grafikPerkembanganLabels[] = $bShort;
-            $grafikPerkembanganData[]   = $tot > 0 ? round(($sel / $tot) * 100, 1) : 0;
+            $grafikPerkembanganData[] = $tot > 0 ? round(($sel / $tot) * 100, 1) : 0;
         }
 
         $grafikPerkembanganAdaData = array_sum($grafikPerkembanganData) > 0;
@@ -190,10 +190,10 @@ class DashboardController extends Controller
 
         // ─── Grafik 3: Kegiatan Harian per Kategori (Bar) ────────────────────
         $kegiatanKategori = ['belajar', 'muhadhoroh', 'olahraga', 'acara_donatur', 'bersih_bersih'];
-        $kegiatanLabels   = ['Belajar', 'Muhadhoroh', 'Olahraga', 'Acara Donatur', 'Bersih-bersih'];
-        $kegiatanData     = [];
+        $kegiatanLabels = ['Belajar', 'Muhadhoroh', 'Olahraga', 'Acara Donatur', 'Bersih-bersih'];
+        $kegiatanData = [];
         $bulanStart = Carbon::create($filterTahun, $filterBulanNum, 1)->startOfMonth();
-        $bulanEnd   = $bulanStart->copy()->endOfMonth();
+        $bulanEnd = $bulanStart->copy()->endOfMonth();
 
         foreach ($kegiatanKategori as $kat) {
             $kegiatanData[] = KegiatanHarian::query()
@@ -208,7 +208,7 @@ class DashboardController extends Controller
         // ─── Grafik 4: Kasus & Pembinaan (Modul Belum Tersedia) ──────────────
         $kasusAnakTotal = 0;
         $pembinaanTotal = 0;
-        $kasusModulAda  = false;
+        $kasusModulAda = false;
 
         // ─── Tabel Monitoring per Asrama ─────────────────────────────────────
         $monitoringQ = Asrama::query()->where('status_aktif', true);
@@ -237,30 +237,30 @@ class DashboardController extends Controller
                 ->where('bulan', $filterBulanNama)->where('tahun', $filterTahun)
                 ->where('status', EvaluasiDiniyah::STATUS_PENDING)->count();
 
-            $asrama->total_eval     = $totE;
-            $asrama->selesai_eval   = $selE;
-            $asrama->pending_eval   = $penE;
+            $asrama->total_eval = $totE;
+            $asrama->selesai_eval = $selE;
+            $asrama->pending_eval = $penE;
             $asrama->persen_selesai = $totE > 0 ? (int) round(($selE / $totE) * 100) : 0;
 
             if ($totE === 0) {
                 $asrama->status_laporan = 'Belum Ada Data';
-                $asrama->status_warna   = 'slate';
+                $asrama->status_warna = 'slate';
             } elseif ($penE > 0) {
                 $asrama->status_laporan = 'Perlu Tindak Lanjut';
-                $asrama->status_warna   = 'amber';
+                $asrama->status_warna = 'amber';
             } else {
                 $asrama->status_laporan = 'Lengkap';
-                $asrama->status_warna   = 'emerald';
+                $asrama->status_warna = 'emerald';
             }
         }
 
         // ─── Kompilasi Data Filter Aktif ─────────────────────────────────────
         $filterAktif = [
-            'bulan_num'  => $filterBulanNum,
+            'bulan_num' => $filterBulanNum,
             'bulan_nama' => $filterBulanNama,
-            'tahun'      => $filterTahun,
-            'jenjang'    => $filterJenjang,
-            'asrama_id'  => $filterAsramaId,
+            'tahun' => $filterTahun,
+            'jenjang' => $filterJenjang,
+            'asrama_id' => $filterAsramaId,
         ];
 
         $tahunOptions = range((int) date('Y') + 1, (int) date('Y') - 4);
@@ -295,4 +295,3 @@ class DashboardController extends Controller
         ));
     }
 }
-

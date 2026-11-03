@@ -1,3 +1,4 @@
+{{-- BAGIAN: SHARED - Autentikasi Login Sistem --}}
 <!DOCTYPE html>
 <html lang="id" class="h-full bg-slate-50">
 <head>

@@ -57,9 +57,9 @@ class CabangTest extends TestCase
         $response->assertRedirect(route('cabang.index'));
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseHas('cabang', [
-            'kode_cabang' => 'CBG-BDG-01',
-            'nama_cabang' => 'Cabang Bandung Pusat',
+        $this->assertDatabaseHas('asrama', [
+            'kode_asrama' => 'CBG-BDG-01',
+            'nama_asrama' => 'Cabang Bandung Pusat',
             'status_aktif' => true,
         ]);
     }
@@ -119,9 +119,9 @@ class CabangTest extends TestCase
         ]);
 
         $response->assertRedirect(route('cabang.index'));
-        $this->assertDatabaseHas('cabang', [
+        $this->assertDatabaseHas('asrama', [
             'id' => $cabang->id,
-            'nama_cabang' => 'Cabang Yogyakarta Baru',
+            'nama_asrama' => 'Cabang Yogyakarta Baru',
         ]);
     }
 
@@ -139,14 +139,14 @@ class CabangTest extends TestCase
         $response = $this->patch(route('cabang.toggle-status', $cabang));
 
         $response->assertRedirect();
-        $this->assertDatabaseHas('cabang', [
+        $this->assertDatabaseHas('asrama', [
             'id' => $cabang->id,
             'status_aktif' => false,
         ]);
 
         // Toggle kembali menjadi aktif
         $this->patch(route('cabang.toggle-status', $cabang));
-        $this->assertDatabaseHas('cabang', [
+        $this->assertDatabaseHas('asrama', [
             'id' => $cabang->id,
             'status_aktif' => true,
         ]);

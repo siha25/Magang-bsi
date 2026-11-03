@@ -219,7 +219,7 @@
     <div class="stat-card">
         <div class="flex items-start justify-between gap-3">
             <div class="flex-1 min-w-0">
-                <div class="stat-label">Asrama Aktif</div>
+                <div class="stat-label">Total Asrama Aktif</div>
                 <div class="flex items-baseline gap-1.5">
                     <span class="stat-num">{{ $totalAsramaAktif }}</span>
                     <span class="text-xs font-semibold text-slate-400">Asrama</span>
@@ -455,7 +455,7 @@
                 </svg>
             </div>
             <p>Belum ada laporan kesehatan</p>
-            <small>Modul rekam kesehatan anak asuh belum tersedia. Total laporan: 0</small>
+            <small>Modul rekam kesehatan anak asuh Belum tersedia. Total laporan: 0</small>
         </div>
     </div>
 

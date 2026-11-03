@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table): void {
             if (! Schema::hasColumn('users', 'is_primary_admin')) {
-                $table->boolean('is_primary_admin')->default(false)->after('role');
+                $table->boolean('is_primary_admin')->nullable()->unique('users_is_primary_admin_unique')->after('role');
             }
         });
     }
@@ -25,6 +25,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table): void {
             if (Schema::hasColumn('users', 'is_primary_admin')) {
+                $table->dropUnique('users_is_primary_admin_unique');
                 $table->dropColumn('is_primary_admin');
             }
         });

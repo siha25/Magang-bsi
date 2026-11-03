@@ -23,7 +23,7 @@ class StoreCabangRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'kode_cabang' => ['required', 'string', 'max:30', 'unique:cabang,kode_cabang'],
+            'kode_cabang' => ['required', 'string', 'max:30', 'unique:asrama,kode_asrama'],
             'nama_cabang' => ['required', 'string', 'max:255'],
             'wilayah' => ['nullable', 'string', 'max:100'],
             'alamat' => ['nullable', 'string', 'max:1000'],

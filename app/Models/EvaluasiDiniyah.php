@@ -41,6 +41,8 @@ class EvaluasiDiniyah extends Model
         'catatan_pengaju',
         'status',
         'catatan_revisi',
+        'catatan_evaluasi_pusat',
+        'status_tindak_lanjut',
         'diajukan_oleh',
         'diajukan_pada',
         'dinilai_oleh',

@@ -33,7 +33,7 @@ class UpdateCabangRequest extends FormRequest
                 'required',
                 'string',
                 'max:30',
-                Rule::unique('cabang', 'kode_cabang')->ignore($cabangId),
+                Rule::unique('asrama', 'kode_asrama')->ignore($cabangId),
             ],
             'nama_cabang' => ['required', 'string', 'max:255'],
             'wilayah' => ['nullable', 'string', 'max:100'],

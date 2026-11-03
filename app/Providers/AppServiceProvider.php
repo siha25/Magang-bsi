@@ -43,7 +43,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Event::listen(MigrationStarted::class, function (MigrationStarted $event): void {
-            if ($event->name !== '2026_10_21_071850_add_primary_admin_marker_to_users_table') {
+            $fileName = (new \ReflectionClass($event->migration))->getFileName() ?: '';
+            if (! str_contains($fileName, '2026_10_21_071850_add_primary_admin_marker_to_users_table')) {
                 return;
             }
 
