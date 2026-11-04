@@ -1,7 +1,10 @@
 <?php
 
+// BAGIAN: SHARED - Autentikasi Pengguna & Inisialisasi Sesi Cabang
+
 namespace App\Http\Controllers;
 
+use App\Shared\Auth\CabangSession;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +21,10 @@ class AuthController extends Controller
     public function showLoginForm(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->intended(route('dashboard'));
+            $user = Auth::user();
+            $target = $user->isAdminCabang() ? route('cabang.dashboard') : route('dashboard');
+
+            return redirect()->intended($target);
         }
 
         return view('auth.login');
@@ -63,13 +69,20 @@ class AuthController extends Controller
             ]);
         }
 
+        // Simpan cabang_id ke session saat user cabang login
+        if ($user->isAdminCabang()) {
+            $request->session()->put(CabangSession::SESSION_KEY, (int) $user->asrama_id);
+        }
+
         // Bersihkan hit rate limiter setelah login berhasil
         RateLimiter::clear($this->throttleKey($request));
 
         // Regenerasi session ID untuk mencegah serangan session fixation
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        $target = $user->isAdminCabang() ? route('cabang.dashboard') : route('dashboard');
+
+        return redirect()->intended($target);
     }
 
     /**

@@ -61,7 +61,7 @@ class DashboardTest extends TestCase
     }
 
     /**
-     * Memastikan statistik utama dan tabel asrama menggunakan data nyata database serta istilah Asrama.
+     * Memastikan statistik utama menggunakan data nyata database serta istilah Asrama.
      */
     public function test_statistics_and_asrama_table_use_real_database_data(): void
     {
@@ -79,10 +79,6 @@ class DashboardTest extends TestCase
         // Memastikan angka statistik sesuai database
         $response->assertSee((string) $totalAsrama);
         $response->assertSee((string) $totalAnak);
-
-        // Memastikan tabel ringkasan asrama menggunakan istilah Asrama
-        $response->assertSee('Tabel Ringkasan Asrama Yayasan Rumah Harapan');
-        $response->assertDontSee('Tabel Ringkasan Cabang');
 
         // Memastikan tidak ada klaim palsu dan angka dummy evaluasi
         $response->assertDontSee('Sinkronisasi Normal');

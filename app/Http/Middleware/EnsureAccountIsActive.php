@@ -1,5 +1,7 @@
 <?php
 
+// BAGIAN: SHARED - Middleware Pemeriksaan Akun Aktif
+
 namespace App\Http\Middleware;
 
 use Closure;

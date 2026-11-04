@@ -7,11 +7,37 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class PrimaryAdminProtectionTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $primary = User::where('is_primary_admin', true)->first();
+        if (! $primary) {
+            $existing = User::where('email', 'adminpusat1@gmail.com')->first();
+            if ($existing) {
+                DB::table('users')->where('id', $existing->id)->update([
+                    'is_primary_admin' => true,
+                    'password' => Hash::make('isolated-testing-password'),
+                ]);
+            } else {
+                $user = User::create([
+                    'name' => 'Siti Hasanah',
+                    'email' => 'adminpusat1@gmail.com',
+                    'password' => Hash::make('isolated-testing-password'),
+                    'role' => User::ROLE_ADMIN_PUSAT,
+                    'status_aktif' => true,
+                ]);
+                DB::table('users')->where('id', $user->id)->update(['is_primary_admin' => true]);
+            }
+        }
+    }
 
     public function test_confirmed_primary_admin_can_log_in(): void
     {

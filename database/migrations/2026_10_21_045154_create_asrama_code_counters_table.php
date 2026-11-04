@@ -12,10 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('asrama_code_counters', function (Blueprint $table) {
-            $table->unsignedTinyInteger('id')->primary();
-            $table->unsignedBigInteger('last_number')->default(0);
-        });
+        if (! Schema::hasTable('asrama_code_counters')) {
+            Schema::create('asrama_code_counters', function (Blueprint $table) {
+                $table->unsignedTinyInteger('id')->primary();
+                $table->unsignedBigInteger('last_number')->default(0);
+            });
+        }
 
         $lastNumber = DB::table('asrama')
             ->where('kode_asrama', 'like', 'ASR-%')
@@ -28,10 +30,12 @@ return new class extends Migration
                 return max($highestNumber, (int) $matches[1]);
             }, 0);
 
-        DB::table('asrama_code_counters')->insert([
-            'id' => 1,
-            'last_number' => $lastNumber,
-        ]);
+        if (! DB::table('asrama_code_counters')->where('id', 1)->exists()) {
+            DB::table('asrama_code_counters')->insert([
+                'id' => 1,
+                'last_number' => $lastNumber,
+            ]);
+        }
     }
 
     /**

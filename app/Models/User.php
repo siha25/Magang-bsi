@@ -5,19 +5,37 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'asrama_id', 'status_aktif'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'encrypted_password',
+        'role',
+        'asrama_id',
+        'status_aktif',
+    ];
+
+    /**
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'encrypted_password',
+    ];
 
     public const ROLE_ADMIN_PUSAT = 'admin_pusat';
 
@@ -45,9 +63,18 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'encrypted_password' => 'encrypted',
             'status_aktif' => 'boolean',
             'is_primary_admin' => 'boolean',
         ];
+    }
+
+    /**
+     * Dapatkan password asli (didekripsi) untuk keperluan bantuan lupa password oleh Admin Pusat.
+     */
+    public function getVisiblePasswordAttribute(): ?string
+    {
+        return $this->encrypted_password;
     }
 
     protected static function booted(): void

@@ -53,6 +53,13 @@
     
     {{-- Sisi Kiri: Judul Halaman Dinamis (Tanpa elemen atau tombol yang tidak semestinya) --}}
     <div class="flex items-center min-w-0">
+
+        <button type="button" onclick="toggleSidebar()" aria-label="Buka/tutup sidebar"
+        style="display:flex; align-items:center; justify-content:center; width:42px; height:42px; margin-right:12px; border:1px solid #d1fae5; border-radius:12px; background:#ecfdf5; color:#047857; cursor:pointer; flex-shrink:0;">
+    <svg style="width:20px; height:20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+</button>
         <h1 class="text-base sm:text-lg lg:text-xl font-bold text-slate-900 tracking-tight truncate">
             {{ $headerTitle }}
         </h1>
@@ -94,44 +101,70 @@
             </div>
         @endif
 
-        <div class="flex items-center gap-2.5 sm:gap-3 px-2.5 sm:px-3.5 py-1.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80">
-            {{-- Avatar Pengguna --}}
-            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-xs shadow-emerald-600/20 shrink-0">
-                @if($user && !empty($user->name))
-                    {{ strtoupper(substr($user->name, 0, 2)) }}
-                @else
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                @endif
-            </div>
+        {{-- Profil + Dropdown --}}
+@auth
+<div id="user-wrapper" class="relative">
+    <button type="button" id="user-btn"
+        onclick="document.getElementById('user-menu').classList.toggle('hidden'); document.getElementById('user-chevron').classList.toggle('rotate-180')"
+        style="display:flex; align-items:center; gap:12px; padding:7px 20px 7px 7px; background-color:#ecfdf5; border:1px solid #a7f3d0; border-radius:9999px; cursor:pointer;">
+        
+        {{-- Avatar --}}
+    {{-- Avatar --}}
+    <span style="display:flex; align-items:center; justify-content:center; width:42px; height:42px; min-width:42px; border-radius:9999px; background:linear-gradient(135deg,#0f766e,#059669); color:#ffffff; font-size:15px; font-weight:700; box-shadow:0 6px 10px rgba(5,150,105,.6), 0 2px 4px rgba(0,0,0,.25);">
+        {{ strtoupper(substr($userName, 0, 2)) }}
+    </span>
+       {{-- Nama --}}
+<span style="font-size:16px; font-weight:700; color:#0f172a; white-space:nowrap;">
+    {{ $userName }}
+</span>
 
-            {{-- Nama Pengguna & Peran --}}
-            <div class="text-left leading-tight hidden min-[360px]:block">
-                <span class="block text-xs sm:text-sm font-bold text-slate-800 truncate max-w-[110px] sm:max-w-[150px]">
-                    {{ $userName }}
-                </span>
-                <span class="block text-[10px] sm:text-[11px] font-medium text-emerald-700 truncate max-w-[110px] sm:max-w-[150px]">
-                    {{ $userRole }}
-                </span>
-            </div>
-        </div>
+        {{-- Chevron --}}
+        <svg id="user-chevron" class="w-4 h-4 text-slate-700 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
 
-        {{-- Tombol Logout --}}
-        @auth
-            <form action="{{ route('logout') }}" method="POST" class="inline m-0">
-                @csrf
-                <button type="submit" 
-                        title="Keluar"
-                        aria-label="Logout"
-                        class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200/80 hover:border-rose-600 transition-all cursor-pointer shadow-xs">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span class="hidden sm:inline">Keluar</span>
-                </button>
-            </form>
-        @endauth
+    {{-- Dropdown --}}
+    <div id="user-menu" class="hidden absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 bg-white shadow-xl z-50 p-2">
+        <a href="#" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm text-slate-800 hover:bg-slate-100 transition-colors">
+            <svg class="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
+            </svg>
+            Profil Saya
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm text-slate-800 hover:bg-slate-100 transition-colors">
+            <svg class="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <circle cx="12" cy="12" r="3"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/>
+            </svg>
+            Pengaturan Akun
+        </a>
+
+        <div class="my-1.5 border-t border-slate-200"></div>
+
+        <form action="{{ route('logout') }}" method="POST" class="m-0">
+            @csrf
+            <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer text-left">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+                Keluar
+            </button>
+        </form>
     </div>
-
+</div>
+@endauth
+</div>
 </header>
+
+    <script>
+    document.addEventListener('click', function (e) {
+        const wrapper = document.getElementById('user-wrapper');
+        const menu = document.getElementById('user-menu');
+        if (wrapper && menu && !wrapper.contains(e.target)) {
+            menu.classList.add('hidden');
+            document.getElementById('user-chevron')?.classList.remove('rotate-180');
+        }
+    });
+</script>
