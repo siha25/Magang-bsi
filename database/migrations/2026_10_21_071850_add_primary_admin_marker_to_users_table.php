@@ -13,7 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-<<<<<<< HEAD
+        if (! Schema::hasTable('users')) {
+            throw new RuntimeException('Primary administrator migration requires the [users] table.');
+        }
+
         $matchingUsers = DB::table('users')
             ->whereRaw('LOWER(name) = ?', ['siti hasanah'])
             ->whereRaw('LOWER(email) = ?', ['adminpusat1@gmail.com'])
@@ -42,10 +45,12 @@ return new class extends Migration
                 'Primary administrator migration requires exactly one Siti Hasanah account with the confirmed email; found %d.',
                 $matchingUsers->count(),
             ));
-=======
-        if (! Schema::hasTable('users')) {
-            throw new RuntimeException('Primary administrator migration requires the [users] table.');
->>>>>>> bc40987ffdf55dc72a252fac2b9349a4dccba0bb
+        }
+
+        $primaryAdmin = $matchingUsers->first();
+
+        if ($primaryAdmin->role !== 'admin_pusat' || ! (bool) $primaryAdmin->status_aktif) {
+            throw new RuntimeException('The confirmed primary administrator must have the admin_pusat role and an active account.');
         }
 
         if (! Schema::hasColumn('users', 'is_primary_admin')) {
@@ -55,16 +60,10 @@ return new class extends Migration
             });
         }
 
-        $primaryAdmin = DB::table('users')
-            ->where('id', 13)
-            ->first(['id', 'name', 'email', 'role', 'status_aktif']);
-
-        if ($primaryAdmin !== null) {
-            DB::table('users')
-                ->where('id', 13)
-                ->whereNull('is_primary_admin')
-                ->update(['is_primary_admin' => true]);
-        }
+        DB::table('users')
+            ->where('id', $primaryAdmin->id)
+            ->whereNull('is_primary_admin')
+            ->update(['is_primary_admin' => true]);
     }
 
     /**
@@ -73,7 +72,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table): void {
-            $table->dropUnique('users_is_primary_admin_unique');
+            if (DB::getDriverName() !== 'sqlite') {
+                $table->dropUnique('users_is_primary_admin_unique');
+            }
             $table->dropColumn('is_primary_admin');
         });
     }
