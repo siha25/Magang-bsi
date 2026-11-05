@@ -7,6 +7,8 @@ use App\Cabang\Controllers\DashboardController as CabangDashboardController;
 use App\Cabang\Controllers\DiniyahController as CabangDiniyahController;
 use App\Cabang\Controllers\HafalanQuranController as CabangHafalanQuranController;
 use App\Cabang\Controllers\KegiatanHarianController as CabangKegiatanHarianController;
+use App\Cabang\Controllers\PengaturanController;
+use App\Cabang\Controllers\ProfilCabangController;
 use App\Http\Controllers\AnakAsuhController;
 use App\Http\Controllers\AsramaController;
 use App\Http\Controllers\AuthController;
@@ -83,6 +85,19 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         // Daftar Santri Cabang
         Route::get('/santri', [CabangAnakAsuhController::class, 'index'])->name('santri.index');
+
+        // Profil Cabang
+        Route::prefix('profil')->name('profil.')->group(function () {
+            Route::get('/', [ProfilCabangController::class, 'index'])->name('index');
+            Route::put('/', [ProfilCabangController::class, 'update'])->name('update');
+        });
+
+        // Pengaturan Sistem & Bahasa Cabang
+        Route::prefix('pengaturan')->name('pengaturan.')->group(function () {
+            Route::get('/', [PengaturanController::class, 'index'])->name('index');
+            Route::put('/', [PengaturanController::class, 'update'])->name('update');
+            Route::post('/ganti-bahasa', [PengaturanController::class, 'switchLocale'])->name('ganti-bahasa');
+        });
     });
 
     // =========================================================================

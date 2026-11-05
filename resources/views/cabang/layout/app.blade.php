@@ -1,18 +1,34 @@
 {{-- BAGIAN: PENGURUS CABANG - Layout Utama Cabang --}}
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-slate-50">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Cabang') - Pendidikan Ansuh | Yayasan Rumah Harapan</title>
+    <title>@yield('title', __('Cabang')) - {{ __('Pendidikan Ansuh | Yayasan Rumah Harapan') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <script>
+        (function() {
+            try {
+                const currentLocale = '{{ app()->getLocale() }}';
+                localStorage.setItem('app_locale', currentLocale);
+
+                const savedTheme = localStorage.getItem('app_theme') || '{{ session("theme", auth()->user()?->theme ?? "light") }}';
+                if (savedTheme === 'dark' || (savedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
 
     <style>
         body {
@@ -100,12 +116,38 @@
             } catch (e) {}
         })();
 
+        function toggleUserMenu(force) {
+            const menu = document.getElementById('user-menu');
+            const btn = document.getElementById('user-btn');
+            const chevron = document.getElementById('user-chevron');
+            if (!menu) return;
+
+            const isOpen = (typeof force === 'boolean') ? force : menu.classList.contains('hidden');
+            if (isOpen) {
+                menu.classList.remove('hidden');
+                chevron?.classList.add('rotate-180');
+                btn?.setAttribute('aria-expanded', 'true');
+            } else {
+                menu.classList.add('hidden');
+                chevron?.classList.remove('rotate-180');
+                btn?.setAttribute('aria-expanded', 'false');
+            }
+        }
+
         document.addEventListener('click', function (e) {
             const wrapper = document.getElementById('user-wrapper');
-            const menu = document.getElementById('user-menu');
-            if (wrapper && menu && !wrapper.contains(e.target)) {
-                menu.classList.add('hidden');
-                document.getElementById('user-chevron')?.classList.remove('rotate-180');
+            if (wrapper && !wrapper.contains(e.target)) {
+                toggleUserMenu(false);
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                const menu = document.getElementById('user-menu');
+                if (menu && !menu.classList.contains('hidden')) {
+                    toggleUserMenu(false);
+                    document.getElementById('user-btn')?.focus();
+                }
             }
         });
     </script>

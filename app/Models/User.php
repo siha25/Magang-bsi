@@ -26,6 +26,10 @@ class User extends Authenticatable
         'role',
         'asrama_id',
         'status_aktif',
+        'locale',
+        'theme',
+        'timezone',
+        'date_format',
     ];
 
     /**

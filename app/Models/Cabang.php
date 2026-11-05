@@ -18,6 +18,8 @@ class Cabang extends Asrama
         'alamat',
         'penanggung_jawab',
         'nomor_telepon',
+        'email',
+        'jam_operasional',
         'status_aktif',
         'kode_cabang',
         'nama_cabang',

@@ -75,6 +75,17 @@ class CabangSession
     }
 
     /**
+     * Segarkan referensi data cabang di dalam sesi.
+     */
+    public static function refresh(): void
+    {
+        $id = self::getId();
+        if ($id) {
+            self::setId($id);
+        }
+    }
+
+    /**
      * Validasi hak akses cabang di sisi server.
      * Mencegah admin cabang mengakses atau memanipulasi data cabang lain lewat URL/API.
      *

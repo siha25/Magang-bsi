@@ -26,6 +26,8 @@ class Asrama extends Model
         'alamat',
         'penanggung_jawab',
         'nomor_telepon',
+        'email',
+        'jam_operasional',
         'status_aktif',
     ];
 
