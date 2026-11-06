@@ -1,4 +1,5 @@
 *.log
+*.html
 .DS_Store
 .env
 .env.backup
