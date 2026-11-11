@@ -133,10 +133,21 @@
                                 <span class="text-[11px] text-slate-400">{{ $keg->asrama?->wilayah ?? '-' }}</span>
                             </td>
                             <td class="py-3.5 px-4">
-                                <span class="font-semibold text-slate-800 block">{{ $keg->nama_kegiatan }}</span>
-                                @if($keg->keterangan)
-                                    <span class="text-[11px] text-slate-400 line-clamp-1">{{ Str::limit($keg->keterangan, 50) }}</span>
-                                @endif
+                                <div class="flex items-center gap-2.5">
+                                    @if($keg->foto_url)
+                                        <button type="button" onclick="openLightbox('{{ $keg->foto_url }}', '{{ addslashes($keg->nama_kegiatan) }}', '{{ $keg->tanggal_kegiatan?->format('d/m/Y') }}')" class="shrink-0 group relative block cursor-pointer" title="Lihat Foto Dokumentasi">
+                                            <img src="{{ $keg->foto_url }}" alt="Dokumentasi" class="w-8 h-8 object-cover rounded-lg border border-slate-200 group-hover:ring-2 group-hover:ring-emerald-500 transition-all shadow-2xs" onerror="this.style.display='none'">
+                                        </button>
+                                    @endif
+                                    <div>
+                                        <span class="font-semibold text-slate-800 block">{{ $keg->nama_kegiatan }}</span>
+                                        @if($keg->foto_url)
+                                            <span class="text-[10px] text-emerald-600 font-medium">Ada dokumentasi</span>
+                                        @elseif($keg->deskripsi)
+                                            <span class="text-[11px] text-slate-400 line-clamp-1">{{ Str::limit($keg->deskripsi, 40) }}</span>
+                                        @endif
+                                    </div>
+                                </div>
                             </td>
                             <td class="py-3.5 px-4">
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 capitalize">
@@ -175,6 +186,41 @@
         @endif
     </div>
 
+</div>
+
+{{-- Modal Lightbox Foto Dokumentasi --}}
+<div id="lightbox-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xs p-4 flex items-center justify-center transition-all opacity-0" onclick="if(event.target === this) closeLightbox()">
+    <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-slate-100 transform transition-all scale-95" id="lightbox-card">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+            <div>
+                <h3 id="lightbox-title" class="text-sm font-bold text-slate-900">Dokumentasi Kegiatan</h3>
+                <p id="lightbox-subtitle" class="text-xs text-slate-500 mt-0.5"></p>
+            </div>
+            <button type="button" onclick="closeLightbox()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer" title="Kembali">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span>Kembali</span>
+            </button>
+        </div>
+        <div class="p-6 bg-slate-900/5 flex items-center justify-center max-h-[70vh] overflow-hidden">
+            <img id="lightbox-img" src="" alt="Dokumentasi Full" class="max-h-[65vh] w-auto max-w-full rounded-2xl object-contain shadow-lg">
+        </div>
+        <div class="px-6 py-3.5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
+            <button type="button" onclick="closeLightbox()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span>Kembali ke Halaman Monitoring</span>
+            </button>
+            <a id="lightbox-download" href="" target="_blank" download class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Buka / Unduh Foto</span>
+            </a>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -243,6 +289,54 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+    }
+});
+
+function openLightbox(imageUrl, title, subtitle) {
+    const modal = document.getElementById('lightbox-modal');
+    const card = document.getElementById('lightbox-card');
+    const img = document.getElementById('lightbox-img');
+    const titleEl = document.getElementById('lightbox-title');
+    const subtitleEl = document.getElementById('lightbox-subtitle');
+    const downloadEl = document.getElementById('lightbox-download');
+
+    if (!modal || !img) return;
+
+    img.src = imageUrl;
+    if (downloadEl) downloadEl.href = imageUrl;
+    if (titleEl) titleEl.textContent = title || 'Dokumentasi Kegiatan';
+    if (subtitleEl) subtitleEl.textContent = subtitle ? ('Tanggal: ' + subtitle) : '';
+
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        if (card) {
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+        }
+    }, 10);
+}
+
+function closeLightbox() {
+    const modal = document.getElementById('lightbox-modal');
+    const card = document.getElementById('lightbox-card');
+    if (!modal) return;
+
+    modal.classList.add('opacity-0');
+    if (card) {
+        card.classList.remove('scale-100');
+        card.classList.add('scale-95');
+    }
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        const img = document.getElementById('lightbox-img');
+        if (img) img.src = '';
+    }, 200);
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeLightbox();
     }
 });
 </script>

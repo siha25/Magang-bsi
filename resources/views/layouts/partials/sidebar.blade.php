@@ -92,7 +92,7 @@
         {{-- Grup Pembinaan Diniyah --}}
         <div>
             <div class="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Kurikulum & Diniyah
+                Kurikulum
             </div>
             <nav class="space-y-1">
                 {{-- Evaluasi Diniyah --}}
@@ -114,12 +114,12 @@
                 </a>
 
                 {{-- Hafalan Hadis --}}
-                <a href="{{ route('evaluasi-diniyah.index', ['jenis_evaluasi' => 'Hafalan Hadis']) }}" 
-                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ request()->routeIs('evaluasi-diniyah.*') && request('jenis_evaluasi') === 'Hafalan Hadis' ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
-                    <svg class="w-5 h-5 {{ request()->routeIs('evaluasi-diniyah.*') && request('jenis_evaluasi') === 'Hafalan Hadis' ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <a href="{{ route('evaluasi-diniyah.index', ['jenis_evaluasi' => 'Hafalan Hadist']) }}" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ request()->routeIs('evaluasi-diniyah.*') && request('jenis_evaluasi') === 'Hafalan Hadist' ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                    <svg class="w-5 h-5 {{ request()->routeIs('evaluasi-diniyah.*') && request('jenis_evaluasi') === 'Hafalan Hadist' ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Hafalan Hadis</span>
+                    <span>Hafalan Hadist</span>
                 </a>
 
                 {{-- Pengetahuan Diniyah --}}

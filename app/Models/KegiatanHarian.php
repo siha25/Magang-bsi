@@ -20,6 +20,7 @@ class KegiatanHarian extends Model
         'deskripsi',
         'jumlah_peserta',
         'catatan_tambahan',
+        'foto_dokumentasi',
         'penginput_id',
     ];
 
@@ -88,5 +89,23 @@ class KegiatanHarian extends Model
     public function getJamSelesaiFormatAttribute(): string
     {
         return substr((string) $this->jam_selesai, 0, 5);
+    }
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        if (blank($this->foto_dokumentasi)) {
+            return null;
+        }
+
+        if (str_starts_with((string) $this->foto_dokumentasi, 'http://') || str_starts_with((string) $this->foto_dokumentasi, 'https://')) {
+            return $this->foto_dokumentasi;
+        }
+
+        return '/storage/'.ltrim((string) $this->foto_dokumentasi, '/');
+    }
+
+    public function getHasFotoAttribute(): bool
+    {
+        return filled($this->foto_dokumentasi);
     }
 }

@@ -72,6 +72,7 @@ class KegiatanHarianController extends Controller
             'deskripsi' => ['nullable', 'string'],
             'jumlah_peserta' => ['required', 'integer', 'min:0'],
             'catatan_tambahan' => ['nullable', 'string'],
+            'foto_dokumentasi' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ], [
             'tanggal_kegiatan.required' => 'Tanggal kegiatan wajib diisi.',
             'kategori.required' => 'Kategori kegiatan wajib dipilih.',
@@ -80,7 +81,15 @@ class KegiatanHarianController extends Controller
             'jam_selesai.required' => 'Jam selesai kegiatan wajib diisi.',
             'jam_selesai.after' => 'Jam selesai tidak boleh lebih awal dari jam mulai.',
             'jumlah_peserta.required' => 'Jumlah peserta wajib diisi angka.',
+            'foto_dokumentasi.image' => 'File dokumentasi harus berupa gambar.',
+            'foto_dokumentasi.mimes' => 'Format file dokumentasi harus JPG, JPEG, PNG, atau WEBP.',
+            'foto_dokumentasi.max' => 'Ukuran foto dokumentasi maksimal 5 MB.',
         ]);
+
+        if ($request->hasFile('foto_dokumentasi')) {
+            $path = $request->file('foto_dokumentasi')->store('kegiatan-harian', 'public');
+            $validated['foto_dokumentasi'] = $path;
+        }
 
         // Simpan data dengan cabang_id otomatis dari session server
         $this->service->storeKegiatan($validated, $cabangId, (int) Auth::id());

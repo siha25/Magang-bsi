@@ -6,6 +6,7 @@ use App\Cabang\Controllers\AnakAsuhController as CabangAnakAsuhController;
 use App\Cabang\Controllers\DashboardController as CabangDashboardController;
 use App\Cabang\Controllers\DiniyahController as CabangDiniyahController;
 use App\Cabang\Controllers\HafalanQuranController as CabangHafalanQuranController;
+use App\Cabang\Controllers\HafalanHadistController as CabangHafalanHadistController;
 use App\Cabang\Controllers\KegiatanHarianController as CabangKegiatanHarianController;
 use App\Cabang\Controllers\PengaturanController;
 use App\Cabang\Controllers\ProfilCabangController;
@@ -63,14 +64,25 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::get('/{id}', [CabangKegiatanHarianController::class, 'show'])->name('show');
         });
 
-        // Input & Evaluasi Hafalan Al-Qur'an Cabang
-        Route::prefix('hafalan-quran')->name('hafalan-quran.')->group(function () {
-            Route::get('/', [CabangHafalanQuranController::class, 'index'])->name('index');
-            Route::get('/create', [CabangHafalanQuranController::class, 'create'])->name('create');
-            Route::post('/', [CabangHafalanQuranController::class, 'store'])->name('store');
-            Route::get('/{id}', [CabangHafalanQuranController::class, 'show'])->name('show');
-            Route::get('/{id}/edit', [CabangHafalanQuranController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [CabangHafalanQuranController::class, 'update'])->name('update');
+        // Input & Evaluasi Hafalan Hadist Pusat
+        Route::prefix('hafalan-hadist')->name('hafalan-hadist.')->middleware('role:admin_pusat')->group(function () {
+            Route::get('/', [PusatHafalanHadistController::class, 'index'])->name('index');
+            Route::get('/create', [PusatHafalanHadistController::class, 'create'])->name('create');
+            Route::post('/', [PusatHafalanHadistController::class, 'store'])->name('store');
+            Route::get('/{id}', [PusatHafalanHadistController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [PusatHafalanHadistController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [PusatHafalanHadistController::class, 'update'])->name('update');
+        });
+
+
+        // Input & Evaluasi Hafalan Hadist Cabang
+        Route::prefix('hafalan-hadist')->name('hafalan-hadist.')->group(function () {
+            Route::get('/', [CabangHafalanHadistController::class, 'index'])->name('index');
+            Route::get('/create', [CabangHafalanHadistController::class, 'create'])->name('create');
+            Route::post('/', [CabangHafalanHadistController::class, 'store'])->name('store');
+            Route::get('/{id}', [CabangHafalanHadistController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [CabangHafalanHadistController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [CabangHafalanHadistController::class, 'update'])->name('update');
         });
 
         // Input & Evaluasi Pengetahuan Diniyah Cabang

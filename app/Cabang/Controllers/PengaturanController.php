@@ -9,6 +9,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 class PengaturanController extends Controller
 {
@@ -60,7 +62,18 @@ class PengaturanController extends Controller
 
         $user = $request->user();
         if ($user) {
-            $user->update($validated);
+            try {
+                $columns = array_filter(
+                    $validated,
+                    fn ($key) => Schema::hasColumn('users', $key),
+                    ARRAY_FILTER_USE_KEY
+                );
+                if (! empty($columns)) {
+                    $user->update($columns);
+                }
+            } catch (Throwable) {
+                // Abaikan error database jika kolom preferensi belum dimigrasi
+            }
         }
 
         session([
@@ -91,7 +104,13 @@ class PengaturanController extends Controller
 
         $user = $request->user();
         if ($user) {
-            $user->update(['locale' => $locale]);
+            try {
+                if (Schema::hasColumn('users', 'locale')) {
+                    $user->update(['locale' => $locale]);
+                }
+            } catch (Throwable) {
+                // Abaikan jika kolom locale belum tersedia di tabel users
+            }
         }
 
         session(['locale' => $locale]);

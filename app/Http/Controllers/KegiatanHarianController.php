@@ -73,12 +73,21 @@ class KegiatanHarianController extends Controller
             'deskripsi' => ['nullable', 'string'],
             'jumlah_peserta' => ['required', 'integer', 'min:0'],
             'catatan_tambahan' => ['nullable', 'string'],
+            'foto_dokumentasi' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ], [
             'jam_selesai.after' => 'Jam selesai tidak boleh lebih awal dari jam mulai.',
+            'foto_dokumentasi.image' => 'File dokumentasi harus berupa gambar.',
+            'foto_dokumentasi.mimes' => 'Format file dokumentasi harus JPG, JPEG, PNG, atau WEBP.',
+            'foto_dokumentasi.max' => 'Ukuran foto dokumentasi maksimal 5 MB.',
         ]);
 
         if (Auth::user()?->isAdminCabang() && (int) $validated['asrama_id'] !== (int) Auth::user()->asrama_id) {
             abort(403, 'Anda hanya dapat mengelola kegiatan asrama Anda sendiri.');
+        }
+
+        if ($request->hasFile('foto_dokumentasi')) {
+            $path = $request->file('foto_dokumentasi')->store('kegiatan-harian', 'public');
+            $validated['foto_dokumentasi'] = $path;
         }
 
         $validated['penginput_id'] = Auth::id();

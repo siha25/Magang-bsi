@@ -19,7 +19,7 @@
     </div>
 
     <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm p-5 sm:p-8">
-        <form method="POST" action="{{ route('cabang.kegiatan-harian.store') }}" class="space-y-6">
+        <form method="POST" action="{{ route('cabang.kegiatan-harian.store') }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {{-- Tanggal Kegiatan --}}
@@ -94,6 +94,42 @@
                     <textarea name="catatan_tambahan" rows="2" placeholder="Catatan kendala atau evaluasi jika ada..." class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border @error('catatan_tambahan') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20">{{ old('catatan_tambahan') }}</textarea>
                     @error('catatan_tambahan')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
                 </div>
+
+                {{-- Foto / Dokumentasi Kegiatan --}}
+                <div class="sm:col-span-2 space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Foto Dokumentasi Kegiatan
+                        <span class="text-[11px] font-normal lowercase text-slate-400 ml-1">(opsional, max 5 MB: JPG, PNG, WEBP)</span>
+                    </label>
+
+                    <div class="border-2 border-dashed @error('foto_dokumentasi') border-rose-400 bg-rose-50/20 @else border-slate-200 hover:border-emerald-400 bg-slate-50/60 @enderror rounded-2xl p-5 sm:p-6 transition-all text-center">
+                        <input type="file" id="foto_dokumentasi" name="foto_dokumentasi" accept="image/jpeg,image/png,image/jpg,image/webp" class="hidden" onchange="previewImage(this)">
+
+                        <div id="upload-placeholder" class="cursor-pointer py-3" onclick="document.getElementById('foto_dokumentasi').click()">
+                            <div class="w-12 h-12 mx-auto rounded-2xl bg-emerald-100/70 text-emerald-700 flex items-center justify-center mb-2.5 transition-transform hover:scale-105">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <p class="text-xs sm:text-sm font-semibold text-slate-700">Klik untuk unggah foto kegiatan</p>
+                            <p class="text-[11px] text-slate-400 mt-1">Format didukung: JPG, JPEG, PNG, atau WEBP (Maksimal 5 MB)</p>
+                        </div>
+
+                        {{-- Preview Box --}}
+                        <div id="preview-wrapper" class="hidden">
+                            <div class="relative inline-block max-w-sm rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white">
+                                <img id="preview-img" src="" alt="Pratinjau Foto Dokumentasi" class="max-h-64 w-auto object-cover rounded-xl mx-auto">
+                                <button type="button" onclick="removeImage()" class="absolute top-2 right-2 p-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white shadow-md transition-all cursor-pointer" title="Hapus Gambar">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <p id="file-name-info" class="text-xs text-slate-500 mt-2 font-medium"></p>
+                        </div>
+                    </div>
+                    @error('foto_dokumentasi')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
+                </div>
             </div>
 
             <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
@@ -103,5 +139,31 @@
         </form>
     </div>
 </div>
+
+<script>
+function previewImage(input) {
+    const file = input.files && input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('upload-placeholder').classList.add('hidden');
+            document.getElementById('preview-wrapper').classList.remove('hidden');
+            const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+            document.getElementById('file-name-info').textContent = file.name + ' (' + sizeMb + ' MB)';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function removeImage() {
+    const input = document.getElementById('foto_dokumentasi');
+    input.value = '';
+    document.getElementById('preview-img').src = '';
+    document.getElementById('upload-placeholder').classList.remove('hidden');
+    document.getElementById('preview-wrapper').classList.add('hidden');
+    document.getElementById('file-name-info').textContent = '';
+}
+</script>
 @endsection
 
