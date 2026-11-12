@@ -85,20 +85,20 @@
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Rata-rata skor: {{ $stats['evaluasi_hafalan']['rata_rata'] }} poin</span>
+                <span>Penilaian predikat: A (Istimewa), B (Baik), C (Cukup)</span>
                 <span class="text-teal-600 font-semibold group-hover:translate-x-0.5 transition-transform">Lihat &rarr;</span>
             </div>
         </a>
 
-        {{-- 3. Santri Predikat Mumtaz (A) --}}
+        {{-- 3. Santri Predikat A (Istimewa) untuk Hafalan --}}
         <div class="bg-white rounded-2xl p-5 border border-amber-100/90 shadow-xs">
             <div class="flex items-center justify-between">
                 <div>
                     <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                        Predikat Mumtaz (A)
+                        Predikat A Hafalan
                     </span>
                     <span class="text-3xl font-extrabold text-amber-600 tracking-tight">
-                        {{ number_format($stats['evaluasi_hafalan']['mumtaz']) }}
+                        {{ number_format($stats['evaluasi_hafalan']['predikat_a'] ?? 0) }}
                     </span>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -108,7 +108,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Nilai evaluasi hafalan &ge; 85</span>
+                <span>Hafalan Al-Qur'an & Hadis</span>
                 <span class="text-[11px] font-semibold text-amber-600">Istimewa</span>
             </div>
         </div>
@@ -265,13 +265,13 @@
                         <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total</span>
                         <span class="text-base font-extrabold text-slate-800">{{ $stats['evaluasi_hafalan']['total'] }}</span>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-100 text-center">
-                        <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Rata-rata</span>
-                        <span class="text-base font-extrabold text-emerald-800">{{ $stats['evaluasi_hafalan']['rata_rata'] }}</span>
+                    <div class="p-2.5 rounded-xl bg-slate-50/80 border border-slate-100 text-center">
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</span>
+                        <span class="text-base font-extrabold text-slate-600">Predikat A/B/C</span>
                     </div>
                     <div class="p-2.5 rounded-xl bg-amber-50/80 border border-amber-100 text-center">
-                        <span class="block text-[10px] font-bold text-amber-700 uppercase tracking-wider">Mumtaz (A)</span>
-                        <span class="text-base font-extrabold text-amber-800">{{ $stats['evaluasi_hafalan']['mumtaz'] }}</span>
+                        <span class="block text-[10px] font-bold text-amber-700 uppercase tracking-wider">Predikat A</span>
+                        <span class="text-base font-extrabold text-amber-800">{{ $stats['evaluasi_hafalan']['predikat_a'] ?? 0 }}</span>
                     </div>
                 </div>
 
@@ -295,11 +295,11 @@
                                 </div>
                             </div>
                             <div class="text-right shrink-0">
-                                <span class="text-sm font-extrabold {{ $hafalan->nilai >= 70 ? 'text-emerald-700' : 'text-amber-600' }}">
-                                    {{ $hafalan->nilai }}
+                                <span class="text-sm font-extrabold text-blue-700">
+                                    {{ $hafalan->predikat ?? '-' }}
                                 </span>
                                 <p class="text-[10px] font-semibold text-slate-400">
-                                    {{ $hafalan->predikat }}
+                                    {{ $hafalan->status === 'pending' ? 'Pending' : 'Disetujui' }}
                                 </p>
                             </div>
                         </div>

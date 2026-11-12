@@ -10,6 +10,7 @@ use App\Models\EvaluasiDiniyah;
 use App\Models\KegiatanHarian;
 use App\Shared\Auth\CabangSession;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -83,13 +84,23 @@ class CabangDataService
         $grafikAdaData = array_sum($grafikPeserta) > 0;
 
         // 5. Evaluasi hafalan santri di cabang ini
+        // Hafalan Al-Qur'an dan Hadis menggunakan predikat A/B/C, bukan nilai numerik
         $evaluasiHafalanQuery = EvaluasiDiniyah::query()
             ->where('asrama_id', $cabangId)
-            ->where('jenis_evaluasi', "Hafalan Al-Qur'an");
+            ->whereIn('jenis_evaluasi', [
+                EvaluasiDiniyah::KATEGORI_QURAN,
+                EvaluasiDiniyah::KATEGORI_HADIS,
+            ]);
 
         $totalHafalan = (clone $evaluasiHafalanQuery)->count();
-        $rataRataHafalan = (clone $evaluasiHafalanQuery)->avg('nilai');
-        $mumtazHafalan = (clone $evaluasiHafalanQuery)->where('nilai', '>=', 85)->count();
+
+        // Hitung predikat A (bukan nilai >= 85, karena hafalan tidak punya nilai numerik)
+        $predikatACount = (clone $evaluasiHafalanQuery)
+            ->where(function ($q): void {
+                $q->where('predikat', 'A')
+                    ->orWhere('predikat_akhir', 'A');
+            })
+            ->count();
 
         $evaluasiHafalanTerbaru = (clone $evaluasiHafalanQuery)
             ->with(['anakAsuh', 'pengaju'])
@@ -112,8 +123,7 @@ class CabangDataService
             'evaluasi_hafalan' => [
                 'list' => $evaluasiHafalanTerbaru,
                 'total' => $totalHafalan,
-                'rata_rata' => $rataRataHafalan !== null ? round((float) $rataRataHafalan, 1) : 0,
-                'mumtaz' => $mumtazHafalan,
+                'predikat_a' => $predikatACount, // Predikat A (Istimewa) untuk hafalan
             ],
         ];
     }
@@ -138,7 +148,7 @@ class CabangDataService
      * CabangId selalu diisi dari session server, bukan dari request pengguna.
      *
      * @param  array<string, mixed>  $data
-     * @param  array<\Illuminate\Http\UploadedFile>  $files
+     * @param  array<UploadedFile>  $files
      */
     public function storeKegiatan(array $data, int $cabangId, int $userId, array $files = []): KegiatanHarian
     {
@@ -200,7 +210,10 @@ class CabangDataService
         $data['asrama_id'] = $cabangId;
         $data['diajukan_oleh'] = $userId;
         $data['diajukan_pada'] = now();
-        $data['status'] = EvaluasiDiniyah::STATUS_DISETUJUI;
+
+        // Status default ditentukan oleh model booted hook (STATUS_PENDING)
+        // Tidak di-override di sini agar workflow pending → review berjalan
+        // Untuk Nilai Diniyah non-hafalan yang tidak perlu review, status bisa diset manual
 
         return EvaluasiDiniyah::create($data);
     }

@@ -11,6 +11,9 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        // SIPEPA: Guard untuk mencegah test menggunakan database produksi/development
+        $protectedDatabases = ['pendidikan_ansuh', 'laravel'];
+
         foreach (config('database.connections', []) as $name => $connection) {
             $url = (string) ($connection['url'] ?? '');
             $urlParts = $url !== '' ? parse_url($url) : false;
@@ -21,9 +24,12 @@ abstract class TestCase extends BaseTestCase
 
             if (
                 (in_array($driver, ['mysql', 'mariadb'], true) || in_array($urlDriver, ['mysql', 'mariadb'], true))
-                && $database === 'laravel'
+                && in_array($database, $protectedDatabases, true)
             ) {
-                throw new LogicException("Tests cannot use database [laravel] through connection [{$name}].");
+                throw new LogicException(
+                    "Tests cannot use production/development database [{$database}] through connection [{$name}]. ".
+                    "Use 'pendidikan_ansuh_test' for testing."
+                );
             }
         }
     }

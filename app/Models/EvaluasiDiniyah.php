@@ -51,6 +51,7 @@ class EvaluasiDiniyah extends Model
         'tahun',
         'semester',
         'predikat_akhir',
+        'dokumen_bukti',
     ];
 
     protected function casts(): array
@@ -64,10 +65,26 @@ class EvaluasiDiniyah extends Model
         ];
     }
 
+    /**
+     * Jenis evaluasi yang menggunakan predikat awal A/B/C (input manual Staff Cabang).
+     * Predikat TIDAK dihitung otomatis dari nilai numerik untuk jenis ini.
+     *
+     * @var list<string>
+     */
+    public const JENIS_PREDIKAT_MANUAL = [
+        self::KATEGORI_QURAN,
+        self::KATEGORI_HADIS,
+    ];
+
     protected static function booted(): void
     {
         static::saving(function (EvaluasiDiniyah $model): void {
-            if ($model->nilai !== null && empty($model->predikat)) {
+            // Hafalan Al-Qur'an & Hafalan Hadis: predikat diisi manual oleh Staff Cabang (A/B/C).
+            // Tidak dihitung ulang dari nilai numerik agar tidak menimpa input.
+            // Nilai Diniyah lain: predikat dihitung otomatis dari nilai numerik.
+            $isHafalanJenis = in_array($model->jenis_evaluasi, self::JENIS_PREDIKAT_MANUAL, true);
+
+            if (! $isHafalanJenis && $model->nilai !== null && empty($model->predikat)) {
                 $model->predikat = static::hitungPredikat((float) $model->nilai);
             }
 
@@ -90,12 +107,16 @@ class EvaluasiDiniyah extends Model
             }
 
             if (empty($model->status)) {
-                // For new evaluations the default status should be pending until admin review.
                 $model->status = self::STATUS_PENDING;
             }
         });
     }
 
+    /**
+     * Hitung predikat berdasarkan nilai numerik.
+     * Digunakan untuk modul Nilai Diniyah (bukan Hafalan Al-Qur'an / Hafalan Hadis).
+     * Batas Mumtaz: nilai >= 90.
+     */
     public static function hitungPredikat(float $nilai): string
     {
         if ($nilai >= 90) {
@@ -112,6 +133,22 @@ class EvaluasiDiniyah extends Model
         }
 
         return 'Perlu Bimbingan (E)';
+    }
+
+    /**
+     * Validasi bahwa nilai predikat hafalan (awal/akhir) hanya boleh A, B, atau C.
+     */
+    public static function isPredikatHafalanValid(?string $predikat): bool
+    {
+        return in_array($predikat, ['A', 'B', 'C'], true);
+    }
+
+    /**
+     * Apakah record ini boleh diedit oleh Staff Cabang (hanya ketika masih pending).
+     */
+    public function isBisaDieditCabang(): bool
+    {
+        return $this->status === self::STATUS_PENDING;
     }
 
     public function asrama(): BelongsTo

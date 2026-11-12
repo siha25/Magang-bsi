@@ -18,6 +18,12 @@
         <p class="text-xs text-slate-500 mt-0.5">Pencatatan setoran hafalan santri cabang <strong>{{ $cabang?->nama_asrama }}</strong>.</p>
     </div>
 
+    {{-- Info alur workflow --}}
+    <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-800 text-xs leading-relaxed">
+        <p class="font-semibold mb-1">ℹ️ Alur Persetujuan Hafalan</p>
+        <p>Setoran yang Anda input akan berstatus <strong>Pending</strong> dan dikirimkan ke Admin Pendik untuk direview. Predikat akhir akan ditetapkan oleh Admin Pendik setelah review.</p>
+    </div>
+
     <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm p-5 sm:p-8">
         <form method="POST" action="{{ route('cabang.hafalan-quran.store') }}" class="space-y-6">
             @csrf
@@ -51,11 +57,17 @@
                     @error('tanggal_evaluasi')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
                 </div>
 
-                {{-- Nilai Angka --}}
+                {{-- Predikat Awal (input manual A/B/C) --}}
                 <div class="space-y-1.5">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Nilai Kelancaran & Tajwid (0 - 100) <span class="text-rose-500">*</span></label>
-                    <input type="number" step="0.5" min="0" max="100" name="nilai" value="{{ old('nilai') }}" placeholder="Contoh: 88.5" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border @error('nilai') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
-                    @error('nilai')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Predikat Hafalan <span class="text-rose-500">*</span></label>
+                    <select name="predikat" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border @error('predikat') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
+                        <option value="">-- Pilih Predikat --</option>
+                        <option value="A" {{ old('predikat') === 'A' ? 'selected' : '' }}>A &mdash; Istimewa</option>
+                        <option value="B" {{ old('predikat') === 'B' ? 'selected' : '' }}>B &mdash; Baik</option>
+                        <option value="C" {{ old('predikat') === 'C' ? 'selected' : '' }}>C &mdash; Cukup</option>
+                    </select>
+                    <p class="text-[10px] text-slate-400">Predikat awal dari Staff Cabang. Predikat akhir akan ditetapkan Admin Pendik.</p>
+                    @error('predikat')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
                 </div>
 
                 {{-- Catatan Penguji / Ustadz --}}
@@ -74,4 +86,3 @@
     </div>
 </div>
 @endsection
-

@@ -5,8 +5,8 @@
 use App\Cabang\Controllers\AnakAsuhController as CabangAnakAsuhController;
 use App\Cabang\Controllers\DashboardController as CabangDashboardController;
 use App\Cabang\Controllers\DiniyahController as CabangDiniyahController;
-use App\Cabang\Controllers\HafalanQuranController as CabangHafalanQuranController;
 use App\Cabang\Controllers\HafalanHadistController as CabangHafalanHadistController;
+use App\Cabang\Controllers\HafalanQuranController as CabangHafalanQuranController;
 use App\Cabang\Controllers\KegiatanHarianController as CabangKegiatanHarianController;
 use App\Cabang\Controllers\PengaturanController;
 use App\Cabang\Controllers\ProfilCabangController;
@@ -25,6 +25,7 @@ use App\Pusat\Controllers\HafalanHadistController as PusatHafalanHadistControlle
 use App\Pusat\Controllers\KelolaCabangController as PusatKelolaCabangController;
 use App\Pusat\Controllers\MonitoringDiniyahController as PusatMonitoringDiniyahController;
 use App\Pusat\Controllers\MonitoringKegiatanController as PusatMonitoringKegiatanController;
+use App\Pusat\Controllers\ReviewHafalanController as PusatReviewHafalanController;
 use Illuminate\Support\Facades\Route;
 
 // Rute Autentikasi Pengurus
@@ -128,6 +129,16 @@ Route::middleware(['auth', 'active'])->group(function () {
         // Evaluasi Ringan Diniyah untuk Santri di Bawah Batas KKM
         Route::get('/evaluasi-diniyah', [PusatEvaluasiDiniyahController::class, 'index'])->name('evaluasi-diniyah.index');
         Route::post('/evaluasi-diniyah/{id}/catatan', [PusatEvaluasiDiniyahController::class, 'simpanCatatan'])->name('evaluasi-diniyah.simpan-catatan');
+
+        // Review & Persetujuan Hafalan (hanya daftar & detail bisa diakses role:pusat)
+        // Aksi mutasi (approve/revisi) memerlukan role admin_pusat — dicek eksplisit di controller
+        Route::prefix('review-hafalan')->name('review-hafalan.')->group(function () {
+            Route::get('/quran', [PusatReviewHafalanController::class, 'indexQuran'])->name('quran.index');
+            Route::get('/hadis', [PusatReviewHafalanController::class, 'indexHadis'])->name('hadis.index');
+            Route::get('/{id}', [PusatReviewHafalanController::class, 'show'])->name('show');
+            Route::post('/{id}/approve', [PusatReviewHafalanController::class, 'approve'])->name('approve');
+            Route::post('/{id}/approve-revisi', [PusatReviewHafalanController::class, 'approveWithRevisi'])->name('approve-revisi');
+        });
 
         // Monitoring & Evaluasi Hafalan Hadist Pusat
         Route::prefix('hafalan-hadist')->name('hafalan-hadist.')->group(function () {

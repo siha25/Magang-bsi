@@ -95,37 +95,42 @@
                 Kurikulum
             </div>
             <nav class="space-y-1">
-                {{-- Evaluasi Diniyah --}}
-                <a href="{{ route('evaluasi-diniyah.index') }}" 
-                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ request()->routeIs('evaluasi-diniyah.*') && !request()->has('jenis_evaluasi') ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
-                    <svg class="w-5 h-5 {{ request()->routeIs('evaluasi-diniyah.*') && !request()->has('jenis_evaluasi') ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                    </svg>
-                    <span>Evaluasi Diniyah</span>
-                </a>
-
                 {{-- Hafalan Al-Qur'an --}}
-                <a href="{{ route('evaluasi-diniyah.index', ['jenis_evaluasi' => 'Hafalan Al-Qur\'an']) }}" 
-                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ request()->routeIs('evaluasi-diniyah.*') && request('jenis_evaluasi') === 'Hafalan Al-Qur\'an' ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
-                    <svg class="w-5 h-5 {{ request()->routeIs('evaluasi-diniyah.*') && request('jenis_evaluasi') === 'Hafalan Al-Qur\'an' ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                @php
+                    $isHafalanQuranRoute = auth()->user()?->isAdminCabang() 
+                        ? request()->routeIs('cabang.hafalan-quran.*')
+                        : request()->routeIs('pusat.review-hafalan.quran*');
+                @endphp
+                <a href="{{ auth()->user()?->isAdminCabang() 
+                    ? route('cabang.hafalan-quran.index') 
+                    : route('pusat.review-hafalan.quran.index') }}" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ $isHafalanQuranRoute ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                    <svg class="w-5 h-5 {{ $isHafalanQuranRoute ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                     <span>Hafalan Al-Qur'an</span>
                 </a>
 
                 {{-- Hafalan Hadis --}}
-                <a href="{{ route('evaluasi-diniyah.index', ['jenis_evaluasi' => 'Hafalan Hadist']) }}" 
-                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ request()->routeIs('evaluasi-diniyah.*') && request('jenis_evaluasi') === 'Hafalan Hadist' ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
-                    <svg class="w-5 h-5 {{ request()->routeIs('evaluasi-diniyah.*') && request('jenis_evaluasi') === 'Hafalan Hadist' ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                @php
+                    $isHafalanHadisRoute = auth()->user()?->isAdminCabang() 
+                        ? request()->routeIs('cabang.hafalan-hadist.*')
+                        : request()->routeIs('pusat.review-hafalan.hadis*') || request()->routeIs('pusat.hafalan-hadist.*');
+                @endphp
+                <a href="{{ auth()->user()?->isAdminCabang() 
+                    ? route('cabang.hafalan-hadist.index') 
+                    : route('pusat.review-hafalan.hadis.index') }}" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ $isHafalanHadisRoute ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                    <svg class="w-5 h-5 {{ $isHafalanHadisRoute ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Hafalan Hadist</span>
+                    <span>Hafalan Hadis</span>
                 </a>
 
                 {{-- Pengetahuan Diniyah --}}
-                <a href="{{ route('evaluasi-diniyah.index', ['jenis_evaluasi' => 'Pengetahuan Diniyah']) }}" 
-                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ request()->routeIs('evaluasi-diniyah.*') && request('jenis_evaluasi') === 'Pengetahuan Diniyah' ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
-                    <svg class="w-5 h-5 {{ request()->routeIs('evaluasi-diniyah.*') && request('jenis_evaluasi') === 'Pengetahuan Diniyah' ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <a href="{{ route('cabang.diniyah.index') }}" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ request()->routeIs('cabang.diniyah.*') ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                    <svg class="w-5 h-5 {{ request()->routeIs('cabang.diniyah.*') ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
                     <span>Pengetahuan Diniyah</span>

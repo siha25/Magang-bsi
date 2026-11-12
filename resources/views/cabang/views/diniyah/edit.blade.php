@@ -18,7 +18,7 @@
     </div>
 
     <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm p-5 sm:p-8">
-        <form method="POST" action="{{ route('cabang.diniyah.update', $evaluasi->id) }}" class="space-y-6">
+        <form method="POST" action="{{ route('cabang.diniyah.update', $evaluasi->id) }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
 
@@ -61,6 +61,24 @@
                 <div class="sm:col-span-2 space-y-1.5">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Catatan Evaluasi Guru / Penguji</label>
                     <textarea name="catatan_pengaju" rows="3" class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20">{{ old('catatan_pengaju', $evaluasi->catatan_pengaju) }}</textarea>
+                </div>
+
+                {{-- Dokumen Bukti Hasil Ujian --}}
+                <div class="sm:col-span-2 space-y-1.5">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Dokumen Bukti Hasil Ujian</label>
+                    @if($evaluasi->dokumen_bukti)
+                        <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center gap-3 mb-2">
+                            <svg class="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div class="flex-1 text-xs">
+                                <p class="font-semibold text-emerald-800">File sudah diunggah</p>
+                                <p class="text-emerald-700">{{ basename($evaluasi->dokumen_bukti) }}</p>
+                            </div>
+                        </div>
+                    @endif
+                    <input type="file" name="dokumen_bukti" accept=".pdf,.jpg,.jpeg,.png" class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-100 file:text-emerald-700 hover:file:bg-emerald-200">
+                    <p class="text-xs text-slate-500">Format: PDF, JPG, JPEG, PNG (Maksimal 5MB). Biarkan kosong jika tidak ingin mengubah file.</p>
                 </div>
             </div>
 

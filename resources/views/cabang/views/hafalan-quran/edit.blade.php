@@ -14,7 +14,8 @@
             <span>/</span>
             <span class="text-emerald-800 font-semibold">Edit</span>
         </div>
-        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Perbarui Nilai Hafalan</h2>
+        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Perbarui Data Setoran Hafalan</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Hanya setoran berstatus <strong>Pending</strong> yang dapat diubah.</p>
     </div>
 
     <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm p-5 sm:p-8">
@@ -45,8 +46,15 @@
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Nilai (0 - 100) <span class="text-rose-500">*</span></label>
-                    <input type="number" step="0.5" min="0" max="100" name="nilai" value="{{ old('nilai', $evaluasi->nilai) }}" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Predikat Hafalan <span class="text-rose-500">*</span></label>
+                    <select name="predikat" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border @error('predikat') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
+                        <option value="">-- Pilih Predikat --</option>
+                        <option value="A" {{ old('predikat', $evaluasi->predikat) === 'A' ? 'selected' : '' }}>A &mdash; Istimewa</option>
+                        <option value="B" {{ old('predikat', $evaluasi->predikat) === 'B' ? 'selected' : '' }}>B &mdash; Baik</option>
+                        <option value="C" {{ old('predikat', $evaluasi->predikat) === 'C' ? 'selected' : '' }}>C &mdash; Cukup</option>
+                    </select>
+                    <p class="text-[10px] text-slate-400">Predikat awal dari Staff Cabang. Status tetap Pending setelah disimpan.</p>
+                    @error('predikat')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="sm:col-span-2 space-y-1.5">
@@ -63,4 +71,3 @@
     </div>
 </div>
 @endsection
-

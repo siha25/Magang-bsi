@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class DiniyahController extends Controller
 {
@@ -29,6 +30,7 @@ class DiniyahController extends Controller
         $query = EvaluasiDiniyah::query()
             ->where('asrama_id', $cabangId)
             ->where('jenis_evaluasi', '!=', "Hafalan Al-Qur'an")
+            ->where('jenis_evaluasi', '!=', "Hafalan Hadis")
             ->with(['anakAsuh', 'asrama', 'pengaju']);
 
         if ($request->filled('jenis_evaluasi')) {
@@ -50,11 +52,11 @@ class DiniyahController extends Controller
         $cabang = CabangSession::getCabang();
 
         $kategoriList = [
-            'Hafalan Hadis',
-            'Pengetahuan Diniyah',
-            'Fiqih & Ibadah',
-            'Aqidah & Akhlak',
-            'Tajwid & Tahsin',
+            'Aqidah',
+            'Fikih',
+            'Tahsin',
+            'Siroh',
+            'Akhlak',
         ];
 
         return view('cabang.views.diniyah.index', compact('diniyahs', 'cabang', 'kategoriList'));
@@ -70,11 +72,11 @@ class DiniyahController extends Controller
         $cabang = CabangSession::getCabang();
         $santriList = $this->service->getSantriList($cabangId);
         $kategoriList = [
-            'Hafalan Hadis',
-            'Pengetahuan Diniyah',
-            'Fiqih & Ibadah',
-            'Aqidah & Akhlak',
-            'Tajwid & Tahsin',
+            'Aqidah',
+            'Fikih',
+            'Tahsin',
+            'Siroh',
+            'Akhlak',
         ];
         $selectedSantriId = $request->query('anak_asuh_id');
 
@@ -95,13 +97,27 @@ class DiniyahController extends Controller
             'tanggal_evaluasi' => ['required', 'date'],
             'nilai' => ['required', 'numeric', 'min:0', 'max:100'],
             'catatan_pengaju' => ['nullable', 'string', 'max:1000'],
+            'dokumen_bukti' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ], [
             'anak_asuh_id.required' => 'Santri wajib dipilih.',
             'jenis_evaluasi.required' => 'Kategori pengetahuan diniyah wajib dipilih.',
             'materi.required' => 'Materi / bab ulangan wajib diisi.',
             'tanggal_evaluasi.required' => 'Tanggal evaluasi wajib diisi.',
             'nilai.required' => 'Nilai ulangan wajib diisi angka 0 - 100.',
+            'dokumen_bukti.mimes' => 'File harus berupa PDF, JPG, JPEG, atau PNG.',
+            'dokumen_bukti.max' => 'Ukuran file maksimal 5MB.',
         ]);
+
+        // Handle file upload
+        if ($request->hasFile('dokumen_bukti') && $request->file('dokumen_bukti')->isValid()) {
+            $file = $request->file('dokumen_bukti');
+            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $filePath = $file->storeAs('evaluasi-diniyah', $fileName, 'private');
+            $validated['dokumen_bukti'] = $filePath;
+        }
+
+        // Nilai Diniyah (non-hafalan) langsung disetujui tanpa review Admin Pendik
+        $validated['status'] = EvaluasiDiniyah::STATUS_DISETUJUI;
 
         // Simpan evaluasi pengetahuan diniyah dengan cabang_id otomatis dari session server
         $this->service->storeEvaluasi($validated, $cabangId, (int) Auth::id());
@@ -129,11 +145,11 @@ class DiniyahController extends Controller
         $cabang = CabangSession::getCabang();
         $santriList = $this->service->getSantriList($cabangId);
         $kategoriList = [
-            'Hafalan Hadis',
-            'Pengetahuan Diniyah',
-            'Fiqih & Ibadah',
-            'Aqidah & Akhlak',
-            'Tajwid & Tahsin',
+            'Aqidah',
+            'Fikih',
+            'Tahsin',
+            'Siroh',
+            'Akhlak',
         ];
 
         return view('cabang.views.diniyah.edit', compact('evaluasi', 'cabang', 'santriList', 'kategoriList'));
@@ -153,7 +169,24 @@ class DiniyahController extends Controller
             'tanggal_evaluasi' => ['required', 'date'],
             'nilai' => ['required', 'numeric', 'min:0', 'max:100'],
             'catatan_pengaju' => ['nullable', 'string', 'max:1000'],
+            'dokumen_bukti' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+        ], [
+            'dokumen_bukti.mimes' => 'File harus berupa PDF, JPG, JPEG, atau PNG.',
+            'dokumen_bukti.max' => 'Ukuran file maksimal 5MB.',
         ]);
+
+        // Handle file upload (jika ada file baru)
+        if ($request->hasFile('dokumen_bukti') && $request->file('dokumen_bukti')->isValid()) {
+            // Hapus file lama jika ada
+            if ($evaluasi->dokumen_bukti && Storage::disk('private')->exists($evaluasi->dokumen_bukti)) {
+                Storage::disk('private')->delete($evaluasi->dokumen_bukti);
+            }
+            
+            $file = $request->file('dokumen_bukti');
+            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $filePath = $file->storeAs('evaluasi-diniyah', $fileName, 'private');
+            $validated['dokumen_bukti'] = $filePath;
+        }
 
         $validated['predikat'] = EvaluasiDiniyah::hitungPredikat((float) $validated['nilai']);
 

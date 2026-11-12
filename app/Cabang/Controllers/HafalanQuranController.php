@@ -6,6 +6,7 @@ namespace App\Cabang\Controllers;
 
 use App\Cabang\Services\CabangDataService;
 use App\Http\Controllers\Controller;
+use App\Models\AnakAsuh;
 use App\Models\EvaluasiDiniyah;
 use App\Shared\Auth\CabangSession;
 use Illuminate\Contracts\View\View;
@@ -28,7 +29,7 @@ class HafalanQuranController extends Controller
 
         $query = EvaluasiDiniyah::query()
             ->where('asrama_id', $cabangId)
-            ->where('jenis_evaluasi', "Hafalan Al-Qur'an")
+            ->where('jenis_evaluasi', EvaluasiDiniyah::KATEGORI_QURAN)
             ->with(['anakAsuh', 'asrama', 'pengaju']);
 
         if ($request->filled('search')) {
@@ -42,6 +43,10 @@ class HafalanQuranController extends Controller
             });
         }
 
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
         if ($request->filled('bulan')) {
             $query->where('bulan', $request->input('bulan'));
         }
@@ -53,10 +58,14 @@ class HafalanQuranController extends Controller
         $hafalans = $query->latest('tanggal_evaluasi')->latest('id')->paginate(10)->withQueryString();
         $cabang = CabangSession::getCabang();
 
+        $totalQuery = EvaluasiDiniyah::query()
+            ->where('asrama_id', $cabangId)
+            ->where('jenis_evaluasi', EvaluasiDiniyah::KATEGORI_QURAN);
+
         $stats = [
-            'total' => (clone $query)->count(),
-            'rata_rata' => round((float) ((clone $query)->avg('nilai') ?? 0), 1),
-            'mumtaz' => (clone $query)->where('nilai', '>=', 85)->count(),
+            'total' => (clone $totalQuery)->count(),
+            'pending' => (clone $totalQuery)->where('status', EvaluasiDiniyah::STATUS_PENDING)->count(),
+            'disetujui' => (clone $totalQuery)->where('status', EvaluasiDiniyah::STATUS_DISETUJUI)->count(),
         ];
 
         return view('cabang.views.hafalan-quran.index', compact('hafalans', 'cabang', 'stats'));
@@ -87,27 +96,39 @@ class HafalanQuranController extends Controller
             'anak_asuh_id' => ['required', 'integer', 'exists:anak_asuh,id'],
             'materi' => ['required', 'string', 'max:255'],
             'tanggal_evaluasi' => ['required', 'date'],
-            'nilai' => ['required', 'numeric', 'min:0', 'max:100'],
+            'predikat' => ['required', 'string', 'in:A,B,C'],
             'catatan_pengaju' => ['nullable', 'string', 'max:1000'],
         ], [
             'anak_asuh_id.required' => 'Santri wajib dipilih.',
             'materi.required' => 'Surah / Juz hafalan wajib diisi.',
             'tanggal_evaluasi.required' => 'Tanggal evaluasi hafalan wajib diisi.',
-            'nilai.required' => 'Nilai hafalan wajib diisi angka 0 - 100.',
+            'predikat.required' => 'Predikat hafalan wajib dipilih (A, B, atau C).',
+            'predikat.in' => 'Predikat hafalan hanya boleh A, B, atau C.',
         ]);
 
-        $validated['jenis_evaluasi'] = "Hafalan Al-Qur'an";
+        $validated['jenis_evaluasi'] = EvaluasiDiniyah::KATEGORI_QURAN;
+        $validated['status'] = EvaluasiDiniyah::STATUS_PENDING;
+        $validated['asrama_id'] = $cabangId;
+        $validated['diajukan_oleh'] = (int) Auth::id();
+        $validated['diajukan_pada'] = now();
+        // nilai tidak diperlukan untuk hafalan; predikat dari input manual
+        $validated['nilai'] = null;
 
-        // Simpan evaluasi hafalan dengan cabang_id otomatis dari session server
-        $this->service->storeEvaluasi($validated, $cabangId, (int) Auth::id());
+        // Pastikan santri milik cabang ini
+        $santri = AnakAsuh::query()
+            ->where('id', $validated['anak_asuh_id'])
+            ->where('asrama_id', $cabangId)
+            ->firstOrFail();
+
+        EvaluasiDiniyah::create($validated);
 
         return redirect()->route('cabang.hafalan-quran.index')
-            ->with('success', "Data hafalan Al-Qur'an santri berhasil disimpan.");
+            ->with('success', "Setoran hafalan Al-Qur'an {$santri->nama_lengkap} berhasil disimpan. Menunggu persetujuan Admin Pendik.");
     }
 
     public function show(int $id): View
     {
-        $evaluasi = EvaluasiDiniyah::with(['anakAsuh', 'asrama', 'pengaju'])->findOrFail($id);
+        $evaluasi = EvaluasiDiniyah::with(['anakAsuh', 'asrama', 'pengaju', 'penilai'])->findOrFail($id);
 
         // Validasi hak akses cabang
         CabangSession::validateAccess($evaluasi->asrama_id);
@@ -122,6 +143,12 @@ class HafalanQuranController extends Controller
 
         CabangSession::validateAccess($evaluasi->asrama_id);
 
+        // Hanya boleh edit jika masih pending
+        if (! $evaluasi->isBisaDieditCabang()) {
+            return redirect()->route('cabang.hafalan-quran.show', $id)
+                ->with('error', 'Data hafalan yang sudah disetujui tidak dapat diubah.');
+        }
+
         $cabang = CabangSession::getCabang();
         $santriList = $this->service->getSantriList($cabangId);
 
@@ -135,19 +162,30 @@ class HafalanQuranController extends Controller
 
         CabangSession::validateAccess($evaluasi->asrama_id);
 
+        // Hanya boleh edit jika masih pending
+        if (! $evaluasi->isBisaDieditCabang()) {
+            return redirect()->route('cabang.hafalan-quran.show', $id)
+                ->with('error', 'Data hafalan yang sudah disetujui tidak dapat diubah.');
+        }
+
         $validated = $request->validate([
             'anak_asuh_id' => ['required', 'integer', 'exists:anak_asuh,id'],
             'materi' => ['required', 'string', 'max:255'],
             'tanggal_evaluasi' => ['required', 'date'],
-            'nilai' => ['required', 'numeric', 'min:0', 'max:100'],
+            'predikat' => ['required', 'string', 'in:A,B,C'],
             'catatan_pengaju' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'predikat.required' => 'Predikat hafalan wajib dipilih (A, B, atau C).',
+            'predikat.in' => 'Predikat hafalan hanya boleh A, B, atau C.',
         ]);
 
-        $validated['predikat'] = EvaluasiDiniyah::hitungPredikat((float) $validated['nilai']);
+        // Status tetap pending setelah edit cabang
+        $validated['status'] = EvaluasiDiniyah::STATUS_PENDING;
+        $validated['asrama_id'] = $cabangId;
 
         $this->service->updateEvaluasi($evaluasi, $validated, $cabangId);
 
         return redirect()->route('cabang.hafalan-quran.index')
-            ->with('success', 'Data hafalan santri berhasil diperbarui.');
+            ->with('success', 'Data setoran hafalan berhasil diperbarui.');
     }
 }

@@ -19,7 +19,7 @@
     </div>
 
     <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm p-5 sm:p-8">
-        <form method="POST" action="{{ route('cabang.diniyah.store') }}" class="space-y-6">
+        <form method="POST" action="{{ route('cabang.diniyah.store') }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -75,6 +75,16 @@
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Catatan Evaluasi Guru / Penguji</label>
                     <textarea name="catatan_pengaju" rows="3" placeholder="Catatan pemahaman materi santri..." class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border @error('catatan_pengaju') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20">{{ old('catatan_pengaju') }}</textarea>
                     @error('catatan_pengaju')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
+                </div>
+
+                {{-- Dokumen Bukti Hasil Ujian --}}
+                <div class="sm:col-span-2 space-y-1.5">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Dokumen Bukti Hasil Ujian</label>
+                    <div class="relative">
+                        <input type="file" name="dokumen_bukti" accept=".pdf,.jpg,.jpeg,.png" class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border @error('dokumen_bukti') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-100 file:text-emerald-700 hover:file:bg-emerald-200">
+                    </div>
+                    <p class="text-xs text-slate-500">Format: PDF, JPG, JPEG, PNG (Maksimal 5MB). Contoh: foto lembar jawaban, hasil scan ujian, bukti hasil evaluasi.</p>
+                    @error('dokumen_bukti')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
                 </div>
             </div>
 
