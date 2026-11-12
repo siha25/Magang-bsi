@@ -103,13 +103,13 @@
                             onchange="handleRoleChange(this.value)"
                             class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-slate-900 border @error('role') border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 @else border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20 @enderror rounded-xl focus:outline-none focus:ring-2 transition-all">
                         <option value="{{ \App\Models\User::ROLE_ADMIN_CABANG }}" {{ old('role', $user->role) === \App\Models\User::ROLE_ADMIN_CABANG ? 'selected' : '' }}>
-                            Admin Cabang / Asrama (Mengelola 1 Asrama Tertentu)
+                            Staff Cabang (Mengelola 1 Asrama Tertentu)
                         </option>
                         <option value="{{ \App\Models\User::ROLE_PIMPINAN_PUSAT }}" {{ old('role', $user->role) === \App\Models\User::ROLE_PIMPINAN_PUSAT ? 'selected' : '' }}>
-                            Pimpinan Pusat (Monitoring & Supervisi Nasional)
+                            Manager (Monitoring & Supervisi Nasional)
                         </option>
                         <option value="{{ \App\Models\User::ROLE_ADMIN_PUSAT }}" {{ old('role', $user->role) === \App\Models\User::ROLE_ADMIN_PUSAT ? 'selected' : '' }}>
-                            Admin Pusat (Akses Penuh Seluruh Sistem)
+                            Admin Pendik (Akses Penuh Seluruh Sistem)
                         </option>
                     </select>
                     @if($user->is_primary_admin)
@@ -121,7 +121,7 @@
                     @enderror
                 </div>
 
-                {{-- Asrama Penugasan (Khusus Admin Cabang) --}}
+                {{-- Asrama Penugasan (Khusus Staff Cabang) --}}
                 <div id="asramaSelectWrapper" class="space-y-1.5 {{ old('role', $user->role) === \App\Models\User::ROLE_ADMIN_CABANG ? '' : 'hidden' }}">
                     <label for="asrama_id" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
                         Asrama yang Ditugaskan <span class="text-rose-500">*</span>

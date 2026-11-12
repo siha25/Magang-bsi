@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class KegiatanHarian extends Model
 {
@@ -40,6 +41,11 @@ class KegiatanHarian extends Model
     public function penginput(): BelongsTo
     {
         return $this->belongsTo(User::class, 'penginput_id');
+    }
+
+    public function dokumentasi(): HasMany
+    {
+        return $this->hasMany(DokumentasiKegiatan::class, 'kegiatan_id')->orderBy('urutan');
     }
 
     public function scopeByRole(Builder $query): Builder
@@ -101,11 +107,76 @@ class KegiatanHarian extends Model
             return $this->foto_dokumentasi;
         }
 
+        if (! empty($this->id)) {
+            return route('kegiatan-harian.legacy-foto', ['id' => $this->id]);
+        }
+
         return '/storage/'.ltrim((string) $this->foto_dokumentasi, '/');
+    }
+
+    public function getSemuaFotoAttribute(): array
+    {
+        $fotos = [];
+
+        // 1. Jika relasi dokumentasi sudah di-eager-load dan memiliki data
+        if ($this->relationLoaded('dokumentasi') && $this->dokumentasi->isNotEmpty()) {
+            foreach ($this->dokumentasi as $dok) {
+                $fotos[] = [
+                    'id' => $dok->id,
+                    'url' => $dok->url,
+                    'nama' => $dok->nama_asli ?? ('Dokumentasi #'.($dok->urutan + 1)),
+                    'ukuran' => $dok->ukuran_formatted,
+                    'is_legacy' => false,
+                ];
+            }
+
+            return $fotos;
+        }
+
+        // 2. Jika relasi belum dimuat tetapi model memiliki ID di DB
+        if (! $this->relationLoaded('dokumentasi') && ! empty($this->id)) {
+            try {
+                $docs = $this->dokumentasi()->get();
+                if ($docs->isNotEmpty()) {
+                    foreach ($docs as $dok) {
+                        $fotos[] = [
+                            'id' => $dok->id,
+                            'url' => $dok->url,
+                            'nama' => $dok->nama_asli ?? ('Dokumentasi #'.($dok->urutan + 1)),
+                            'ukuran' => $dok->ukuran_formatted,
+                            'is_legacy' => false,
+                        ];
+                    }
+
+                    return $fotos;
+                }
+            } catch (\Throwable) {
+                // Abaikan jika tabel dokumentasi_kegiatan belum dimigrasi
+            }
+        }
+
+        // 3. Fallback foto historis (legacy) tanpa duplikasi
+        if (filled($this->foto_dokumentasi)) {
+            $fotos[] = [
+                'id' => null,
+                'url' => $this->foto_url,
+                'nama' => 'Foto Dokumentasi',
+                'ukuran' => null,
+                'is_legacy' => true,
+            ];
+        }
+
+        return $fotos;
     }
 
     public function getHasFotoAttribute(): bool
     {
-        return filled($this->foto_dokumentasi);
+        if (filled($this->foto_dokumentasi)) {
+            return true;
+        }
+
+        return $this->relationLoaded('dokumentasi')
+            ? $this->dokumentasi->isNotEmpty()
+            : $this->dokumentasi()->exists();
     }
 }

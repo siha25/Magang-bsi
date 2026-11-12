@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Admin Pusat')
+@section('title', 'Dashboard Admin Pendik')
 
-@section('header_title', 'Dashboard Admin Pusat')
+@section('header_title', 'Dashboard Admin Pendik')
 
 @section('content')
 {{-- ================================================================== --}}
-{{-- DASHBOARD ADMIN PUSAT - SIMPENA (Sistem Informasi Manajemen          --}}
+{{-- DASHBOARD ADMIN PENDIK - SIMPENA (Sistem Informasi Manajemen        --}}
 {{-- Pendidikan dan Pembinaan Anak Asuh) Yayasan Rumah Harapan           --}}
 {{-- ================================================================== --}}
 
 @php
     $user = auth()->user();
-    $userName = $user?->name ?? 'Admin Pusat';
+    $userName = $user?->name ?? 'Admin Pendik';
 @endphp
 
 <div class="space-y-6">
@@ -93,7 +93,7 @@
         <div class="flex-1">
             <div class="db-badge">
                 <span class="dot"></span>
-                <span>Dashboard Admin Pusat &bull; {{ $filterAktif['bulan_nama'] }} {{ $filterAktif['tahun'] }}</span>
+                <span>Dashboard Admin Pendik &bull; {{ $filterAktif['bulan_nama'] }} {{ $filterAktif['tahun'] }}</span>
             </div>
             <h1>Assalamu'alaikum, {{ $userName }}</h1>
             <p class="sub">Monitoring Perkembangan Pendidikan dan Pembinaan Anak Asuh<br>Yayasan Rumah Harapan — Seluruh Asrama Aktif</p>
@@ -277,7 +277,7 @@
                 </div>
                 <div class="mt-3 pt-3 border-t border-slate-100 text-[11px]">
                     @if($evalPendingTotal > 0)
-                        <span class="text-amber-600 font-semibold">Menunggu penilaian Admin Pusat</span>
+                        <span class="text-amber-600 font-semibold">Menunggu penilaian Admin Pendik</span>
                     @else
                         <span class="text-slate-400">Tidak ada evaluasi yang menunggu</span>
                     @endif
@@ -373,8 +373,8 @@
 
 </div>
 
-{{-- ========== 5. GRAFIK BARIS 2: KEGIATAN HARIAN + KASUS & PEMBINAAN + KESEHATAN ========== --}}
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+{{-- ========== 5. GRAFIK BARIS 2: KEGIATAN HARIAN ========== --}}
+<div class="grid grid-cols-1 gap-5">
 
     {{-- Grafik 3: Kegiatan Harian per Kategori (Bar) --}}
     <div class="chart-card">
@@ -406,6 +406,7 @@
         @endif
     </div>
 
+    @if(false) {{-- Modul Kasus & Kesehatan disembunyikan pada Tahap 1 sesuai instruksi --}}
     {{-- Grafik 4: Kasus & Pembinaan (Bar 2 Indikator) --}}
     <div class="chart-card">
         <div class="section-hd">
@@ -458,6 +459,7 @@
             <small>Modul rekam kesehatan anak asuh Belum tersedia. Total laporan: 0</small>
         </div>
     </div>
+    @endif
 
 </div>
 

@@ -108,7 +108,7 @@
         <div class="p-5 border-b border-slate-100 flex items-center justify-between">
             <div>
                 <h3 class="text-sm font-bold text-slate-900">Tabel Rekapitulasi Kegiatan Nasional</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Daftar kegiatan yang diinput oleh pengurus cabang masing-masing</p>
+                <p class="text-xs text-slate-500 mt-0.5">Daftar kegiatan yang diinput oleh staff cabang masing-masing</p>
             </div>
             <span class="text-xs text-slate-500 font-medium">Halaman {{ $kegiatans->currentPage() }} dari {{ $kegiatans->lastPage() }}</span>
         </div>
@@ -164,7 +164,7 @@
                                 </span>
                             </td>
                             <td class="py-3.5 px-4">
-                                <span class="font-medium text-slate-800">{{ $keg->penginput?->name ?? 'Pengurus Cabang' }}</span>
+                                <span class="font-medium text-slate-800">{{ $keg->penginput?->name ?? 'Staff Cabang' }}</span>
                             </td>
                         </tr>
                     @empty

@@ -20,9 +20,9 @@
     $notifications = [];
     if ($user) {
         if ($user->isAdminPusat()) {
-            $userRole = 'Admin Pusat';
+            $userRole = 'Admin Pendik';
         } elseif ($user->isAdminCabang()) {
-            $userRole = 'Admin Cabang';
+            $userRole = 'Staff Cabang';
             $notifications = [
                 [
                     'id' => 'h1',
@@ -34,15 +34,15 @@
                 [
                     'id' => 'k1',
                     'title' => 'Pengajuan hafalan telah diproses',
-                    'message' => 'Status pengajuan hafalan telah disetujui oleh Admin Pusat.',
+                    'message' => 'Status pengajuan hafalan telah disetujui oleh Admin Pendik.',
                     'read' => true,
                     'time' => 'Hari ini',
                 ],
             ];
         } elseif ($user->isPimpinanPusat()) {
-            $userRole = 'Pimpinan Pusat';
+            $userRole = 'Manager';
         } else {
-            $userRole = ucwords(str_replace('_', ' ', (string) $user->role));
+            $userRole = $user->role_label ?? ucwords(str_replace('_', ' ', (string) $user->role));
         }
     }
     $unreadNotifications = collect($notifications)->where('read', false)->count();

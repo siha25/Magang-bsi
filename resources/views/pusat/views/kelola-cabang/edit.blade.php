@@ -101,7 +101,7 @@
             <div class="pt-4 border-t border-slate-100">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-3 flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                    2. Akun Pengurus Cabang
+                    2. Akun Staff Cabang
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>

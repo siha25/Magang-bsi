@@ -39,7 +39,7 @@
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
                     {{ \App\Shared\Auth\CabangSession::getNamaCabang() }}
                 </span>
-                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-200">Cabang</span>
+                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-200">Staff Cabang</span>
             </div>
             <span class="text-[11px] text-slate-500 pl-3.5 truncate">
                 Wilayah: {{ \App\Shared\Auth\CabangSession::getDaerah() }}

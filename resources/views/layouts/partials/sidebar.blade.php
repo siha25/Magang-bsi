@@ -133,12 +133,13 @@
             </nav>
         </div>
 
-        {{-- Grup Perkembangan & Pembinaan --}}
+        {{-- Grup Administrasi --}}
         <div>
             <div class="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Kesejahteraan & Asrama
+                Administrasi
             </div>
             <nav class="space-y-1">
+                @if(false) {{-- Modul Kesehatan & Kasus disembunyikan pada Tahap 1 sesuai arahan --}}
                 {{-- Kesehatan Anak --}}
                 <a href="#kesehatan-anak" 
                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
@@ -156,6 +157,7 @@
                     </svg>
                     <span>Kasus & Pembinaan</span>
                 </a>
+                @endif
 
                 {{-- Laporan --}}
                 <a href="#laporan" 

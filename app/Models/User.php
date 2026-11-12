@@ -144,6 +144,19 @@ class User extends Authenticatable
     }
 
     /**
+     * Label tampilan peran pengguna untuk antarmuka.
+     */
+    public function getRoleLabelAttribute(): string
+    {
+        return match ($this->role) {
+            self::ROLE_ADMIN_PUSAT => 'Admin Pendik',
+            self::ROLE_ADMIN_CABANG => 'Staff Cabang',
+            self::ROLE_PIMPINAN_PUSAT => 'Manager',
+            default => ucfirst(str_replace('_', ' ', (string) $this->role)),
+        };
+    }
+
+    /**
      * Alias backward compatibility.
      */
     public function isAdminAsrama(): bool

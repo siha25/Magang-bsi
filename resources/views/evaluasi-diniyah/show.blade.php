@@ -116,7 +116,7 @@
             {{-- Metadata & Penginput --}}
             <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-400 gap-2">
                 <div>
-                    Diinput oleh: <span class="font-semibold text-slate-600">{{ $evaluasiDiniyah->pengaju?->name ?? 'Admin Cabang' }}</span>
+                    Diinput oleh: <span class="font-semibold text-slate-600">{{ $evaluasiDiniyah->pengaju?->name ?? 'Staff Cabang' }}</span>
                     @if($evaluasiDiniyah->diajukan_pada)
                         pada {{ $evaluasiDiniyah->diajukan_pada->format('d M Y, H:i') }}
                     @endif

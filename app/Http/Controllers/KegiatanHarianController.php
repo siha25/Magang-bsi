@@ -46,7 +46,7 @@ class KegiatanHarianController extends Controller
     {
         $kegiatan = KegiatanHarian::query()
             ->byRole()
-            ->with(['asrama', 'penginput'])
+            ->with(['asrama', 'penginput', 'dokumentasi'])
             ->findOrFail($kegiatanHarian);
 
         return view('kegiatan-harian.show', compact('kegiatan'));

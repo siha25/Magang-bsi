@@ -50,6 +50,7 @@ class EvaluasiDiniyah extends Model
         'bulan',
         'tahun',
         'semester',
+        'predikat_akhir',
     ];
 
     protected function casts(): array
@@ -89,7 +90,8 @@ class EvaluasiDiniyah extends Model
             }
 
             if (empty($model->status)) {
-                $model->status = self::STATUS_DISETUJUI;
+                // For new evaluations the default status should be pending until admin review.
+                $model->status = self::STATUS_PENDING;
             }
         });
     }

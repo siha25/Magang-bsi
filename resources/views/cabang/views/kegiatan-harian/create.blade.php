@@ -95,15 +95,23 @@
                     @error('catatan_tambahan')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
                 </div>
 
-                {{-- Foto / Dokumentasi Kegiatan --}}
+                {{-- Foto / Dokumentasi Kegiatan (Maksimal 5 Foto) --}}
                 <div class="sm:col-span-2 space-y-2">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                        Foto Dokumentasi Kegiatan
-                        <span class="text-[11px] font-normal lowercase text-slate-400 ml-1">(opsional, max 5 MB: JPG, PNG, WEBP)</span>
-                    </label>
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                            Foto Dokumentasi Kegiatan
+                            <span class="text-[11px] font-normal lowercase text-slate-400 ml-1">(opsional, maks 5 foto, maks 2 MB/foto)</span>
+                        </label>
+                        <span id="counter-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 transition-colors">
+                            0 / 5 foto dipilih
+                        </span>
+                    </div>
 
-                    <div class="border-2 border-dashed @error('foto_dokumentasi') border-rose-400 bg-rose-50/20 @else border-slate-200 hover:border-emerald-400 bg-slate-50/60 @enderror rounded-2xl p-5 sm:p-6 transition-all text-center">
-                        <input type="file" id="foto_dokumentasi" name="foto_dokumentasi" accept="image/jpeg,image/png,image/jpg,image/webp" class="hidden" onchange="previewImage(this)">
+                    {{-- Pesan Error Validasi Klien (JS) --}}
+                    <div id="client-error-box" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium"></div>
+
+                    <div id="drop-area" class="border-2 border-dashed @if($errors->has('foto_dokumentasi') || $errors->has('foto_dokumentasi.*')) border-rose-400 bg-rose-50/20 @else border-slate-200 hover:border-emerald-400 bg-slate-50/60 @endif rounded-2xl p-5 sm:p-6 transition-all text-center">
+                        <input type="file" id="foto_dokumentasi" name="foto_dokumentasi[]" multiple accept="image/jpeg,image/png,image/jpg,image/webp" class="hidden">
 
                         <div id="upload-placeholder" class="cursor-pointer py-3" onclick="document.getElementById('foto_dokumentasi').click()">
                             <div class="w-12 h-12 mx-auto rounded-2xl bg-emerald-100/70 text-emerald-700 flex items-center justify-center mb-2.5 transition-transform hover:scale-105">
@@ -111,24 +119,31 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                             </div>
-                            <p class="text-xs sm:text-sm font-semibold text-slate-700">Klik untuk unggah foto kegiatan</p>
-                            <p class="text-[11px] text-slate-400 mt-1">Format didukung: JPG, JPEG, PNG, atau WEBP (Maksimal 5 MB)</p>
+                            <p class="text-xs sm:text-sm font-semibold text-slate-700">Klik untuk memilih atau seret foto kegiatan ke sini</p>
+                            <p class="text-[11px] text-slate-400 mt-1">Format didukung: JPG, JPEG, PNG, atau WebP &bull; Maksimal 2 MB per foto &bull; Maksimal 5 foto</p>
                         </div>
 
-                        {{-- Preview Box --}}
-                        <div id="preview-wrapper" class="hidden">
-                            <div class="relative inline-block max-w-sm rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white">
-                                <img id="preview-img" src="" alt="Pratinjau Foto Dokumentasi" class="max-h-64 w-auto object-cover rounded-xl mx-auto">
-                                <button type="button" onclick="removeImage()" class="absolute top-2 right-2 p-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white shadow-md transition-all cursor-pointer" title="Hapus Gambar">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <p id="file-name-info" class="text-xs text-slate-500 mt-2 font-medium"></p>
+                        {{-- Preview Grid Multi-Foto --}}
+                        <div id="preview-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mt-3 hidden text-left"></div>
+
+                        {{-- Tombol Tambah Foto Tambahan jika belum 5 --}}
+                        <div id="add-more-container" class="mt-4 pt-3 border-t border-slate-200/60 hidden flex justify-center">
+                            <button type="button" onclick="document.getElementById('foto_dokumentasi').click()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold transition-colors cursor-pointer">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                </svg>
+                                <span>Tambah Foto Lain</span>
+                            </button>
                         </div>
                     </div>
-                    @error('foto_dokumentasi')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
+
+                    {{-- Pesan Error Server-side --}}
+                    @error('foto_dokumentasi')
+                        <p class="text-xs text-rose-600 font-medium">{{ $message }}</p>
+                    @enderror
+                    @error('foto_dokumentasi.*')
+                        <p class="text-xs text-rose-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
@@ -141,29 +156,177 @@
 </div>
 
 <script>
-function previewImage(input) {
-    const file = input.files && input.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('preview-img').src = e.target.result;
-            document.getElementById('upload-placeholder').classList.add('hidden');
-            document.getElementById('preview-wrapper').classList.remove('hidden');
-            const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-            document.getElementById('file-name-info').textContent = file.name + ' (' + sizeMb + ' MB)';
-        };
-        reader.readAsDataURL(file);
-    }
-}
+(function() {
+    const fileInput = document.getElementById('foto_dokumentasi');
+    const previewGrid = document.getElementById('preview-grid');
+    const counterBadge = document.getElementById('counter-badge');
+    const errorBox = document.getElementById('client-error-box');
+    const placeholder = document.getElementById('upload-placeholder');
+    const addMoreContainer = document.getElementById('add-more-container');
+    const dropArea = document.getElementById('drop-area');
 
-function removeImage() {
-    const input = document.getElementById('foto_dokumentasi');
-    input.value = '';
-    document.getElementById('preview-img').src = '';
-    document.getElementById('upload-placeholder').classList.remove('hidden');
-    document.getElementById('preview-wrapper').classList.add('hidden');
-    document.getElementById('file-name-info').textContent = '';
-}
+    const MAX_FILES = 5;
+    const MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2 MB
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+
+    // DataTransfer untuk mengelola kumpulan file yang aktif
+    let dt = new DataTransfer();
+
+    function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.classList.remove('hidden');
+    }
+
+    function clearError() {
+        errorBox.textContent = '';
+        errorBox.classList.add('hidden');
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes >= 1048576) {
+            return (bytes / 1048576).toFixed(2) + ' MB';
+        }
+        return (bytes / 1024).toFixed(0) + ' KB';
+    }
+
+    function updateView() {
+        previewGrid.innerHTML = '';
+        const count = dt.items.length;
+
+        // Perbarui badge jumlah foto
+        counterBadge.textContent = count + ' / ' + MAX_FILES + ' foto dipilih';
+        if (count > 0) {
+            counterBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 transition-colors';
+            previewGrid.classList.remove('hidden');
+            if (count < MAX_FILES) {
+                addMoreContainer.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                addMoreContainer.classList.add('hidden');
+                placeholder.classList.add('hidden');
+            }
+        } else {
+            counterBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 transition-colors';
+            previewGrid.classList.add('hidden');
+            addMoreContainer.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+        }
+
+        // Sinkronisasi ke elemen input
+        fileInput.files = dt.files;
+
+        // Render setiap kartu pratinjau
+        Array.from(dt.files).forEach((file, index) => {
+            const card = document.createElement('div');
+            card.className = 'relative rounded-xl border border-slate-200 bg-white shadow-xs overflow-hidden flex flex-col group';
+
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'relative w-full aspect-square bg-slate-100 overflow-hidden';
+
+            const img = document.createElement('img');
+            img.className = 'w-full h-full object-cover';
+            img.src = URL.createObjectURL(file);
+
+            // Tombol batalkan / hapus foto ini
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.title = 'Batalkan foto ini';
+            removeBtn.className = 'absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow-md transition-all cursor-pointer';
+            removeBtn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>';
+            removeBtn.onclick = function(e) {
+                e.stopPropagation();
+                removeFileAtIndex(index);
+            };
+
+            imgContainer.appendChild(img);
+            imgContainer.appendChild(removeBtn);
+
+            const meta = document.createElement('div');
+            meta.className = 'p-2 text-[10px] bg-white';
+            meta.innerHTML = '<p class="font-semibold text-slate-700 truncate" title="' + file.name + '">' + file.name + '</p>' +
+                             '<p class="text-slate-400 mt-0.5">' + formatFileSize(file.size) + '</p>';
+
+            card.appendChild(imgContainer);
+            card.appendChild(meta);
+            previewGrid.appendChild(card);
+        });
+    }
+
+    function removeFileAtIndex(idxToRemove) {
+        const newDt = new DataTransfer();
+        Array.from(dt.files).forEach((file, index) => {
+            if (index !== idxToRemove) {
+                newDt.items.add(file);
+            }
+        });
+        dt = newDt;
+        clearError();
+        updateView();
+    }
+
+    function addFiles(newFiles) {
+        clearError();
+        const incoming = Array.from(newFiles);
+
+        for (let file of incoming) {
+            // 1. Cek batas maksimal foto
+            if (dt.items.length >= MAX_FILES) {
+                showError('Maksimal ' + MAX_FILES + ' foto dokumentasi yang dapat dipilih.');
+                break;
+            }
+
+            // 2. Cek format berkas
+            if (!ALLOWED_TYPES.includes(file.type)) {
+                showError('Format file "' + file.name + '" tidak didukung. Harap pilih gambar dengan format JPG, JPEG, PNG, atau WebP.');
+                continue;
+            }
+
+            // 3. Cek ukuran berkas (maks 2 MB)
+            if (file.size > MAX_SIZE_BYTES) {
+                showError('Ukuran file "' + file.name + '" (' + formatFileSize(file.size) + ') melebihi batas maksimal 2 MB.');
+                continue;
+            }
+
+            // Cegah duplikasi file yang sama persis
+            const isDuplicate = Array.from(dt.files).some(f => f.name === file.name && f.size === file.size && f.lastModified === file.lastModified);
+            if (!isDuplicate) {
+                dt.items.add(file);
+            }
+        }
+
+        updateView();
+    }
+
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            addFiles(this.files);
+        }
+    });
+
+    // Drag and drop support
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropArea.classList.add('border-emerald-500', 'bg-emerald-50/40');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropArea.classList.remove('border-emerald-500', 'bg-emerald-50/40');
+        }, false);
+    });
+
+    dropArea.addEventListener('drop', function(e) {
+        const droppedFiles = e.dataTransfer.files;
+        if (droppedFiles && droppedFiles.length > 0) {
+            addFiles(droppedFiles);
+        }
+    }, false);
+})();
 </script>
 @endsection
 

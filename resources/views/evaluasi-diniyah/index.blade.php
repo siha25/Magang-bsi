@@ -325,7 +325,7 @@
                                     </div>
                                     <h3 class="text-base font-bold text-slate-800">Belum Ada Data Evaluasi Diniyah</h3>
                                     <p class="text-xs text-slate-500">
-                                        Data nilai ulangan diniyah belum dimasukkan. Admin cabang dapat mulai memasukkan nilai evaluasi untuk anak-anak asuh di setiap cabang.
+                                        Data nilai ulangan diniyah belum dimasukkan. Staff Cabang dapat mulai memasukkan nilai evaluasi untuk anak-anak asuh di setiap cabang.
                                     </p>
                                     @if(auth()->user()?->isAdminCabang() || auth()->user()?->isAdminPusat())
                                         <div class="pt-2">

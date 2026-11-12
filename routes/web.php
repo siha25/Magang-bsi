@@ -15,11 +15,13 @@ use App\Http\Controllers\AsramaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DokumentasiKegiatanController;
 use App\Http\Controllers\EvaluasiDiniyahController;
 use App\Http\Controllers\KegiatanHarianController;
 use App\Http\Controllers\UserController;
 use App\Pusat\Controllers\DashboardController as PusatDashboardController;
 use App\Pusat\Controllers\EvaluasiDiniyahController as PusatEvaluasiDiniyahController;
+use App\Pusat\Controllers\HafalanHadistController as PusatHafalanHadistController;
 use App\Pusat\Controllers\KelolaCabangController as PusatKelolaCabangController;
 use App\Pusat\Controllers\MonitoringDiniyahController as PusatMonitoringDiniyahController;
 use App\Pusat\Controllers\MonitoringKegiatanController as PusatMonitoringKegiatanController;
@@ -64,16 +66,15 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::get('/{id}', [CabangKegiatanHarianController::class, 'show'])->name('show');
         });
 
-        // Input & Evaluasi Hafalan Hadist Pusat
-        Route::prefix('hafalan-hadist')->name('hafalan-hadist.')->middleware('role:admin_pusat')->group(function () {
-            Route::get('/', [PusatHafalanHadistController::class, 'index'])->name('index');
-            Route::get('/create', [PusatHafalanHadistController::class, 'create'])->name('create');
-            Route::post('/', [PusatHafalanHadistController::class, 'store'])->name('store');
-            Route::get('/{id}', [PusatHafalanHadistController::class, 'show'])->name('show');
-            Route::get('/{id}/edit', [PusatHafalanHadistController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [PusatHafalanHadistController::class, 'update'])->name('update');
+        // Input & Evaluasi Hafalan Al-Qur'an Cabang
+        Route::prefix('hafalan-quran')->name('hafalan-quran.')->group(function () {
+            Route::get('/', [CabangHafalanQuranController::class, 'index'])->name('index');
+            Route::get('/create', [CabangHafalanQuranController::class, 'create'])->name('create');
+            Route::post('/', [CabangHafalanQuranController::class, 'store'])->name('store');
+            Route::get('/{id}', [CabangHafalanQuranController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [CabangHafalanQuranController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [CabangHafalanQuranController::class, 'update'])->name('update');
         });
-
 
         // Input & Evaluasi Hafalan Hadist Cabang
         Route::prefix('hafalan-hadist')->name('hafalan-hadist.')->group(function () {
@@ -128,6 +129,16 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/evaluasi-diniyah', [PusatEvaluasiDiniyahController::class, 'index'])->name('evaluasi-diniyah.index');
         Route::post('/evaluasi-diniyah/{id}/catatan', [PusatEvaluasiDiniyahController::class, 'simpanCatatan'])->name('evaluasi-diniyah.simpan-catatan');
 
+        // Monitoring & Evaluasi Hafalan Hadist Pusat
+        Route::prefix('hafalan-hadist')->name('hafalan-hadist.')->group(function () {
+            Route::get('/', [PusatHafalanHadistController::class, 'index'])->name('index');
+            Route::get('/create', [PusatHafalanHadistController::class, 'create'])->name('create');
+            Route::post('/', [PusatHafalanHadistController::class, 'store'])->name('store');
+            Route::get('/{id}', [PusatHafalanHadistController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [PusatHafalanHadistController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [PusatHafalanHadistController::class, 'update'])->name('update');
+        });
+
         // Manajemen Akun & Wilayah Cabang (Khusus Admin Pusat)
         Route::prefix('kelola-cabang')->name('kelola-cabang.')->middleware('role:admin_pusat')->group(function () {
             Route::get('/', [PusatKelolaCabangController::class, 'index'])->name('index');
@@ -171,6 +182,10 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::post('/', [KegiatanHarianController::class, 'store'])->name('store')->middleware('role:admin_pusat,admin_cabang');
         Route::get('/{kegiatanHarian}', [KegiatanHarianController::class, 'show'])->name('show')->middleware('role:admin_pusat,admin_cabang,pimpinan_pusat');
     });
+
+    // Akses Privat & Aman Dokumentasi Foto Kegiatan
+    Route::get('dokumentasi-kegiatan/{id}', [DokumentasiKegiatanController::class, 'showFile'])->name('kegiatan-harian.dokumentasi.show');
+    Route::get('kegiatan-harian-legacy-foto/{id}', [DokumentasiKegiatanController::class, 'showLegacyFoto'])->name('kegiatan-harian.legacy-foto');
 
     // Modul Evaluasi Diniyah
     Route::prefix('evaluasi-diniyah')->name('evaluasi-diniyah.')->group(function () {

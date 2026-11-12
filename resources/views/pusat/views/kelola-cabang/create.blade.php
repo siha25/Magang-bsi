@@ -29,9 +29,9 @@
     {{-- Form Tambah Cabang & Akun --}}
     <div class="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-100/90 shadow-xs">
         <div class="mb-6 pb-4 border-b border-slate-100">
-            <h1 class="text-lg font-bold text-slate-900">Form Pendaftaran Cabang & Akun Pengurus</h1>
+            <h1 class="text-lg font-bold text-slate-900">Form Pendaftaran Cabang & Akun Staff Cabang</h1>
             <p class="text-xs text-slate-500 mt-1">
-                Data cabang (kode unik otomatis) dan akun login pengurus cabang akan langsung dibuat secara terintegrasi.
+                Data cabang (kode unik otomatis) dan akun login staff cabang akan langsung dibuat secara terintegrasi.
             </p>
         </div>
 
@@ -96,7 +96,7 @@
             <div class="pt-4 border-t border-slate-100">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-3 flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                    2. Akun Login Pengurus Cabang
+                    2. Akun Login Staff Cabang
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>

@@ -67,6 +67,53 @@
             </div>
         </a>
 
+        {{-- 2. Total Evaluasi Hafalan Tercatat --}}
+        <a href="{{ route('cabang.hafalan-quran.index') }}" class="group block bg-white rounded-2xl p-5 border border-emerald-100/90 shadow-xs hover:border-emerald-300 hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1 group-hover:text-emerald-700 transition-colors">
+                        Total Setoran Hafalan
+                    </span>
+                    <span class="text-3xl font-extrabold text-slate-900 tracking-tight">
+                        {{ number_format($stats['evaluasi_hafalan']['total']) }}
+                    </span>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white flex items-center justify-center transition-colors">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span>Rata-rata skor: {{ $stats['evaluasi_hafalan']['rata_rata'] }} poin</span>
+                <span class="text-teal-600 font-semibold group-hover:translate-x-0.5 transition-transform">Lihat &rarr;</span>
+            </div>
+        </a>
+
+        {{-- 3. Santri Predikat Mumtaz (A) --}}
+        <div class="bg-white rounded-2xl p-5 border border-amber-100/90 shadow-xs">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                        Predikat Mumtaz (A)
+                    </span>
+                    <span class="text-3xl font-extrabold text-amber-600 tracking-tight">
+                        {{ number_format($stats['evaluasi_hafalan']['mumtaz']) }}
+                    </span>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span>Nilai evaluasi hafalan &ge; 85</span>
+                <span class="text-[11px] font-semibold text-amber-600">Istimewa</span>
+            </div>
+        </div>
+
+        @if(false) {{-- Kartu Kesehatan & Kasus disembunyikan pada Tahap 1 sesuai instruksi --}}
         {{-- 2. Jumlah Sakit di Bulan Terkini --}}
         <div class="bg-white rounded-2xl p-5 border border-rose-100/90 shadow-xs">
             <div class="flex items-center justify-between">
@@ -122,6 +169,7 @@
                 <span class="text-[11px] font-medium text-slate-400">Kondisi Tertib</span>
             </div>
         </div>
+        @endif
 
     </div>
 
@@ -182,7 +230,7 @@
             {{-- Footer Keterangan Grafik --}}
             <div class="mt-6 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
                 <span>Skala penilaian 0 - 100 poin &bull; Standar KKM: 70</span>
-                <span>Sumber: Penilaian Pengurus Cabang</span>
+                <span>Sumber: Penilaian Staff Cabang</span>
             </div>
         </div>
 

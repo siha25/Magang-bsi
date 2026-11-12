@@ -35,7 +35,7 @@
                 Evaluasi Khusus Santri Bawah KKM
             </h1>
             <p class="text-xs sm:text-sm text-slate-500 mt-1">
-                Fokus supervisi Pengurus Pusat untuk santri yang membutuhkan remedial atau bimbingan khusus dari cabang.
+                Fokus supervisi Admin Pendik untuk santri yang membutuhkan remedial atau bimbingan khusus dari cabang.
             </p>
         </div>
 
@@ -194,7 +194,7 @@
                                     Catatan Evaluasi / Rekomendasi Pusat
                                 </label>
                                 <textarea name="catatan_evaluasi_pusat" id="catatan_{{ $ev->id }}" rows="2" required
-                                          placeholder="Tuliskan arahan bimbingan kepada pengurus cabang untuk santri ini..."
+                                          placeholder="Tuliskan arahan bimbingan kepada staff cabang untuk santri ini..."
                                           class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none">{{ old('catatan_evaluasi_pusat', $ev->catatan_evaluasi_pusat) }}</textarea>
                             </div>
 

@@ -28,7 +28,7 @@ class KegiatanHarianController extends Controller
 
         $query = KegiatanHarian::query()
             ->where('asrama_id', $cabangId)
-            ->with(['asrama', 'penginput']);
+            ->with(['asrama', 'penginput', 'dokumentasi']);
 
         if ($request->filled('tanggal')) {
             $query->whereDate('tanggal_kegiatan', $request->date('tanggal'));
@@ -72,7 +72,8 @@ class KegiatanHarianController extends Controller
             'deskripsi' => ['nullable', 'string'],
             'jumlah_peserta' => ['required', 'integer', 'min:0'],
             'catatan_tambahan' => ['nullable', 'string'],
-            'foto_dokumentasi' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'foto_dokumentasi' => ['nullable', 'array', 'max:5'],
+            'foto_dokumentasi.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'tanggal_kegiatan.required' => 'Tanggal kegiatan wajib diisi.',
             'kategori.required' => 'Kategori kegiatan wajib dipilih.',
@@ -81,18 +82,17 @@ class KegiatanHarianController extends Controller
             'jam_selesai.required' => 'Jam selesai kegiatan wajib diisi.',
             'jam_selesai.after' => 'Jam selesai tidak boleh lebih awal dari jam mulai.',
             'jumlah_peserta.required' => 'Jumlah peserta wajib diisi angka.',
-            'foto_dokumentasi.image' => 'File dokumentasi harus berupa gambar.',
-            'foto_dokumentasi.mimes' => 'Format file dokumentasi harus JPG, JPEG, PNG, atau WEBP.',
-            'foto_dokumentasi.max' => 'Ukuran foto dokumentasi maksimal 5 MB.',
+            'foto_dokumentasi.array' => 'Format berkas dokumentasi tidak valid.',
+            'foto_dokumentasi.max' => 'Maksimal 5 foto dokumentasi yang dapat diunggah per kegiatan.',
+            'foto_dokumentasi.*.image' => 'Setiap berkas dokumentasi harus berupa gambar.',
+            'foto_dokumentasi.*.mimes' => 'Format file foto harus berupa JPG, JPEG, PNG, atau WebP.',
+            'foto_dokumentasi.*.max' => 'Ukuran setiap foto dokumentasi maksimal 2 MB.',
         ]);
 
-        if ($request->hasFile('foto_dokumentasi')) {
-            $path = $request->file('foto_dokumentasi')->store('kegiatan-harian', 'public');
-            $validated['foto_dokumentasi'] = $path;
-        }
+        $files = $request->hasFile('foto_dokumentasi') ? (array) $request->file('foto_dokumentasi') : [];
 
-        // Simpan data dengan cabang_id otomatis dari session server
-        $this->service->storeKegiatan($validated, $cabangId, (int) Auth::id());
+        // Simpan data dengan cabang_id otomatis dari session server secara transaksional
+        $this->service->storeKegiatan($validated, $cabangId, (int) Auth::id(), $files);
 
         return redirect()->route('cabang.kegiatan-harian.index')
             ->with('success', 'Kegiatan harian berhasil disimpan.');
@@ -101,7 +101,7 @@ class KegiatanHarianController extends Controller
     public function show(int $id): View
     {
         $cabangId = CabangSession::getId();
-        $kegiatan = KegiatanHarian::with(['asrama', 'penginput'])->findOrFail($id);
+        $kegiatan = KegiatanHarian::with(['asrama', 'penginput', 'dokumentasi'])->findOrFail($id);
 
         // Validasi server-side: Cabang tidak boleh melihat kegiatan cabang lain
         CabangSession::validateAccess($kegiatan->asrama_id);

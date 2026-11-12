@@ -174,7 +174,7 @@
                                 </span>
                             </td>
                             <td class="py-3.5 px-4">
-                                <span class="font-medium text-slate-800">{{ $ev->penilai?->name ?? 'Pengurus Cabang' }}</span>
+                                <span class="font-medium text-slate-800">{{ $ev->penilai?->name ?? 'Staff Cabang' }}</span>
                             </td>
                         </tr>
                     @empty

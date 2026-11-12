@@ -5,10 +5,13 @@
 namespace App\Cabang\Services;
 
 use App\Models\AnakAsuh;
+use App\Models\DokumentasiKegiatan;
 use App\Models\EvaluasiDiniyah;
 use App\Models\KegiatanHarian;
 use App\Shared\Auth\CabangSession;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class CabangDataService
 {
@@ -130,15 +133,56 @@ class CabangDataService
     }
 
     /**
-     * Simpan kegiatan harian cabang.
+     * Simpan kegiatan harian cabang beserta dokumentasi foto.
+     * Menggunakan transaksi database & membersihkan file yang terunggah jika gagal.
      * CabangId selalu diisi dari session server, bukan dari request pengguna.
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<\Illuminate\Http\UploadedFile>  $files
      */
-    public function storeKegiatan(array $data, int $cabangId, int $userId): KegiatanHarian
+    public function storeKegiatan(array $data, int $cabangId, int $userId, array $files = []): KegiatanHarian
     {
-        $data['asrama_id'] = $cabangId;
-        $data['penginput_id'] = $userId;
+        $uploadedPaths = [];
 
-        return KegiatanHarian::create($data);
+        try {
+            return DB::transaction(function () use ($data, $cabangId, $userId, $files, &$uploadedPaths) {
+                $data['asrama_id'] = $cabangId;
+                $data['penginput_id'] = $userId;
+
+                // Hapus key file dari data kegiatan_harian
+                unset($data['foto_dokumentasi']);
+
+                $kegiatan = KegiatanHarian::create($data);
+
+                foreach (array_values($files) as $index => $file) {
+                    if ($file && $file->isValid()) {
+                        // Simpan file ke direktori privat (storage/app/private/dokumentasi-kegiatan)
+                        // Menggunakan hash nama acak bawaan Laravel untuk keamanan (bukan nama file asli)
+                        $path = $file->store('dokumentasi-kegiatan', 'local');
+                        $uploadedPaths[] = $path;
+
+                        DokumentasiKegiatan::create([
+                            'kegiatan_id' => $kegiatan->id,
+                            'path_file' => $path,
+                            'nama_asli' => $file->getClientOriginalName(),
+                            'ukuran_byte' => $file->getSize() ?? 0,
+                            'urutan' => $index,
+                        ]);
+                    }
+                }
+
+                return $kegiatan;
+            });
+        } catch (\Throwable $e) {
+            // Bersihkan file yang sudah terlanjur tersimpan di disk privat jika rollback
+            foreach ($uploadedPaths as $storedPath) {
+                if (Storage::disk('local')->exists($storedPath)) {
+                    Storage::disk('local')->delete($storedPath);
+                }
+            }
+
+            throw $e;
+        }
     }
 
     /**

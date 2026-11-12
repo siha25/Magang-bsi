@@ -18,7 +18,7 @@
             Tambah Pengguna Baru
         </h2>
         <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Buat akun login pengurus baru (Admin Pusat, Admin Cabang/Asrama, atau Pimpinan).
+            Buat akun login pengurus baru (Admin Pendik, Staff Cabang, atau Manager).
         </p>
     </div>
 
@@ -43,7 +43,7 @@
     <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-sm overflow-hidden">
         <div class="p-5 sm:p-8 border-b border-slate-100 bg-gradient-to-r from-emerald-50/40 via-white to-white">
             <h3 class="text-base font-bold text-slate-900">Informasi Kredensial & Hak Akses</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Password yang didaftarkan akan dapat diintip dan di-reset oleh Admin Pusat jika pengguna lupa.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Password yang didaftarkan akan dapat diintip dan di-reset oleh Admin Pendik jika pengguna lupa.</p>
         </div>
 
         <form method="POST" action="{{ route('users.store') }}" class="p-5 sm:p-8 space-y-6">
@@ -97,13 +97,13 @@
                             class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-slate-900 border @error('role') border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 @else border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20 @enderror rounded-xl focus:outline-none focus:ring-2 transition-all">
                         <option value="">-- Pilih Peran Akun --</option>
                         <option value="{{ \App\Models\User::ROLE_ADMIN_CABANG }}" {{ old('role') === \App\Models\User::ROLE_ADMIN_CABANG ? 'selected' : '' }}>
-                            Admin Cabang / Asrama (Mengelola 1 Asrama Tertentu)
+                            Staff Cabang (Mengelola 1 Asrama Tertentu)
                         </option>
                         <option value="{{ \App\Models\User::ROLE_PIMPINAN_PUSAT }}" {{ old('role') === \App\Models\User::ROLE_PIMPINAN_PUSAT ? 'selected' : '' }}>
-                            Pimpinan Pusat (Monitoring & Supervisi Nasional)
+                            Manager (Monitoring & Supervisi Nasional)
                         </option>
                         <option value="{{ \App\Models\User::ROLE_ADMIN_PUSAT }}" {{ old('role') === \App\Models\User::ROLE_ADMIN_PUSAT ? 'selected' : '' }}>
-                            Admin Pusat (Akses Penuh Seluruh Sistem)
+                            Admin Pendik (Akses Penuh Seluruh Sistem)
                         </option>
                     </select>
                     @error('role')
@@ -111,7 +111,7 @@
                     @enderror
                 </div>
 
-                {{-- Asrama Penugasan (Khusus Admin Cabang) --}}
+                {{-- Asrama Penugasan (Khusus Staff Cabang) --}}
                 <div id="asramaSelectWrapper" class="space-y-1.5 {{ old('role') === \App\Models\User::ROLE_ADMIN_CABANG ? '' : 'hidden' }}">
                     <label for="asrama_id" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
                         Asrama yang Ditugaskan <span class="text-rose-500">*</span>
@@ -152,7 +152,7 @@
                         </button>
                     </div>
                     <span class="text-[11px] text-slate-400 block mt-1">
-                        Minimal 6 karakter. Password ini dapat dilihat Admin Pusat di tabel akun jika pengguna meminta bantuan.
+                        Minimal 6 karakter. Password ini dapat dilihat Admin Pendik di tabel akun jika pengguna meminta bantuan.
                     </span>
                     @error('password')
                         <p class="text-xs text-rose-600 font-medium">{{ $message }}</p>

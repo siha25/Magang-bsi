@@ -66,14 +66,14 @@
             <div>
                 <h4 class="text-xs sm:text-sm font-bold text-slate-800">Bantuan Lupa Password Pengguna</h4>
                 <p class="text-xs text-slate-600 mt-0.5">
-                    Admin Pusat dapat melihat email dan password masuk masing-masing pengguna dengan menekan ikon <strong>Mata</strong> (Intip Password) atau mereset password baru secara langsung.
+                    Admin Pendik dapat melihat email dan password masuk masing-masing pengguna dengan menekan ikon <strong>Mata</strong> (Intip Password) atau mereset password baru secara langsung.
                 </p>
             </div>
         </div>
         <div class="flex items-center gap-2 self-start md:self-auto shrink-0">
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white text-emerald-800 text-xs font-semibold border border-emerald-200">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Akses Eksklusif Admin Pusat
+                Akses Eksklusif Admin Pendik
             </span>
         </div>
     </div>
@@ -90,9 +90,9 @@
             <span class="text-[11px] text-slate-400 block mt-2">Seluruh akun terdaftar</span>
         </div>
 
-        {{-- Admin Pusat --}}
+        {{-- Admin Pendik --}}
         <div class="bg-white rounded-2xl p-4 sm:p-5 border border-emerald-100/90 shadow-2xs">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block mb-1">Admin Pusat</span>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block mb-1">Admin Pendik</span>
             <div class="flex items-baseline gap-2">
                 <span class="text-2xl sm:text-3xl font-extrabold text-emerald-700">{{ $stats['admin_pusat'] }}</span>
                 <span class="text-xs text-emerald-600 font-medium">Akun</span>
@@ -100,9 +100,9 @@
             <span class="text-[11px] text-emerald-600/80 block mt-2">Akses penuh sistem</span>
         </div>
 
-        {{-- Admin Cabang / Asrama --}}
+        {{-- Staff Cabang --}}
         <div class="bg-white rounded-2xl p-4 sm:p-5 border border-teal-100/90 shadow-2xs">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-teal-700 block mb-1">Admin Cabang / Asrama</span>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-teal-700 block mb-1">Staff Cabang</span>
             <div class="flex items-baseline gap-2">
                 <span class="text-2xl sm:text-3xl font-extrabold text-teal-700">{{ $stats['admin_cabang'] }}</span>
                 <span class="text-xs text-slate-500">Akun</span>
@@ -110,9 +110,9 @@
             <span class="text-[11px] text-teal-600/80 block mt-2">Petugas pembina asrama</span>
         </div>
 
-        {{-- Pimpinan --}}
+        {{-- Manager --}}
         <div class="bg-white rounded-2xl p-4 sm:p-5 border border-amber-100/90 shadow-2xs">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-1">Pimpinan Pusat</span>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-1">Manager</span>
             <div class="flex items-baseline gap-2">
                 <span class="text-2xl sm:text-3xl font-extrabold text-amber-700">{{ $stats['pimpinan'] }}</span>
                 <span class="text-xs text-slate-500">Akun</span>
@@ -147,9 +147,9 @@
                     <select name="role" 
                             class="w-full text-xs sm:text-sm px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
                         <option value="">Semua Peran / Role</option>
-                        <option value="{{ \App\Models\User::ROLE_ADMIN_PUSAT }}" {{ request('role') === \App\Models\User::ROLE_ADMIN_PUSAT ? 'selected' : '' }}>Admin Pusat</option>
-                        <option value="{{ \App\Models\User::ROLE_ADMIN_CABANG }}" {{ request('role') === \App\Models\User::ROLE_ADMIN_CABANG ? 'selected' : '' }}>Admin Cabang</option>
-                        <option value="{{ \App\Models\User::ROLE_PIMPINAN_PUSAT }}" {{ request('role') === \App\Models\User::ROLE_PIMPINAN_PUSAT ? 'selected' : '' }}>Pimpinan Pusat</option>
+                        <option value="{{ \App\Models\User::ROLE_ADMIN_PUSAT }}" {{ request('role') === \App\Models\User::ROLE_ADMIN_PUSAT ? 'selected' : '' }}>Admin Pendik</option>
+                        <option value="{{ \App\Models\User::ROLE_ADMIN_CABANG }}" {{ request('role') === \App\Models\User::ROLE_ADMIN_CABANG ? 'selected' : '' }}>Staff Cabang</option>
+                        <option value="{{ \App\Models\User::ROLE_PIMPINAN_PUSAT }}" {{ request('role') === \App\Models\User::ROLE_PIMPINAN_PUSAT ? 'selected' : '' }}>Manager</option>
                     </select>
                 </div>
 
@@ -220,17 +220,17 @@
                             @if($item->role === \App\Models\User::ROLE_ADMIN_PUSAT)
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                    Admin Pusat
+                                    Admin Pendik
                                 </span>
                             @elseif($item->role === \App\Models\User::ROLE_ADMIN_CABANG)
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-teal-100 text-teal-800 border border-teal-200">
                                     <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-                                    Admin Cabang
+                                    Staff Cabang
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">
                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                    Pimpinan Pusat
+                                    Manager
                                 </span>
                             @endif
                         </td>
