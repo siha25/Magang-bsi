@@ -24,6 +24,7 @@ class AnakAsuh extends Model
     protected $fillable = [
         'asrama_id',
         'nomor_induk',
+        'nomor_urut',
         'nama_lengkap',
         'jenis_kelamin',
         'tempat_lahir',
@@ -43,6 +44,7 @@ class AnakAsuh extends Model
     protected function casts(): array
     {
         return [
+            'nomor_urut' => 'integer',
             'tanggal_lahir' => 'date',
             'tanggal_masuk' => 'date',
             'status_aktif' => 'boolean',

@@ -22,6 +22,7 @@ use App\Http\Controllers\UserController;
 use App\Pusat\Controllers\DashboardController as PusatDashboardController;
 use App\Pusat\Controllers\EvaluasiDiniyahController as PusatEvaluasiDiniyahController;
 use App\Pusat\Controllers\HafalanHadistController as PusatHafalanHadistController;
+use App\Pusat\Controllers\KategoriKegiatanController as PusatKategoriKegiatanController;
 use App\Pusat\Controllers\KelolaCabangController as PusatKelolaCabangController;
 use App\Pusat\Controllers\MonitoringDiniyahController as PusatMonitoringDiniyahController;
 use App\Pusat\Controllers\MonitoringKegiatanController as PusatMonitoringKegiatanController;
@@ -172,6 +173,15 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/{id}/reset-password', [PusatKelolaCabangController::class, 'resetPassword'])->name('reset-password');
             Route::patch('/{id}/toggle-status', [PusatKelolaCabangController::class, 'toggleStatus'])->name('toggle-status');
         });
+
+        // Pengelolaan Master Kategori Kegiatan Multi-Cabang (Khusus Admin Pusat)
+        Route::prefix('kategori-kegiatan')->name('kategori-kegiatan.')->middleware('role:admin_pusat')->group(function () {
+            Route::get('/', [PusatKategoriKegiatanController::class, 'index'])->name('index');
+            Route::post('/', [PusatKategoriKegiatanController::class, 'store'])->name('store');
+            Route::put('/{id}', [PusatKategoriKegiatanController::class, 'update'])->name('update');
+            Route::patch('/{id}/toggle-status', [PusatKategoriKegiatanController::class, 'toggleStatus'])->name('toggle-status');
+            Route::delete('/{id}', [PusatKategoriKegiatanController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // =========================================================================
@@ -191,10 +201,12 @@ Route::middleware(['auth', 'active'])->group(function () {
     // Modul Data Anak Asuh
     Route::prefix('anak-asuh')->name('anak-asuh.')->group(function () {
         Route::get('/', [AnakAsuhController::class, 'index'])->name('index')->middleware('role:admin_pusat,admin_cabang,pimpinan_pusat');
+        Route::get('/preview-nomor-induk', [AnakAsuhController::class, 'previewNomorInduk'])->name('preview-nomor-induk')->middleware('role:admin_pusat');
         Route::get('/tambah', [AnakAsuhController::class, 'create'])->name('create')->middleware('role:admin_pusat');
         Route::post('/', [AnakAsuhController::class, 'store'])->name('store')->middleware('role:admin_pusat');
         Route::get('/{anakAsuh}/edit', [AnakAsuhController::class, 'edit'])->name('edit')->middleware('role:admin_pusat');
         Route::put('/{anakAsuh}', [AnakAsuhController::class, 'update'])->name('update')->middleware('role:admin_pusat');
+        Route::delete('/{anakAsuh}', [AnakAsuhController::class, 'destroy'])->name('destroy')->middleware('role:admin_pusat');
         Route::patch('/{anakAsuh}/toggle-status', [AnakAsuhController::class, 'toggleStatus'])->name('toggle-status')->middleware('role:admin_pusat');
     });
 

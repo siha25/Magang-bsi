@@ -6,12 +6,14 @@ namespace App\Cabang\Controllers;
 
 use App\Cabang\Services\CabangDataService;
 use App\Http\Controllers\Controller;
+use App\Models\KategoriKegiatan;
 use App\Models\KegiatanHarian;
 use App\Shared\Auth\CabangSession;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class KegiatanHarianController extends Controller
 {
@@ -53,7 +55,13 @@ class KegiatanHarianController extends Controller
 
         $cabang = CabangSession::getCabang();
 
-        return view('cabang.views.kegiatan-harian.create', compact('cabang'));
+        // Ambil kategori kegiatan aktif yang distandarisasi oleh Pengurus Pusat
+        $kategoriList = KategoriKegiatan::query()
+            ->active()
+            ->orderBy('nama')
+            ->get();
+
+        return view('cabang.views.kegiatan-harian.create', compact('cabang', 'kategoriList'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -65,7 +73,13 @@ class KegiatanHarianController extends Controller
 
         $validated = $request->validate([
             'tanggal_kegiatan' => ['required', 'date'],
-            'kategori' => ['required', 'in:belajar,muhadhoroh,olahraga,acara_donatur,bersih_bersih'],
+            'kategori' => [
+                'required',
+                'string',
+                Rule::exists('kategori_kegiatan', 'kode')
+                    ->where('is_active', true)
+                    ->whereNull('deleted_at'),
+            ],
             'nama_kegiatan' => ['required', 'string', 'max:255'],
             'jam_mulai' => ['required', 'date_format:H:i'],
             'jam_selesai' => ['required', 'date_format:H:i', 'after:jam_mulai'],
@@ -77,6 +91,7 @@ class KegiatanHarianController extends Controller
         ], [
             'tanggal_kegiatan.required' => 'Tanggal kegiatan wajib diisi.',
             'kategori.required' => 'Kategori kegiatan wajib dipilih.',
+            'kategori.exists' => 'Kategori kegiatan yang dipilih tidak valid atau sudah dinonaktifkan.',
             'nama_kegiatan.required' => 'Nama kegiatan wajib diisi.',
             'jam_mulai.required' => 'Jam mulai kegiatan wajib diisi.',
             'jam_selesai.required' => 'Jam selesai kegiatan wajib diisi.',
@@ -88,6 +103,11 @@ class KegiatanHarianController extends Controller
             'foto_dokumentasi.*.mimes' => 'Format file foto harus berupa JPG, JPEG, PNG, atau WebP.',
             'foto_dokumentasi.*.max' => 'Ukuran setiap foto dokumentasi maksimal 2 MB.',
         ]);
+
+        $kategoriModel = KategoriKegiatan::where('kode', $validated['kategori'])->first();
+        if ($kategoriModel) {
+            $validated['kategori_kegiatan_id'] = $kategoriModel->id;
+        }
 
         $files = $request->hasFile('foto_dokumentasi') ? (array) $request->file('foto_dokumentasi') : [];
 

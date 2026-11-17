@@ -38,11 +38,9 @@
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Kategori kegiatan <span class="text-rose-500">*</span></label>
                     <select name="kategori" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border @error('kategori') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
                         <option value="">Pilih Kategori</option>
-                        <option value="belajar" {{ old('kategori') === 'belajar' ? 'selected' : '' }}>Belajar</option>
-                        <option value="muhadhoroh" {{ old('kategori') === 'muhadhoroh' ? 'selected' : '' }}>Muhadhoroh</option>
-                        <option value="olahraga" {{ old('kategori') === 'olahraga' ? 'selected' : '' }}>Olahraga</option>
-                        <option value="acara_donatur" {{ old('kategori') === 'acara_donatur' ? 'selected' : '' }}>Acara Donatur</option>
-                        <option value="bersih_bersih" {{ old('kategori') === 'bersih_bersih' ? 'selected' : '' }}>Bersih-bersih</option>
+                        @foreach($kategoriList as $kat)
+                            <option value="{{ $kat->kode }}" {{ old('kategori') === $kat->kode ? 'selected' : '' }}>{{ $kat->nama }}</option>
+                        @endforeach
                     </select>
                     @error('kategori')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
                 </div>

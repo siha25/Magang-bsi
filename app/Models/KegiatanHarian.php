@@ -13,6 +13,7 @@ class KegiatanHarian extends Model
 
     protected $fillable = [
         'asrama_id',
+        'kategori_kegiatan_id',
         'tanggal_kegiatan',
         'kategori',
         'nama_kegiatan',
@@ -31,6 +32,11 @@ class KegiatanHarian extends Model
             'tanggal_kegiatan' => 'date',
             'jumlah_peserta' => 'integer',
         ];
+    }
+
+    public function kategoriKegiatan(): BelongsTo
+    {
+        return $this->belongsTo(KategoriKegiatan::class, 'kategori_kegiatan_id');
     }
 
     public function asrama(): BelongsTo
@@ -77,6 +83,10 @@ class KegiatanHarian extends Model
 
     public function getKategoriLabelAttribute(): string
     {
+        if ($this->relationLoaded('kategoriKegiatan') && $this->kategoriKegiatan) {
+            return $this->kategoriKegiatan->nama;
+        }
+
         return match ($this->kategori) {
             'belajar' => 'Belajar',
             'muhadhoroh' => 'Muhadhoroh',

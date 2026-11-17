@@ -24,13 +24,6 @@
       0 => 'Laravel\\Pail\\PailServiceProvider',
     ),
   ),
-  'laravel/pao' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Laravel\\Pao\\Laravel\\ServiceProvider',
-    ),
-  ),
   'laravel/roster' => 
   array (
     'providers' => 

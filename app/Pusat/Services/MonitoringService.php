@@ -74,7 +74,7 @@ class MonitoringService
      */
     public function getMonitoringKegiatanData(array $filters = []): array
     {
-        $query = KegiatanHarian::with(['asrama', 'penginput']);
+        $query = KegiatanHarian::with(['asrama', 'penginput', 'kategoriKegiatan']);
 
         if (! empty($filters['cabang_id'])) {
             $query->where('asrama_id', $filters['cabang_id']);

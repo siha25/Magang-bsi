@@ -1,8 +1,8 @@
-@{{-- Sidebar Navigasi Admin Pendidikan --}}
+{{-- Sidebar Navigasi Admin Pendidikan --}}
 <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-emerald-100 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full lg:static shadow-sm lg:shadow-none" aria-label="Sidebar Navigasi">
     {{-- Header Sidebar: Logo & Yayasan --}}
     <div class="h-20 px-6 flex items-center justify-between border-b border-emerald-50 bg-gradient-to-r from-emerald-50/60 to-white">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group">
+        <a href="{{ auth()->user()?->isAdminPusat() ? route('pusat.dashboard') : route('dashboard') }}" class="flex items-center gap-3 group">
             <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-600/25 group-hover:scale-105 transition-transform duration-200">
                 {{-- Logo Icon Motif Pendidikan & Harapan --}}
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -28,11 +28,21 @@
     {{-- Badge Divisi --}}
     <div class="px-6 pt-4 pb-2">
         <div class="px-3 py-1.5 rounded-xl bg-emerald-50/80 border border-emerald-100/80 flex items-center justify-between text-xs font-medium text-emerald-800">
-            <span class="flex items-center gap-1.5">
+            <span class="flex items-center gap-1.5 font-bold">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Divisi Pendidikan Anak Asuh
+                @if(auth()->user()?->isAdminPusat())
+                    Admin Pendik
+                @else
+                    Divisi Pendidikan Anak Asuh
+                @endif
             </span>
-            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-200">2026/2027</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-200">
+                @if(auth()->user()?->isAdminPusat())
+                    Seluruh Cabang
+                @else
+                    2026/2027
+                @endif
+            </span>
         </div>
     </div>
 
@@ -43,8 +53,8 @@
             <div class="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Menu Utama</div>
             <nav class="space-y-1">
                 {{-- Dashboard --}}
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all duration-150 {{ request()->routeIs('dashboard') ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
-                    <svg class="w-5 h-5 {{ request()->routeIs('dashboard') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <a href="{{ auth()->user()?->isAdminPusat() ? route('pusat.dashboard') : route('dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all duration-150 {{ request()->routeIs('dashboard') || request()->routeIs('pusat.dashboard') ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                    <svg class="w-5 h-5 {{ request()->routeIs('dashboard') || request()->routeIs('pusat.dashboard') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                     <span>Dashboard</span>
                 </a>
                 {{-- Data Asrama --}}
@@ -57,8 +67,14 @@
                     <svg class="w-5 h-5 {{ request()->routeIs('anak-asuh.*') ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     <span>Data Anak Asuh</span>
                 </a>
-
-
+                @if(auth()->user()?->isAdminPusat())
+                {{-- Akun Pengguna --}}
+                <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ request()->routeIs('users.*') ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                    <svg class="w-5 h-5 {{ request()->routeIs('users.*') ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <span>Akun Pengguna</span>
+                </a>
+                @endif
+            </nav>
         </div>
 
         {{-- Grup Pembinaan Diniyah (Admin Pendik vs Cabang) --}}
@@ -70,8 +86,8 @@
                     @php
                         $isKegiatanHarian = request()->routeIs('pusat.monitoring-kegiatan.*');
                         $isHafalanQuran   = request()->routeIs('pusat.review-hafalan.quran*');
-                        $isHafalanHadis   = request()->routeIs('pusat.review-hafalan.hadis*');
-                        $isPengetahuan    = request()->routeIs('pusat.monitoring-diniyah.*');
+                        $isHafalanHadis   = request()->routeIs('pusat.review-hafalan.hadis*') || request()->routeIs('pusat.hafalan-hadist.*');
+                        $isPengetahuan    = request()->routeIs('pusat.monitoring-diniyah.*') || request()->routeIs('pusat.evaluasi-diniyah.*') || request()->routeIs('evaluasi-diniyah.*');
                     @endphp
                     {{-- Kegiatan Harian --}}
                     <a href="{{ route('pusat.monitoring-kegiatan.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ $isKegiatanHarian ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
@@ -90,7 +106,7 @@
                     </a>
                     {{-- Pengetahuan Diniyah --}}
                     <a href="{{ route('pusat.monitoring-diniyah.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ $isPengetahuan ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
-                        <svg class="w-5 h-5 {{ $isPengetahuan ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <svg class="w-5 h-5 {{ $isPengetahuan ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                         <span>Pengetahuan Diniyah</span>
                     </a>
                 </nav>
@@ -125,18 +141,13 @@
         <div>
             <div class="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Administrasi</div>
             <nav class="space-y-1">
-                @if(false) {{-- Modul Kesehatan & Kasus disembunyikan pada Tahap 1 sesuai arahan --}}
-                {{-- Kesehatan Anak --}}
-                <a href="#kesehatan-anak" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
-                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                    <span>Kesehatan Anak</span>
-                </a>
-                @endif
-                {{-- Kasus & Pembinaan --}}
+                @if(!auth()->user()?->isAdminPusat())
+                {{-- Kasus & Pembinaan (Non-Admin Pendik) --}}
                 <a href="#kasus-pembinaan" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
                     <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                     <span>Kasus & Pembinaan</span>
                 </a>
+                @endif
                 {{-- Laporan --}}
                 <a href="#laporan" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
                     <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -147,14 +158,7 @@
                     <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     <span>Pengaturan</span>
                 </a>
-                @if(auth()->user()?->isAdminPusat())
-                {{-- Kelola Akun Pengguna --}}
-                <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ request()->routeIs('users.*') ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
-                    <svg class="w-5 h-5 {{ request()->routeIs('users.*') ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                    <span>Akun Pengguna</span>
-                </a>
-                @endif
-
+            </nav>
         </div>
     </div>
 

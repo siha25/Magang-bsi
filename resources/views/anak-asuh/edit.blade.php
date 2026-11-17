@@ -64,16 +64,15 @@
                 {{-- Nomor Induk --}}
                 <div class="space-y-1.5">
                     <label for="nomor_induk" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                        Nomor Induk <span class="text-rose-500">*</span>
+                        Nomor Induk <span class="text-xs font-normal text-slate-400 lowercase">(tetap)</span>
                     </label>
                     <input type="text" 
                            id="nomor_induk" 
                            name="nomor_induk" 
                            value="{{ old('nomor_induk', $anakAsuh->nomor_induk) }}"
-                           required
-                           placeholder="Contoh: AA-2026-001" 
-                           class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-slate-900 border @error('nomor_induk') border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 @else border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20 @enderror rounded-xl focus:outline-none focus:ring-2 transition-all font-mono">
-                    <p class="text-[11px] text-slate-400">Nomor induk unik identitas anak asuh.</p>
+                           readonly
+                           class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-100/90 text-slate-600 border @error('nomor_induk') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none cursor-not-allowed font-mono tracking-wide shadow-inner">
+                    <p class="text-[11px] text-slate-400">Nomor induk bersifat permanen dan tidak dapat diubah setelah terdaftar.</p>
                     @error('nomor_induk')
                         <p class="text-xs text-rose-600 font-medium">{{ $message }}</p>
                     @enderror
@@ -270,21 +269,57 @@
             </div>
 
             {{-- Tombol Aksi --}}
-            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <a href="{{ route('anak-asuh.index') }}" 
-                   class="px-5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-semibold transition-colors">
-                    Batal
-                </a>
-                <button type="submit" 
-                        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-xs sm:text-sm font-semibold shadow-md shadow-orange-500/25 transition-all">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                @can('delete', $anakAsuh)
+                <button type="button" 
+                        onclick="confirmDeleteAnakAsuh()" 
+                        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100/80 active:scale-95 text-rose-700 text-xs sm:text-sm font-semibold transition-all">
+                    <svg class="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                    <span>Simpan Perubahan</span>
+                    <span>Hapus Data Anak Asuh</span>
                 </button>
+                @else
+                <div></div>
+                @endcan
+
+                <div class="flex items-center justify-end gap-3">
+                    <a href="{{ route('anak-asuh.index') }}" 
+                       class="px-5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-semibold transition-colors">
+                        Batal
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-xs sm:text-sm font-semibold shadow-md shadow-orange-500/25 transition-all">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Simpan Perubahan</span>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
+
+    @can('delete', $anakAsuh)
+    {{-- Form Hapus Anak Asuh (Terpisah dari Form Edit) --}}
+    <form id="form-delete-anak-asuh" 
+          action="{{ route('anak-asuh.destroy', $anakAsuh) }}" 
+          method="POST" 
+          class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
+
+    <script>
+    function confirmDeleteAnakAsuh() {
+        const nama = @json($anakAsuh->nama_lengkap);
+        const nomor = @json($anakAsuh->nomor_induk);
+        if (confirm(`Apakah Anda yakin ingin menghapus data anak asuh "${nama}" (${nomor})?\n\nPerhatian: Data yang dihapus tidak dapat dikembalikan.`)) {
+            document.getElementById('form-delete-anak-asuh').submit();
+        }
+    }
+    </script>
+    @endcan
 
 </div>
 @endsection

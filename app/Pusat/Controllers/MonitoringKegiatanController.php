@@ -6,6 +6,7 @@ namespace App\Pusat\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asrama;
+use App\Models\KategoriKegiatan;
 use App\Pusat\Services\MonitoringService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -36,19 +37,14 @@ class MonitoringKegiatanController extends Controller
             ->orderBy('wilayah')
             ->pluck('wilayah');
 
-        $kategoriOptions = [
-            'belajar' => 'Belajar',
-            'muhadhoroh' => 'Muhadhoroh',
-            'olahraga' => 'Olahraga',
-            'acara_donatur' => 'Acara Donatur',
-            'bersih_bersih' => 'Bersih-bersih',
-        ];
+        // Seluruh kategori kegiatan master untuk filter & modal kelola kategori
+        $kategoriList = KategoriKegiatan::orderBy('nama')->get();
 
         return view('pusat.views.monitoring-kegiatan.index', array_merge($data, [
             'filters' => $filters,
             'cabangOptions' => $cabangOptions,
             'daerahOptions' => $daerahOptions,
-            'kategoriOptions' => $kategoriOptions,
+            'kategoriList' => $kategoriList,
         ]));
     }
 }

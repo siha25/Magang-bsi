@@ -39,21 +39,83 @@
                     <p class="text-[11px] text-slate-400">Data otomatis terikat ke cabang Anda secara aman dari sesi server.</p>
                 </div>
 
-                {{-- Kategori Kegiatan --}}
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Kategori kegiatan <span class="text-rose-500">*</span></label>
-                    <select name="kategori" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border @error('kategori') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
-                        <option value="">Pilih Kategori</option>
-                        <option value="belajar" {{ old('kategori') === 'belajar' ? 'selected' : '' }}>Belajar</option>
-                        <option value="muhadhoroh" {{ old('kategori') === 'muhadhoroh' ? 'selected' : '' }}>Muhadhoroh</option>
-                        <option value="olahraga" {{ old('kategori') === 'olahraga' ? 'selected' : '' }}>Olahraga</option>
-                        <option value="acara_donatur" {{ old('kategori') === 'acara_donatur' ? 'selected' : '' }}>Acara Donatur</option>
-                        <option value="bersih_bersih" {{ old('kategori') === 'bersih_bersih' ? 'selected' : '' }}>Bersih-bersih</option>
-                    </select>
+                {{-- Kategori Kegiatan (Custom Dropdown: Nama Tebal + Deskripsi 2 Baris) --}}
+                <div class="space-y-1.5 relative" id="custom-kategori-wrapper">
+                    <div class="flex items-center justify-between">
+                        <label for="custom-kategori-trigger" class="block text-xs font-bold uppercase tracking-wider text-slate-700">Kategori kegiatan <span class="text-rose-500">*</span></label>
+                        <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Dari Pusat</span>
+                    </div>
+
+                    {{-- Hidden input yang dikirim ke backend --}}
+                    <input type="hidden" name="kategori" id="kategori" value="{{ old('kategori') }}" required>
+
+                    {{-- Tombol Trigger Dropdown --}}
+                    <button type="button"
+                            id="custom-kategori-trigger"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                            class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border @error('kategori') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 flex items-center justify-between text-left transition-colors cursor-pointer">
+                        <span id="custom-kategori-selected-text" class="text-slate-400 font-normal truncate">Pilih Kategori</span>
+                        <svg class="w-4 h-4 text-slate-400 ml-2 shrink-0 transition-transform duration-200" id="custom-kategori-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+
+                    {{-- Panel Dropdown Menu --}}
+                    <div id="custom-kategori-menu"
+                         class="hidden absolute z-30 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden transition-all duration-150">
+                        {{-- Search input inside dropdown --}}
+                        <div class="p-2 border-b border-slate-100 bg-slate-50/70">
+                            <div class="relative">
+                                <input type="text"
+                                       id="custom-kategori-search"
+                                       placeholder="Cari kategori..."
+                                       autocomplete="off"
+                                       class="w-full pl-8 pr-7 py-1.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <button type="button" id="custom-kategori-clear-search" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer">&times;</button>
+                            </div>
+                        </div>
+
+                        {{-- Option List --}}
+                        <div id="custom-kategori-options"
+                             role="listbox"
+                             class="max-h-60 overflow-y-auto divide-y divide-slate-50 p-1"
+                             style="scrollbar-width: thin;">
+                            @forelse($kategoriList as $kat)
+                                <div role="option"
+                                     tabindex="0"
+                                     data-value="{{ $kat->kode }}"
+                                     data-nama="{{ $kat->nama }}"
+                                     data-deskripsi="{{ $kat->deskripsi ?? '' }}"
+                                     class="kategori-option group p-2.5 rounded-xl cursor-pointer hover:bg-emerald-50/80 focus:bg-emerald-50/80 focus:outline-none transition-colors flex items-start justify-between gap-3 {{ old('kategori') === $kat->kode ? 'bg-emerald-50 text-emerald-900 is-selected' : 'text-slate-800' }}">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-emerald-900 flex items-center gap-1.5">
+                                            <span>{{ $kat->nama }}</span>
+                                            <span class="kategori-check {{ old('kategori') === $kat->kode ? '' : 'hidden' }} text-emerald-600">
+                                                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                            </span>
+                                        </div>
+                                        @if(!empty($kat->deskripsi))
+                                            <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed mt-0.5 group-hover:text-slate-600">
+                                                {{ $kat->deskripsi }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="py-6 text-center text-xs text-slate-400">
+                                    Belum ada kategori kegiatan aktif dari pusat.
+                                </div>
+                            @endforelse
+                            <div id="custom-kategori-notfound" class="hidden py-6 text-center text-xs text-slate-400">
+                                Tidak ada kategori yang cocok.
+                            </div>
+                        </div>
+                    </div>
+
                     @error('kategori')<p class="text-xs text-rose-600 font-medium">{{ $message }}</p>@enderror
                 </div>
 
-                {{-- Nama Kegiatan --}}
+                {{-- Nama Kegiatan / Judul --}}
                 <div class="space-y-1.5">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Nama kegiatan / judul <span class="text-rose-500">*</span></label>
                     <input type="text" name="nama_kegiatan" value="{{ old('nama_kegiatan') }}" placeholder="Contoh: Belajar Tajwid Bersama" required class="w-full px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border @error('nama_kegiatan') border-rose-400 @else border-slate-200 @enderror rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
@@ -326,6 +388,198 @@
             addFiles(droppedFiles);
         }
     }, false);
+})();
+
+// =========================================================================
+// CUSTOM DROPDOWN KATEGORI KEGIATAN (NAMA TEBAL + DESKRIPSI)
+// =========================================================================
+(function() {
+    const wrapper = document.getElementById('custom-kategori-wrapper');
+    const trigger = document.getElementById('custom-kategori-trigger');
+    const menu = document.getElementById('custom-kategori-menu');
+    const arrow = document.getElementById('custom-kategori-arrow');
+    const selectedText = document.getElementById('custom-kategori-selected-text');
+    const hiddenInput = document.getElementById('kategori');
+    const searchInput = document.getElementById('custom-kategori-search');
+    const clearSearchBtn = document.getElementById('custom-kategori-clear-search');
+    const options = document.querySelectorAll('.kategori-option');
+    const notFoundEl = document.getElementById('custom-kategori-notfound');
+
+    if (!wrapper || !trigger || !menu || !hiddenInput) return;
+
+    let isOpen = false;
+    let focusedIndex = -1;
+
+    function getVisibleOptions() {
+        return Array.from(options).filter(opt => !opt.classList.contains('hidden'));
+    }
+
+    function openDropdown() {
+        if (isOpen) return;
+        isOpen = true;
+        menu.classList.remove('hidden');
+        trigger.setAttribute('aria-expanded', 'true');
+        if (arrow) arrow.classList.add('rotate-180');
+        if (searchInput) {
+            searchInput.value = '';
+            filterOptions('');
+            setTimeout(() => searchInput.focus(), 50);
+        }
+    }
+
+    function closeDropdown() {
+        if (!isOpen) return;
+        isOpen = false;
+        menu.classList.add('hidden');
+        trigger.setAttribute('aria-expanded', 'false');
+        if (arrow) arrow.classList.remove('rotate-180');
+        focusedIndex = -1;
+        options.forEach(opt => opt.classList.remove('ring-2', 'ring-emerald-500/30'));
+    }
+
+    function toggleDropdown() {
+        if (isOpen) closeDropdown();
+        else openDropdown();
+    }
+
+    function selectOption(opt) {
+        const value = opt.getAttribute('data-value');
+        const nama = opt.getAttribute('data-nama');
+
+        hiddenInput.value = value;
+        selectedText.textContent = nama;
+        selectedText.className = 'font-bold text-slate-800 truncate';
+
+        options.forEach(o => {
+            const isMatch = o.getAttribute('data-value') === value;
+            o.classList.toggle('bg-emerald-50', isMatch);
+            o.classList.toggle('text-emerald-900', isMatch);
+            o.classList.toggle('is-selected', isMatch);
+            const check = o.querySelector('.kategori-check');
+            if (check) check.classList.toggle('hidden', !isMatch);
+        });
+
+        closeDropdown();
+        trigger.focus();
+    }
+
+    // Inisialisasi teks pilihan jika ada nilai awal (old input)
+    if (hiddenInput.value) {
+        const initialOpt = Array.from(options).find(o => o.getAttribute('data-value') === hiddenInput.value);
+        if (initialOpt) {
+            selectedText.textContent = initialOpt.getAttribute('data-nama');
+            selectedText.className = 'font-bold text-slate-800 truncate';
+        }
+    }
+
+    trigger.addEventListener('click', toggleDropdown);
+
+    function filterOptions(query) {
+        const q = query.toLowerCase().trim();
+        let matchCount = 0;
+
+        options.forEach(opt => {
+            const nama = (opt.getAttribute('data-nama') || '').toLowerCase();
+            const deskripsi = (opt.getAttribute('data-deskripsi') || '').toLowerCase();
+            const matches = !q || nama.includes(q) || deskripsi.includes(q);
+            opt.classList.toggle('hidden', !matches);
+            if (matches) matchCount++;
+        });
+
+        if (notFoundEl) {
+            notFoundEl.classList.toggle('hidden', matchCount > 0);
+        }
+
+        if (clearSearchBtn) {
+            clearSearchBtn.classList.toggle('hidden', !q);
+        }
+        focusedIndex = -1;
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            filterOptions(this.value);
+        });
+
+        searchInput.addEventListener('keydown', function(e) {
+            const visible = getVisibleOptions();
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (visible.length > 0) {
+                    focusedIndex = (focusedIndex + 1) % visible.length;
+                    highlightOption(visible);
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (visible.length > 0) {
+                    focusedIndex = (focusedIndex - 1 + visible.length) % visible.length;
+                    highlightOption(visible);
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (focusedIndex >= 0 && visible[focusedIndex]) {
+                    selectOption(visible[focusedIndex]);
+                } else if (visible.length === 1) {
+                    selectOption(visible[0]);
+                }
+            } else if (e.key === 'Escape') {
+                closeDropdown();
+                trigger.focus();
+            }
+        });
+    }
+
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', function() {
+            if (searchInput) {
+                searchInput.value = '';
+                filterOptions('');
+                searchInput.focus();
+            }
+        });
+    }
+
+    function highlightOption(visible) {
+        visible.forEach((opt, idx) => {
+            if (idx === focusedIndex) {
+                opt.classList.add('bg-emerald-50', 'ring-2', 'ring-emerald-500/30');
+                opt.scrollIntoView({ block: 'nearest' });
+            } else {
+                opt.classList.remove('bg-emerald-50', 'ring-2', 'ring-emerald-500/30');
+            }
+        });
+    }
+
+    options.forEach(opt => {
+        opt.addEventListener('click', function() {
+            selectOption(this);
+        });
+
+        opt.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                selectOption(this);
+            } else if (e.key === 'Escape') {
+                closeDropdown();
+                trigger.focus();
+            }
+        });
+    });
+
+    trigger.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openDropdown();
+        } else if (e.key === 'Escape') {
+            closeDropdown();
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!wrapper.contains(e.target)) {
+            closeDropdown();
+        }
+    });
 })();
 </script>
 @endsection

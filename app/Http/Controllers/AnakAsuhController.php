@@ -6,9 +6,12 @@ use App\Http\Requests\StoreAnakAsuhRequest;
 use App\Http\Requests\UpdateAnakAsuhRequest;
 use App\Models\AnakAsuh;
 use App\Models\Asrama;
+use App\Services\NomorIndukGenerator;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AnakAsuhController extends Controller
 {
@@ -103,16 +106,63 @@ class AnakAsuhController extends Controller
     }
 
     /**
-     * Menyimpan data anak asuh baru ke database.
+     * Endpoint API pratinjau nomor induk berikutnya (AJAX).
      */
-    public function store(StoreAnakAsuhRequest $request): RedirectResponse
+    public function previewNomorInduk(Request $request, NomorIndukGenerator $generator): JsonResponse
+    {
+        $this->authorize('create', AnakAsuh::class);
+
+        $validated = $request->validate([
+            'asrama_id' => ['required', 'integer', 'exists:asrama,id'],
+            'tanggal_masuk' => ['required', 'date'],
+        ], [
+            'asrama_id.required' => 'Asrama binaan wajib dipilih.',
+            'asrama_id.exists' => 'Asrama yang dipilih tidak valid atau belum terdaftar.',
+            'tanggal_masuk.required' => 'Tanggal masuk asrama wajib diisi.',
+            'tanggal_masuk.date' => 'Format tanggal masuk asrama tidak valid.',
+        ]);
+
+        try {
+            $result = $generator->preview((int) $validated['asrama_id'], $validated['tanggal_masuk']);
+
+            return response()->json([
+                'success' => true,
+                'nomor_induk' => $result['nomor_induk'],
+                'nomor_urut' => $result['nomor_urut'],
+                'tahun' => $result['tahun'],
+                'yy' => $result['yy'],
+                'kode_asrama_digits' => $result['kode_asrama_digits'],
+                'message' => 'Nomor induk berhasil dipratinjau.',
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Menyimpan data anak asuh baru ke database dengan penomoran induk otomatis dan transaction locking.
+     */
+    public function store(StoreAnakAsuhRequest $request, NomorIndukGenerator $generator): RedirectResponse
     {
         $this->authorize('create', AnakAsuh::class);
 
         $validated = $request->validated();
         $validated['status_aktif'] = $request->boolean('status_aktif', true);
 
-        $anakAsuh = AnakAsuh::create($validated);
+        $anakAsuh = DB::transaction(function () use ($validated, $generator) {
+            $nomorIndukData = $generator->generateForCreation(
+                (int) $validated['asrama_id'],
+                $validated['tanggal_masuk']
+            );
+
+            $validated['nomor_induk'] = $nomorIndukData['nomor_induk'];
+            $validated['nomor_urut'] = $nomorIndukData['nomor_urut'];
+
+            return AnakAsuh::create($validated);
+        });
 
         return redirect()
             ->route('anak-asuh.index')
@@ -136,6 +186,7 @@ class AnakAsuhController extends Controller
 
     /**
      * Memperbarui data anak asuh di database.
+     * Nomor induk tidak diubah secara otomatis pada mode edit.
      */
     public function update(UpdateAnakAsuhRequest $request, AnakAsuh $anakAsuh): RedirectResponse
     {
@@ -143,12 +194,31 @@ class AnakAsuhController extends Controller
 
         $validated = $request->validated();
         $validated['status_aktif'] = $request->boolean('status_aktif', false);
+        // Pastikan nomor_induk dan nomor_urut asli tidak pernah berubah saat edit
+        unset($validated['nomor_induk'], $validated['nomor_urut']);
 
         $anakAsuh->update($validated);
 
         return redirect()
             ->route('anak-asuh.index')
             ->with('success', "Perubahan data anak asuh '{$anakAsuh->nama_lengkap}' berhasil disimpan.");
+    }
+
+    /**
+     * Menghapus data anak asuh dari database.
+     */
+    public function destroy(AnakAsuh $anakAsuh): RedirectResponse
+    {
+        $this->authorize('delete', $anakAsuh);
+
+        $nama = $anakAsuh->nama_lengkap;
+        $nomor = $anakAsuh->nomor_induk;
+
+        $anakAsuh->delete();
+
+        return redirect()
+            ->route('anak-asuh.index')
+            ->with('success', "Data anak asuh '{$nama}' ({$nomor}) berhasil dihapus.");
     }
 
     /**

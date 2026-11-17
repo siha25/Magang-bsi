@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asrama;
+use App\Models\KategoriKegiatan;
 use App\Models\KegiatanHarian;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +16,7 @@ class KegiatanHarianController extends Controller
     {
         $query = KegiatanHarian::query()
             ->byRole()
-            ->with(['asrama', 'penginput']);
+            ->with(['asrama', 'penginput', 'kategoriKegiatan']);
 
         if ($request->filled('tanggal')) {
             $query->whereDate('tanggal_kegiatan', $request->date('tanggal'));
@@ -46,7 +47,7 @@ class KegiatanHarianController extends Controller
     {
         $kegiatan = KegiatanHarian::query()
             ->byRole()
-            ->with(['asrama', 'penginput', 'dokumentasi'])
+            ->with(['asrama', 'penginput', 'dokumentasi', 'kategoriKegiatan'])
             ->findOrFail($kegiatanHarian);
 
         return view('kegiatan-harian.show', compact('kegiatan'));
@@ -58,7 +59,12 @@ class KegiatanHarianController extends Controller
             ? Asrama::orderBy('nama_asrama')->get()
             : collect([Auth::user()?->asrama])->filter();
 
-        return view('kegiatan-harian.create', compact('asramas'));
+        $kategoriList = KategoriKegiatan::query()
+            ->active()
+            ->orderBy('nama')
+            ->get();
+
+        return view('kegiatan-harian.create', compact('asramas', 'kategoriList'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -66,7 +72,7 @@ class KegiatanHarianController extends Controller
         $validated = $request->validate([
             'asrama_id' => ['required', 'integer', 'exists:asrama,id'],
             'tanggal_kegiatan' => ['required', 'date'],
-            'kategori' => ['required', 'in:belajar,muhadhoroh,olahraga,acara_donatur,bersih_bersih'],
+            'kategori' => ['required', 'string'],
             'nama_kegiatan' => ['required', 'string', 'max:255'],
             'jam_mulai' => ['required', 'date_format:H:i'],
             'jam_selesai' => ['required', 'date_format:H:i', 'after:jam_mulai'],
@@ -83,6 +89,11 @@ class KegiatanHarianController extends Controller
 
         if (Auth::user()?->isAdminCabang() && (int) $validated['asrama_id'] !== (int) Auth::user()->asrama_id) {
             abort(403, 'Anda hanya dapat mengelola kegiatan asrama Anda sendiri.');
+        }
+
+        $kategoriModel = KategoriKegiatan::where('kode', $validated['kategori'])->first();
+        if ($kategoriModel) {
+            $validated['kategori_kegiatan_id'] = $kategoriModel->id;
         }
 
         if ($request->hasFile('foto_dokumentasi')) {
