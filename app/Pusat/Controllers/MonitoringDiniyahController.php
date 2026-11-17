@@ -25,6 +25,8 @@ class MonitoringDiniyahController extends Controller
             'tanggal_mulai' => $request->input('tanggal_mulai'),
             'tanggal_selesai' => $request->input('tanggal_selesai'),
             'materi' => $request->string('materi')->trim()->toString(),
+            'cari' => $request->string('cari')->trim()->toString(),
+            'cari' => $request->string('cari')->trim()->toString(),
         ];
 
         $data = $this->service->getMonitoringDiniyahData($filters);
@@ -37,7 +39,11 @@ class MonitoringDiniyahController extends Controller
             ->orderBy('wilayah')
             ->pluck('wilayah');
 
-        $materiOptions = EvaluationStatus::DAFTAR_KATEGORI;
+        // Hanya tampilkan materi Pengetahuan Diniyah (bukan Hafalan Al-Qur'an / Hafalan Hadis)
+        $materiOptions = array_values(array_filter(
+            EvaluationStatus::DAFTAR_KATEGORI,
+            fn ($k) => ! in_array($k, ["Hafalan Al-Qur'an", 'Hafalan Hadis'], true)
+        ));
 
         return view('pusat.views.monitoring-diniyah.index', array_merge($data, [
             'filters' => $filters,

@@ -114,6 +114,7 @@ class HafalanHadistController extends Controller
 
         $validated['jenis_evaluasi'] = EvaluasiDiniyah::KATEGORI_HADIS;
         $validated['status'] = EvaluasiDiniyah::STATUS_PENDING;
+        $validated['predikat_akhir'] = null;
         $validated['asrama_id'] = $cabangId;
         $validated['diajukan_oleh'] = (int) Auth::id();
         $validated['diajukan_pada'] = now();
@@ -196,6 +197,7 @@ class HafalanHadistController extends Controller
 
         // Status tetap pending setelah edit cabang
         $validated['status'] = EvaluasiDiniyah::STATUS_PENDING;
+        $validated['predikat_akhir'] = null;
         $validated['asrama_id'] = $cabangId;
 
         $this->service->updateEvaluasi($evaluasi, $validated, $cabangId);

@@ -139,10 +139,22 @@ class MonitoringService
 
     /**
      * Dapatkan data grafik dan tabel untuk Monitoring Pengetahuan Diniyah Seluruh Cabang.
+     * Hanya menampilkan kategori Pengetahuan Diniyah (bukan Hafalan Al-Qur'an / Hafalan Hadis).
      */
     public function getMonitoringDiniyahData(array $filters = []): array
     {
-        $query = EvaluasiDiniyah::with(['asrama', 'anakAsuh', 'pengaju']);
+        // Kategori Pengetahuan Diniyah saja (eksklusi Hafalan Al-Qur'an dan Hafalan Hadis)
+        $kategoriPengetahuan = array_values(array_filter(
+            EvaluationStatus::DAFTAR_KATEGORI,
+            fn ($k) => ! in_array($k, ["Hafalan Al-Qur'an", 'Hafalan Hadis'], true)
+        ));
+
+        $query = EvaluasiDiniyah::with(['asrama', 'anakAsuh', 'pengaju'])
+            ->when(
+                ! empty($filters['materi']),
+                fn ($q) => $q->where('jenis_evaluasi', $filters['materi']),
+                fn ($q) => $q->whereIn('jenis_evaluasi', $kategoriPengetahuan)
+            );
 
         if (! empty($filters['cabang_id'])) {
             $query->where('asrama_id', $filters['cabang_id']);
@@ -160,8 +172,9 @@ class MonitoringService
             $query->whereDate('tanggal_evaluasi', '<=', $filters['tanggal_selesai']);
         }
 
-        if (! empty($filters['materi'])) {
-            $query->where('jenis_evaluasi', $filters['materi']);
+        if (! empty($filters['cari'])) {
+            $cari = $filters['cari'];
+            $query->whereHas('anakAsuh', fn ($q) => $q->where('nama_lengkap', 'like', "%{$cari}%"));
         }
 
         // 1. Grafik Rata-rata Nilai per Cabang
@@ -175,7 +188,12 @@ class MonitoringService
         $cabangRataNilai = [];
 
         foreach ($cabangs as $c) {
-            $subQ = EvaluasiDiniyah::where('asrama_id', $c->id);
+            $subQ = EvaluasiDiniyah::where('asrama_id', $c->id)
+                ->when(
+                    ! empty($filters['materi']),
+                    fn ($q) => $q->where('jenis_evaluasi', $filters['materi']),
+                    fn ($q) => $q->whereIn('jenis_evaluasi', $kategoriPengetahuan)
+                );
 
             if (! empty($filters['tanggal_mulai'])) {
                 $subQ->whereDate('tanggal_evaluasi', '>=', $filters['tanggal_mulai']);
@@ -183,21 +201,17 @@ class MonitoringService
             if (! empty($filters['tanggal_selesai'])) {
                 $subQ->whereDate('tanggal_evaluasi', '<=', $filters['tanggal_selesai']);
             }
-            if (! empty($filters['materi'])) {
-                $subQ->where('jenis_evaluasi', $filters['materi']);
-            }
 
             $avg = $subQ->avg('nilai');
             $cabangLabels[] = $c->nama_asrama;
             $cabangRataNilai[] = $avg !== null ? round((float) $avg, 1) : 0;
         }
 
-        // 2. Grafik Rata-rata Nilai per Materi
-        $daftarMateri = EvaluationStatus::DAFTAR_KATEGORI;
+        // 2. Grafik Rata-rata Nilai per Materi (hanya kategori Pengetahuan)
         $materiLabels = [];
         $materiRataNilai = [];
 
-        foreach ($daftarMateri as $kat) {
+        foreach ($kategoriPengetahuan as $kat) {
             $subMQ = EvaluasiDiniyah::where('jenis_evaluasi', $kat);
 
             if (! empty($filters['cabang_id'])) {
@@ -218,7 +232,7 @@ class MonitoringService
             $materiRataNilai[] = $avgM !== null ? round((float) $avgM, 1) : 0;
         }
 
-        $evaluasis = $query->latest('tanggal_evaluasi')->latest('id')->paginate(10)->withQueryString();
+        $evaluasis = $query->latest('tanggal_evaluasi')->latest('id')->paginate(20)->withQueryString();
 
         return [
             'evaluasis' => $evaluasis,

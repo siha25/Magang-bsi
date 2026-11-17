@@ -26,6 +26,7 @@ use App\Pusat\Controllers\KelolaCabangController as PusatKelolaCabangController;
 use App\Pusat\Controllers\MonitoringDiniyahController as PusatMonitoringDiniyahController;
 use App\Pusat\Controllers\MonitoringKegiatanController as PusatMonitoringKegiatanController;
 use App\Pusat\Controllers\ReviewHafalanController as PusatReviewHafalanController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Rute Autentikasi Pengurus
@@ -119,6 +120,17 @@ Route::middleware(['auth', 'active'])->group(function () {
     // =========================================================================
     Route::prefix('pusat')->name('pusat.')->middleware('role:pusat')->group(function () {
         Route::get('/', [PusatDashboardController::class, 'index'])->name('dashboard');
+
+        // Ganti Bahasa (i18n)
+        Route::post('/ganti-bahasa', function (Request $request) {
+            $locale = $request->input('locale', 'id');
+            if (in_array($locale, ['id', 'en'])) {
+                session(['locale' => $locale]);
+                app()->setLocale($locale);
+            }
+
+            return redirect()->back();
+        })->name('ganti-bahasa');
 
         // Monitoring Kegiatan Harian Nasional (Read-Only)
         Route::get('/monitoring-kegiatan', [PusatMonitoringKegiatanController::class, 'index'])->name('monitoring-kegiatan.index');

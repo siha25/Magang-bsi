@@ -101,12 +101,25 @@
             } catch (e) {}
         })();
 
+        function toggleUserMenu(force) {
+            const menu = document.getElementById('user-menu');
+            const chevron = document.getElementById('user-chevron');
+            if (!menu) return;
+
+            const isHidden = menu.classList.contains('hidden');
+            const shouldOpen = (typeof force === 'boolean') ? force : isHidden;
+            
+            menu.classList.toggle('hidden', !shouldOpen);
+            if (chevron) {
+                chevron.classList.toggle('rotate-180', shouldOpen);
+            }
+        }
+
         document.addEventListener('click', function (e) {
             const wrapper = document.getElementById('user-wrapper');
             const menu = document.getElementById('user-menu');
             if (wrapper && menu && !wrapper.contains(e.target)) {
-                menu.classList.add('hidden');
-                document.getElementById('user-chevron')?.classList.remove('rotate-180');
+                toggleUserMenu(false);
             }
         });
     </script>
