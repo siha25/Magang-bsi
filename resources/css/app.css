@@ -4,8 +4,487 @@
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source "../../storage/framework/views/*.php";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+/* Tipografi Global yang Rapi & Tajam */
+html,
+body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+    letter-spacing: -0.015em;
+}
+
+/* ============================================================================
+   MODE GELAP (html.dark) — Kontras Tinggi, Rapi, dan Mudah Dibaca
+   ============================================================================ */
+html.dark {
+    color-scheme: dark;
+}
+
+html.dark,
+html.dark body {
+    background-color: #0b1411 !important;
+    color: #f1f5f9 !important;
+}
+
+html.dark aside#sidebar,
+html.dark header,
+html.dark footer {
+    background-color: #0f1c17 !important;
+    border-color: #1e352d !important;
+    color: #e2e8f0;
+}
+
+/* Permukaan Kartu & Panel */
+html.dark .bg-white,
+html.dark .bg-white\/95,
+html.dark .bg-white\/90,
+html.dark .bg-white\/85,
+html.dark .bg-white\/80,
+html.dark .bg-white\/70 {
+    background-color: #13221c !important;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/50,
+html.dark .bg-slate-50\/60,
+html.dark .bg-slate-50\/70,
+html.dark .bg-slate-50\/75,
+html.dark .bg-slate-50\/80,
+html.dark .bg-slate-50\/90,
+html.dark .bg-gray-50 {
+    background-color: #162821 !important;
+}
+
+html.dark .bg-slate-100,
+html.dark .bg-slate-100\/70,
+html.dark .bg-slate-100\/80,
+html.dark .bg-slate-100\/90,
+html.dark .bg-slate-200,
+html.dark .bg-slate-200\/70,
+html.dark .bg-gray-100,
+html.dark .bg-gray-200 {
+    background-color: #1c322a !important;
+}
+
+/* Override Gradient Terang (Header Sidebar, Dropdown Header, Filter Card, Modal) */
+html.dark aside#sidebar > div:first-child,
+html.dark .from-emerald-50,
+html.dark .from-emerald-50\/25,
+html.dark .from-emerald-50\/30,
+html.dark .from-emerald-50\/40,
+html.dark .from-emerald-50\/50,
+html.dark .from-emerald-50\/60,
+html.dark .from-emerald-50\/70,
+html.dark .from-emerald-50\/80,
+html.dark .from-blue-50,
+html.dark .from-slate-50 {
+    background-image: linear-gradient(135deg, #162b23 0%, #13221c 100%) !important;
+    background-color: #13221c !important;
+    border-color: #1e352d !important;
+}
+
+/* Permukaan Pastel Badge, Alert & Pill Status */
+html.dark .bg-emerald-50,
+html.dark .bg-emerald-50\/30,
+html.dark .bg-emerald-50\/40,
+html.dark .bg-emerald-50\/50,
+html.dark .bg-emerald-50\/60,
+html.dark .bg-emerald-50\/70,
+html.dark .bg-emerald-50\/80,
+html.dark .bg-emerald-100,
+html.dark .bg-emerald-100\/70,
+html.dark .bg-emerald-100\/90,
+html.dark .bg-emerald-200 {
+    background-color: rgba(16, 185, 129, 0.16) !important;
+}
+
+html.dark .bg-teal-50,
+html.dark .bg-teal-100 {
+    background-color: rgba(20, 184, 166, 0.16) !important;
+}
+
+html.dark .bg-amber-50,
+html.dark .bg-amber-50\/60,
+html.dark .bg-amber-50\/80,
+html.dark .bg-amber-100,
+html.dark .bg-amber-100\/70,
+html.dark .bg-yellow-50,
+html.dark .bg-yellow-100 {
+    background-color: rgba(245, 158, 11, 0.16) !important;
+}
+
+html.dark .bg-orange-50,
+html.dark .bg-orange-100 {
+    background-color: rgba(249, 115, 22, 0.16) !important;
+}
+
+html.dark .bg-rose-50,
+html.dark .bg-rose-50\/20,
+html.dark .bg-rose-100,
+html.dark .bg-rose-100\/80,
+html.dark .bg-red-50,
+html.dark .bg-red-100 {
+    background-color: rgba(244, 63, 94, 0.16) !important;
+}
+
+html.dark .bg-blue-50,
+html.dark .bg-blue-100,
+html.dark .bg-sky-50,
+html.dark .bg-sky-100 {
+    background-color: rgba(59, 130, 246, 0.16) !important;
+}
+
+html.dark .bg-indigo-50,
+html.dark .bg-indigo-100,
+html.dark .bg-purple-50,
+html.dark .bg-purple-100 {
+    background-color: rgba(99, 102, 241, 0.16) !important;
+}
+
+/* Warna Teks Kontras Tinggi */
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-gray-900,
+html.dark .text-gray-800 {
+    color: #f8fafc !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600,
+html.dark .text-gray-700,
+html.dark .text-gray-600 {
+    color: #e2e8f0 !important;
+}
+
+html.dark .text-slate-500,
+html.dark .text-gray-500 {
+    color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-400,
+html.dark .text-gray-400 {
+    color: #94a3b8 !important;
+}
+
+html.dark .text-emerald-950,
+html.dark .text-emerald-900,
+html.dark .text-emerald-800,
+html.dark .text-emerald-700 {
+    color: #6ee7b7 !important;
+}
+
+html.dark .text-emerald-600,
+html.dark .text-emerald-600\/80 {
+    color: #34d399 !important;
+}
+
+html.dark .text-teal-900,
+html.dark .text-teal-800,
+html.dark .text-teal-700,
+html.dark .text-teal-600,
+html.dark .text-teal-600\/80 {
+    color: #5eead4 !important;
+}
+
+html.dark .text-amber-900,
+html.dark .text-amber-800,
+html.dark .text-amber-700,
+html.dark .text-amber-600,
+html.dark .text-amber-600\/80 {
+    color: #fcd34d !important;
+}
+
+html.dark .text-orange-900,
+html.dark .text-orange-800,
+html.dark .text-orange-700,
+html.dark .text-orange-600,
+html.dark .text-orange-600\/80 {
+    color: #fdba74 !important;
+}
+
+html.dark .text-rose-900,
+html.dark .text-rose-800,
+html.dark .text-rose-700,
+html.dark .text-rose-600,
+html.dark .text-rose-500 {
+    color: #fda4af !important;
+}
+
+html.dark .text-blue-900,
+html.dark .text-blue-800,
+html.dark .text-blue-700,
+html.dark .text-blue-600,
+html.dark .text-sky-700 {
+    color: #93c5fd !important;
+}
+
+html.dark .text-indigo-900,
+html.dark .text-indigo-800,
+html.dark .text-indigo-700,
+html.dark .text-purple-600 {
+    color: #c4b5fd !important;
+}
+
+/* Pertahankan teks putih pada tombol & menu aktif solid */
+html.dark .bg-emerald-600,
+html.dark .bg-emerald-600 .text-white,
+html.dark .bg-emerald-700,
+html.dark .bg-rose-600,
+html.dark .bg-amber-600,
+html.dark .bg-blue-600,
+html.dark .bg-teal-600 {
+    color: #ffffff !important;
+}
+
+/* Border & Divider Tabel */
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-200\/50,
+html.dark .border-slate-200\/60,
+html.dark .border-slate-200\/70,
+html.dark .border-slate-200\/80,
+html.dark .border-slate-200\/90,
+html.dark .border-slate-300,
+html.dark .border-gray-200,
+html.dark .border-gray-300,
+html.dark .border-emerald-50 {
+    border-color: #1f362e !important;
+}
+
+html.dark .border-emerald-100,
+html.dark .border-emerald-100\/60,
+html.dark .border-emerald-100\/70,
+html.dark .border-emerald-100\/80,
+html.dark .border-emerald-100\/90,
+html.dark .border-emerald-200,
+html.dark .border-emerald-200\/60,
+html.dark .border-emerald-200\/80,
+html.dark .border-emerald-300,
+html.dark .border-emerald-300\/40 {
+    border-color: rgba(52, 211, 153, 0.3) !important;
+}
+
+html.dark .border-teal-100\/90,
+html.dark .border-teal-200 {
+    border-color: rgba(45, 212, 191, 0.3) !important;
+}
+
+html.dark .border-amber-100\/90,
+html.dark .border-amber-200,
+html.dark .border-amber-200\/60,
+html.dark .border-amber-300,
+html.dark .border-amber-300\/40,
+html.dark .border-orange-200,
+html.dark .border-orange-200\/70,
+html.dark .border-orange-300 {
+    border-color: rgba(251, 191, 36, 0.32) !important;
+}
+
+html.dark .border-rose-50,
+html.dark .border-rose-100,
+html.dark .border-rose-100\/90,
+html.dark .border-rose-200,
+html.dark .border-rose-200\/80,
+html.dark .border-rose-300,
+html.dark .border-rose-300\/40 {
+    border-color: rgba(251, 113, 133, 0.32) !important;
+}
+
+html.dark .border-blue-200,
+html.dark .border-blue-200\/50,
+html.dark .border-blue-300,
+html.dark .border-indigo-200 {
+    border-color: rgba(96, 165, 250, 0.32) !important;
+}
+
+html.dark .divide-slate-50 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #1e352d !important;
+}
+
+/* Status Hover yang Konsisten */
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-50\/60:hover,
+html.dark .hover\:bg-slate-50\/70:hover,
+html.dark .hover\:bg-slate-50\/80:hover,
+html.dark .hover\:bg-slate-100:hover,
+html.dark .hover\:bg-slate-100\/70:hover,
+html.dark .hover\:bg-slate-100\/80:hover,
+html.dark .hover\:bg-slate-200:hover,
+html.dark .hover\:bg-white:hover {
+    background-color: #1a2f27 !important;
+}
+
+html.dark .hover\:bg-emerald-50:hover,
+html.dark .hover\:bg-emerald-50\/30:hover,
+html.dark .hover\:bg-emerald-50\/70:hover,
+html.dark .hover\:bg-emerald-50\/80:hover,
+html.dark .hover\:bg-emerald-100:hover,
+html.dark .hover\:bg-emerald-100\/70:hover,
+html.dark .hover\:bg-emerald-100\/90:hover {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+html.dark .hover\:bg-amber-50:hover,
+html.dark .hover\:bg-amber-100\/70:hover {
+    background-color: rgba(245, 158, 11, 0.22) !important;
+}
+
+html.dark .hover\:bg-orange-50:hover {
+    background-color: rgba(249, 115, 22, 0.22) !important;
+}
+
+html.dark .hover\:bg-blue-50:hover,
+html.dark .hover\:bg-blue-100:hover {
+    background-color: rgba(59, 130, 246, 0.22) !important;
+}
+
+html.dark .hover\:bg-rose-50:hover,
+html.dark .hover\:bg-rose-100:hover,
+html.dark .hover\:bg-rose-100\/80:hover {
+    background-color: rgba(244, 63, 94, 0.22) !important;
+}
+
+html.dark .hover\:text-slate-800:hover,
+html.dark .hover\:text-slate-700:hover,
+html.dark .hover\:text-slate-600:hover {
+    color: #ffffff !important;
+}
+
+html.dark .hover\:text-emerald-600:hover,
+html.dark .hover\:text-emerald-700:hover,
+html.dark .hover\:text-emerald-800:hover,
+html.dark .hover\:text-emerald-900:hover {
+    color: #6ee7b7 !important;
+}
+
+html.dark .hover\:text-amber-600:hover,
+html.dark .hover\:text-amber-700:hover,
+html.dark .hover\:text-amber-800:hover {
+    color: #fde68a !important;
+}
+
+html.dark .hover\:text-blue-700:hover {
+    color: #bfdbfe !important;
+}
+
+html.dark .hover\:text-rose-600:hover,
+html.dark .hover\:text-rose-700:hover,
+html.dark .hover\:text-rose-900:hover {
+    color: #fecdd3 !important;
+}
+
+html.dark .hover\:border-emerald-200:hover,
+html.dark .hover\:border-emerald-300:hover,
+html.dark .hover\:border-emerald-400:hover {
+    border-color: rgba(52, 211, 153, 0.45) !important;
+}
+
+html.dark .hover\:border-rose-200:hover {
+    border-color: rgba(251, 113, 133, 0.45) !important;
+}
+
+html.dark .hover\:border-slate-300:hover {
+    border-color: #2f5245 !important;
+}
+
+/* Input, Select, Textarea & Placeholder */
+html.dark input:not([type="radio"]):not([type="checkbox"]):not([type="range"]):not([type="submit"]):not([type="button"]),
+html.dark select,
+html.dark textarea {
+    background-color: #0f1c17 !important;
+    border-color: #264238 !important;
+    color: #f8fafc !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+html.dark select option {
+    background-color: #0f1c17;
+    color: #f8fafc;
+}
+
+/* Komponen CSS Kustom di Dashboard Legacy (`resources/views/dashboard.blade.php`) */
+html.dark .stat-card,
+html.dark .filter-bar,
+html.dark .chart-card {
+    background-color: #13221c !important;
+    border-color: #1f362e !important;
+}
+
+html.dark .stat-num,
+html.dark .section-hd h2 {
+    color: #f8fafc !important;
+}
+
+html.dark .stat-label,
+html.dark .section-hd p,
+html.dark .empty-state p,
+html.dark .empty-state small {
+    color: #cbd5e1 !important;
+}
+
+html.dark .empty-state .es-icon {
+    background-color: #1c322a !important;
+    color: #94a3b8 !important;
+}
+
+html.dark .mon-table th {
+    background-color: #162821 !important;
+    border-color: #1f362e !important;
+    color: #cbd5e1 !important;
+}
+
+html.dark .mon-table td {
+    border-color: #1e352d !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark .mon-table tr:hover td {
+    background-color: #1a2f27 !important;
+}
+
+html.dark .badge-emerald {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    color: #6ee7b7 !important;
+}
+
+html.dark .badge-amber {
+    background-color: rgba(245, 158, 11, 0.2) !important;
+    color: #fcd34d !important;
+}
+
+html.dark .badge-slate {
+    background-color: #1c322a !important;
+    color: #e2e8f0 !important;
+}
+
+@media print {
+    aside#sidebar,
+    header,
+    footer,
+    #sidebar-overlay,
+    .no-print {
+        display: none !important;
+    }
+
+    main {
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+}

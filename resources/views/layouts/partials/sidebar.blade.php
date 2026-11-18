@@ -149,14 +149,26 @@
                 </a>
                 @endif
                 {{-- Laporan --}}
-                <a href="#laporan" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
-                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span>Laporan</span>
+                @php
+                    $laporanHref = (auth()->user()?->isAdminPusat() || auth()->user()?->isPimpinanPusat())
+                        ? route('pusat.laporan.index')
+                        : '#laporan';
+                    $isLaporanRoute = request()->routeIs('pusat.laporan.*');
+                @endphp
+                <a href="{{ $laporanHref }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ $isLaporanRoute ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                    <svg class="w-5 h-5 {{ $isLaporanRoute ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span>{{ __('Laporan') }}</span>
                 </a>
                 {{-- Pengaturan --}}
-                <a href="#pengaturan" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70 transition-all group">
-                    <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    <span>Pengaturan</span>
+                @php
+                    $pengaturanHref = (auth()->user()?->isAdminPusat() || auth()->user()?->isPimpinanPusat())
+                        ? route('pusat.pengaturan.index')
+                        : (auth()->user()?->isAdminCabang() ? route('cabang.pengaturan.index') : '#pengaturan');
+                    $isPengaturanRoute = request()->routeIs('pusat.pengaturan.*') || request()->routeIs('cabang.pengaturan.*');
+                @endphp
+                <a href="{{ $pengaturanHref }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all group {{ $isPengaturanRoute ? 'bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/30' : 'font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                    <svg class="w-5 h-5 {{ $isPengaturanRoute ? 'text-white' : 'text-slate-400 group-hover:text-emerald-600' }} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>{{ __('Pengaturan') }}</span>
                 </a>
             </nav>
         </div>

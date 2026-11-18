@@ -38,7 +38,7 @@ class MonitoringKegiatanController extends Controller
             ->pluck('wilayah');
 
         // Seluruh kategori kegiatan master untuk filter & modal kelola kategori
-        $kategoriList = KategoriKegiatan::orderBy('nama')->get();
+        $kategoriList = KategoriKegiatan::safeAll();
 
         return view('pusat.views.monitoring-kegiatan.index', array_merge($data, [
             'filters' => $filters,

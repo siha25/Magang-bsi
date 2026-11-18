@@ -55,11 +55,11 @@
     <div class="flex items-center min-w-0">
 
         <button type="button" onclick="toggleSidebar()" aria-label="Buka/tutup sidebar"
-        style="display:flex; align-items:center; justify-content:center; width:42px; height:42px; margin-right:12px; border:1px solid #d1fae5; border-radius:12px; background:#ecfdf5; color:#047857; cursor:pointer; flex-shrink:0;">
-    <svg style="width:20px; height:20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-</button>
+            class="flex items-center justify-center w-[42px] h-[42px] mr-3 border border-emerald-200 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors cursor-pointer shrink-0 focus:outline-none focus:ring-2 focus:ring-emerald-500/30">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
         <h1 class="text-base sm:text-lg lg:text-xl font-bold text-slate-900 tracking-tight truncate">
             {{ $headerTitle }}
         </h1>
@@ -106,15 +106,14 @@
 <div id="user-wrapper" class="relative">
     <button type="button" id="user-btn"
         onclick="document.getElementById('user-menu').classList.toggle('hidden'); document.getElementById('user-chevron').classList.toggle('rotate-180')"
-        style="display:flex; align-items:center; gap:12px; padding:7px 20px 7px 7px; background-color:#ecfdf5; border:1px solid #a7f3d0; border-radius:9999px; cursor:pointer;">
+        class="flex items-center gap-3 py-[7px] pr-5 pl-[7px] bg-emerald-50/80 hover:bg-emerald-100/70 border border-emerald-200 rounded-full transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/30">
         
         {{-- Avatar --}}
-    {{-- Avatar --}}
     <span style="display:flex; align-items:center; justify-content:center; width:42px; height:42px; min-width:42px; border-radius:9999px; background:linear-gradient(135deg,#0f766e,#059669); color:#ffffff; font-size:15px; font-weight:700; box-shadow:0 6px 10px rgba(5,150,105,.6), 0 2px 4px rgba(0,0,0,.25);">
         {{ strtoupper(substr($userName, 0, 2)) }}
     </span>
        {{-- Nama --}}
-<span style="font-size:16px; font-weight:700; color:#0f172a; white-space:nowrap;">
+<span class="text-base font-bold text-slate-900 whitespace-nowrap">
     {{ $userName }}
 </span>
 
@@ -125,33 +124,83 @@
     </button>
 
     {{-- Dropdown --}}
-    <div id="user-menu" class="hidden absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 bg-white shadow-xl z-50 p-2">
-        <a href="#" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm text-slate-800 hover:bg-slate-100 transition-colors">
-            <svg class="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                <circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M4 21c0-4 4-7 8-7s8 3 8 7"/>
-            </svg>
-            Profil Saya
-        </a>
+    @php
+        $isPusatUser = $user && ($user->isAdminPusat() || $user->isPimpinanPusat());
+        $isCabangUser = $user && $user->isAdminCabang();
+        $profilUrl = $isPusatUser ? route('pusat.profil.index') : ($isCabangUser ? route('cabang.profil.index') : '#');
+        $pengaturanUrl = $isPusatUser ? route('pusat.pengaturan.index') : ($isCabangUser ? route('cabang.pengaturan.index') : '#');
+        $localeRoute = $isPusatUser ? route('pusat.ganti-bahasa') : ($isCabangUser ? route('cabang.pengaturan.ganti-bahasa') : null);
+        $currentLocale = app()->getLocale();
+    @endphp
+    <div id="user-menu" class="hidden absolute right-0 mt-2 w-72 rounded-2xl border border-emerald-100 bg-white shadow-xl shadow-slate-900/10 z-50 p-2">
+        <div class="p-3 bg-gradient-to-br from-emerald-50/70 to-teal-50/40 rounded-xl border border-emerald-100/70 mb-2">
+            <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="text-xs font-bold text-slate-900 truncate">{{ $userName }}</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white text-emerald-800 border border-emerald-200 shrink-0">
+                    {{ $userRole }}
+                </span>
+            </div>
+            <p class="text-[11px] text-emerald-700 font-medium truncate">
+                {{ $user?->email ?? '' }}
+            </p>
+        </div>
 
-        <a href="#" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm text-slate-800 hover:bg-slate-100 transition-colors">
-            <svg class="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                <circle cx="12" cy="12" r="3"/>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/>
-            </svg>
-            Pengaturan Akun
-        </a>
-
-        <div class="my-1.5 border-t border-slate-200"></div>
-
-        <form action="{{ route('logout') }}" method="POST" class="m-0">
-            @csrf
-            <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer text-left">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+        <div class="space-y-1">
+            <a href="{{ $profilUrl }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors {{ request()->routeIs('pusat.profil.*') || request()->routeIs('cabang.profil.*') ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                <svg class="w-4 h-4 {{ request()->routeIs('pusat.profil.*') || request()->routeIs('cabang.profil.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                Keluar
-            </button>
-        </form>
+                <span>{{ __('Profil Akun') }}</span>
+            </a>
+
+            <a href="{{ $pengaturanUrl }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors {{ request()->routeIs('pusat.pengaturan.*') || request()->routeIs('cabang.pengaturan.*') ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                <svg class="w-4 h-4 {{ request()->routeIs('pusat.pengaturan.*') || request()->routeIs('cabang.pengaturan.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>{{ __('Pengaturan') }}</span>
+            </a>
+        </div>
+
+        @if($localeRoute)
+        <div class="my-2 pt-2 border-t border-slate-100 px-3 py-1 flex items-center justify-between">
+            <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+                {{ __('Bahasa') }}
+            </span>
+
+            <div class="inline-flex rounded-lg bg-slate-100 p-0.5 text-[10px] font-bold">
+                <form action="{{ $localeRoute }}" method="POST" class="inline m-0">
+                    @csrf
+                    <input type="hidden" name="locale" value="id">
+                    <button type="submit" class="px-2 py-0.5 rounded-md transition-all cursor-pointer {{ $currentLocale === 'id' ? 'bg-white text-emerald-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-800' }}">
+                        ID
+                    </button>
+                </form>
+                <form action="{{ $localeRoute }}" method="POST" class="inline m-0">
+                    @csrf
+                    <input type="hidden" name="locale" value="en">
+                    <button type="submit" class="px-2 py-0.5 rounded-md transition-all cursor-pointer {{ $currentLocale === 'en' ? 'bg-white text-emerald-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-800' }}">
+                        EN
+                    </button>
+                </form>
+            </div>
+        </div>
+        @endif
+
+        <div class="pt-1 border-t border-slate-100">
+            <form action="{{ route('logout') }}" method="POST" class="m-0">
+                @csrf
+                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer text-left">
+                    <svg class="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span>{{ __('Keluar') }}</span>
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 @endauth

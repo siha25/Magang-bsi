@@ -90,6 +90,21 @@
 
     {{-- Script Interaktivitas Ringan (Vanilla JS) --}}
     <script>
+        window.applyChartTheme = function () {
+            if (typeof Chart === 'undefined') return;
+            const isDark = document.documentElement.classList.contains('dark');
+            Chart.defaults.font.family = "'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif";
+            Chart.defaults.color = isDark ? '#cbd5e1' : '#475569';
+            Chart.defaults.borderColor = isDark ? 'rgba(148, 163, 184, 0.16)' : 'rgba(226, 232, 240, 0.75)';
+            if (Chart.defaults.scale && Chart.defaults.scale.grid) {
+                Chart.defaults.scale.grid.color = isDark ? 'rgba(148, 163, 184, 0.14)' : 'rgba(226, 232, 240, 0.6)';
+            }
+            if (Chart.defaults.plugins && Chart.defaults.plugins.legend && Chart.defaults.plugins.legend.labels) {
+                Chart.defaults.plugins.legend.labels.color = isDark ? '#e2e8f0' : '#334155';
+            }
+        };
+        document.addEventListener('DOMContentLoaded', window.applyChartTheme);
+
         function toggleSidebar(force) {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');

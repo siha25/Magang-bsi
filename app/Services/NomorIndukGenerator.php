@@ -6,6 +6,7 @@ use App\Models\AnakAsuh;
 use App\Models\Asrama;
 use Carbon\Carbon;
 use DateTimeInterface;
+use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 
 class NomorIndukGenerator
@@ -79,8 +80,10 @@ class NomorIndukGenerator
             $query->lockForUpdate();
         }
 
-        // 1. Ambil nilai maksimum dari kolom nomor_urut
-        $maxFromCol = (int) $query->max('nomor_urut');
+        // 1. Ambil nilai maksimum dari kolom nomor_urut (jika kolom sudah dimigrasi)
+        $maxFromCol = Schema::hasColumn('anak_asuh', 'nomor_urut')
+            ? (int) $query->max('nomor_urut')
+            : 0;
 
         // 2. Periksa juga nomor_induk jika ada data historis tanpa kolom nomor_urut (baik tanpa setrip maupun format lama)
         $highestFromInduk = 0;

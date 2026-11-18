@@ -1,18 +1,36 @@
 {{-- BAGIAN: PENGURUS PUSAT - Layout Utama Pusat --}}
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-slate-50">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Pusat') - Pendidikan Ansuh | Yayasan Rumah Harapan</title>
+    <title>@yield('title', __('Pusat')) - {{ __('Pendidikan Ansuh | Yayasan Rumah Harapan') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <script>
+        (function() {
+            try {
+                const currentLocale = '{{ app()->getLocale() }}';
+                localStorage.setItem('app_locale', currentLocale);
+
+                const serverTheme = '{{ session("theme", auth()->user()?->theme ?? "") }}';
+                const savedTheme = serverTheme || localStorage.getItem('app_theme') || 'light';
+                localStorage.setItem('app_theme', savedTheme);
+                if (savedTheme === 'dark' || (savedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
 
     <style>
         body {
@@ -74,6 +92,22 @@
 
     {{-- Script Interaktivitas Ringan (Vanilla JS) --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        window.applyChartTheme = function () {
+            if (typeof Chart === 'undefined') return;
+            const isDark = document.documentElement.classList.contains('dark');
+            Chart.defaults.font.family = "'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif";
+            Chart.defaults.color = isDark ? '#cbd5e1' : '#475569';
+            Chart.defaults.borderColor = isDark ? 'rgba(148, 163, 184, 0.16)' : 'rgba(226, 232, 240, 0.75)';
+            if (Chart.defaults.scale && Chart.defaults.scale.grid) {
+                Chart.defaults.scale.grid.color = isDark ? 'rgba(148, 163, 184, 0.14)' : 'rgba(226, 232, 240, 0.6)';
+            }
+            if (Chart.defaults.plugins && Chart.defaults.plugins.legend && Chart.defaults.plugins.legend.labels) {
+                Chart.defaults.plugins.legend.labels.color = isDark ? '#e2e8f0' : '#334155';
+            }
+        };
+        window.applyChartTheme();
+    </script>
     <script>
         function toggleSidebar(force) {
             const sidebar = document.getElementById('sidebar');

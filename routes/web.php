@@ -24,10 +24,12 @@ use App\Pusat\Controllers\EvaluasiDiniyahController as PusatEvaluasiDiniyahContr
 use App\Pusat\Controllers\HafalanHadistController as PusatHafalanHadistController;
 use App\Pusat\Controllers\KategoriKegiatanController as PusatKategoriKegiatanController;
 use App\Pusat\Controllers\KelolaCabangController as PusatKelolaCabangController;
+use App\Pusat\Controllers\LaporanController as PusatLaporanController;
 use App\Pusat\Controllers\MonitoringDiniyahController as PusatMonitoringDiniyahController;
 use App\Pusat\Controllers\MonitoringKegiatanController as PusatMonitoringKegiatanController;
+use App\Pusat\Controllers\PengaturanController as PusatPengaturanController;
+use App\Pusat\Controllers\ProfilController as PusatProfilController;
 use App\Pusat\Controllers\ReviewHafalanController as PusatReviewHafalanController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Rute Autentikasi Pengurus
@@ -122,16 +124,28 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::prefix('pusat')->name('pusat.')->middleware('role:pusat')->group(function () {
         Route::get('/', [PusatDashboardController::class, 'index'])->name('dashboard');
 
-        // Ganti Bahasa (i18n)
-        Route::post('/ganti-bahasa', function (Request $request) {
-            $locale = $request->input('locale', 'id');
-            if (in_array($locale, ['id', 'en'])) {
-                session(['locale' => $locale]);
-                app()->setLocale($locale);
-            }
+        // Ganti Bahasa (i18n) - Shortcut navbar Pusat
+        Route::post('/ganti-bahasa', [PusatPengaturanController::class, 'switchLocale'])->name('ganti-bahasa');
 
-            return redirect()->back();
-        })->name('ganti-bahasa');
+        // Profil Akun Pengurus Pusat (Admin Pendik & Manager)
+        Route::prefix('profil')->name('profil.')->group(function () {
+            Route::get('/', [PusatProfilController::class, 'index'])->name('index');
+            Route::put('/', [PusatProfilController::class, 'update'])->name('update');
+            Route::put('/password', [PusatProfilController::class, 'updatePassword'])->name('update-password');
+        });
+
+        // Pengaturan Sistem & Bahasa Pengurus Pusat
+        Route::prefix('pengaturan')->name('pengaturan.')->group(function () {
+            Route::get('/', [PusatPengaturanController::class, 'index'])->name('index');
+            Route::put('/', [PusatPengaturanController::class, 'update'])->name('update');
+            Route::post('/ganti-bahasa', [PusatPengaturanController::class, 'switchLocale'])->name('ganti-bahasa');
+        });
+
+        // Pusat Laporan & Rekapitulasi Seluruh Cabang
+        Route::prefix('laporan')->name('laporan.')->group(function () {
+            Route::get('/', [PusatLaporanController::class, 'index'])->name('index');
+            Route::get('/export', [PusatLaporanController::class, 'exportCsv'])->name('export');
+        });
 
         // Monitoring Kegiatan Harian Nasional (Read-Only)
         Route::get('/monitoring-kegiatan', [PusatMonitoringKegiatanController::class, 'index'])->name('monitoring-kegiatan.index');

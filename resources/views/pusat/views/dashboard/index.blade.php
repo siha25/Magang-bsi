@@ -212,6 +212,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const rataNilai = @json($dashboardData['cabang_rata_nilai']);
     const kkm = {{ $kkm }};
 
+    const isDark = document.documentElement.classList.contains('dark');
+    const tickColor = isDark ? '#cbd5e1' : '#475569';
+    const gridColor = isDark ? 'rgba(148, 163, 184, 0.14)' : 'rgba(226, 232, 240, 0.6)';
+    const doughnutBorder = isDark ? '#13221c' : '#ffffff';
+
     // 1. Chart Kegiatan per Cabang
     const ctxKegiatan = document.getElementById('chartKegiatanCabang');
     if (ctxKegiatan) {
@@ -242,11 +247,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { precision: 0, font: { size: 11 } },
-                        grid: { color: 'rgba(226, 232, 240, 0.6)' }
+                        ticks: { precision: 0, color: tickColor, font: { size: 11 } },
+                        grid: { color: gridColor }
                     },
                     x: {
-                        ticks: { font: { size: 11 } },
+                        ticks: { color: tickColor, font: { size: 11 } },
                         grid: { display: false }
                     }
                 }
@@ -272,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         '#ef4444'
                     ],
                     borderWidth: 2,
-                    borderColor: '#ffffff',
+                    borderColor: doughnutBorder,
                 }]
             },
             options: {
@@ -320,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 plugins: {
                     legend: {
                         position: 'top',
-                        labels: { font: { size: 11 } }
+                        labels: { color: tickColor, font: { size: 11 } }
                     },
                     tooltip: {
                         callbacks: {
@@ -332,11 +337,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     y: {
                         min: 0,
                         max: 100,
-                        ticks: { font: { size: 11 } },
-                        grid: { color: 'rgba(226, 232, 240, 0.6)' }
+                        ticks: { color: tickColor, font: { size: 11 } },
+                        grid: { color: gridColor }
                     },
                     x: {
-                        ticks: { font: { size: 11 } },
+                        ticks: { color: tickColor, font: { size: 11 } },
                         grid: { display: false }
                     }
                 }

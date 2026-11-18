@@ -7,8 +7,10 @@ namespace App\Pusat\Services;
 use App\Models\AnakAsuh;
 use App\Models\Asrama;
 use App\Models\EvaluasiDiniyah;
+use App\Models\KategoriKegiatan;
 use App\Models\KegiatanHarian;
 use App\Shared\Types\EvaluationStatus;
+use Illuminate\Support\Facades\Schema;
 
 class MonitoringService
 {
@@ -23,8 +25,12 @@ class MonitoringService
         $totalCabang = Asrama::count();
         $totalCabangAktif = Asrama::where('status_aktif', true)->count();
         $totalKegiatan = KegiatanHarian::count();
-        $rataRataDiniyah = EvaluasiDiniyah::avg('nilai');
-        $jumlahSantriKurang = EvaluasiDiniyah::where('nilai', '<', $kkm)
+        $rataRataDiniyah = EvaluasiDiniyah::pengetahuanDiniyah()
+            ->whereNotNull('nilai')
+            ->avg('nilai');
+        $jumlahSantriKurang = EvaluasiDiniyah::pengetahuanDiniyah()
+            ->whereNotNull('nilai')
+            ->where('nilai', '<', $kkm)
             ->distinct('anak_asuh_id')
             ->count('anak_asuh_id');
 
@@ -39,13 +45,18 @@ class MonitoringService
         foreach ($cabangs as $c) {
             $cabangLabels[] = $c->nama_asrama;
             $cabangKegiatanCounts[] = KegiatanHarian::where('asrama_id', $c->id)->count();
-            $avgScore = EvaluasiDiniyah::where('asrama_id', $c->id)->avg('nilai');
+            $avgScore = EvaluasiDiniyah::pengetahuanDiniyah()
+                ->where('asrama_id', $c->id)
+                ->whereNotNull('nilai')
+                ->avg('nilai');
             $cabangRataNilai[] = $avgScore !== null ? round((float) $avgScore, 1) : 0;
             $cabangSantriCounts[] = AnakAsuh::where('asrama_id', $c->id)->where('status_aktif', true)->count();
         }
 
-        // 3. Distribusi Predikat Nilai Seluruh Cabang
-        $evaluasis = EvaluasiDiniyah::get(['nilai']);
+        // 3. Distribusi Predikat Nilai Seluruh Cabang (khusus Pengetahuan Diniyah)
+        $evaluasis = EvaluasiDiniyah::pengetahuanDiniyah()
+            ->whereNotNull('nilai')
+            ->get(['nilai']);
         $distribusi = [
             'mumtaz' => $evaluasis->where('nilai', '>=', 90)->count(),
             'jayyid_jiddan' => $evaluasis->whereBetween('nilai', [80, 89.99])->count(),
@@ -74,7 +85,15 @@ class MonitoringService
      */
     public function getMonitoringKegiatanData(array $filters = []): array
     {
-        $query = KegiatanHarian::with(['asrama', 'penginput', 'kategoriKegiatan']);
+        $relations = ['asrama', 'penginput'];
+        if (KategoriKegiatan::hasTable() && Schema::hasColumn('kegiatan_harian', 'kategori_kegiatan_id')) {
+            $relations[] = 'kategoriKegiatan';
+        }
+        if (Schema::hasTable('dokumentasi_kegiatan')) {
+            $relations[] = 'dokumentasi';
+        }
+
+        $query = KegiatanHarian::with($relations);
 
         if (! empty($filters['cabang_id'])) {
             $query->where('asrama_id', $filters['cabang_id']);
@@ -143,18 +162,46 @@ class MonitoringService
      */
     public function getMonitoringDiniyahData(array $filters = []): array
     {
-        // Kategori Pengetahuan Diniyah saja (eksklusi Hafalan Al-Qur'an dan Hafalan Hadis)
-        $kategoriPengetahuan = array_values(array_filter(
-            EvaluationStatus::DAFTAR_KATEGORI,
-            fn ($k) => ! in_array($k, ["Hafalan Al-Qur'an", 'Hafalan Hadis'], true)
-        ));
+        // Gabungkan daftar kategori standar dengan kategori non-hafalan yang tercatat di database
+        $existingKategori = EvaluasiDiniyah::pengetahuanDiniyah()
+            ->whereNotNull('jenis_evaluasi')
+            ->where('jenis_evaluasi', '!=', '')
+            ->distinct()
+            ->pluck('jenis_evaluasi')
+            ->all();
+
+        $kategoriPengetahuan = array_values(array_unique(array_merge(
+            EvaluationStatus::KATEGORI_PENGETAHUAN_DINIYAH,
+            $existingKategori
+        )));
+
+        $applyCommonFilters = function ($q) use ($filters): void {
+            if (! empty($filters['materi'])) {
+                $q->where('jenis_evaluasi', $filters['materi']);
+            }
+            if (! empty($filters['jenjang'])) {
+                $q->whereHas('anakAsuh', fn ($sub) => $sub->where('jenjang_pendidikan', $filters['jenjang']));
+            }
+            if (! empty($filters['tanggal_mulai'])) {
+                $q->whereDate('tanggal_evaluasi', '>=', $filters['tanggal_mulai']);
+            }
+            if (! empty($filters['tanggal_selesai'])) {
+                $q->whereDate('tanggal_evaluasi', '<=', $filters['tanggal_selesai']);
+            }
+            if (! empty($filters['cari'])) {
+                $cari = $filters['cari'];
+                $q->where(function ($searchQ) use ($cari): void {
+                    $searchQ->where('materi', 'like', "%{$cari}%")
+                        ->orWhereHas('anakAsuh', function ($sub) use ($cari): void {
+                            $sub->where('nama_lengkap', 'like', "%{$cari}%")
+                                ->orWhere('nomor_induk', 'like', "%{$cari}%");
+                        });
+                });
+            }
+        };
 
         $query = EvaluasiDiniyah::with(['asrama', 'anakAsuh', 'pengaju'])
-            ->when(
-                ! empty($filters['materi']),
-                fn ($q) => $q->where('jenis_evaluasi', $filters['materi']),
-                fn ($q) => $q->whereIn('jenis_evaluasi', $kategoriPengetahuan)
-            );
+            ->pengetahuanDiniyah();
 
         if (! empty($filters['cabang_id'])) {
             $query->where('asrama_id', $filters['cabang_id']);
@@ -164,20 +211,9 @@ class MonitoringService
             $query->whereHas('asrama', fn ($q) => $q->where('wilayah', $filters['daerah']));
         }
 
-        if (! empty($filters['tanggal_mulai'])) {
-            $query->whereDate('tanggal_evaluasi', '>=', $filters['tanggal_mulai']);
-        }
+        $applyCommonFilters($query);
 
-        if (! empty($filters['tanggal_selesai'])) {
-            $query->whereDate('tanggal_evaluasi', '<=', $filters['tanggal_selesai']);
-        }
-
-        if (! empty($filters['cari'])) {
-            $cari = $filters['cari'];
-            $query->whereHas('anakAsuh', fn ($q) => $q->where('nama_lengkap', 'like', "%{$cari}%"));
-        }
-
-        // 1. Grafik Rata-rata Nilai per Cabang
+        // 1. Grafik Rata-rata Nilai per Cabang (sinkron dengan Dashboard Pusat)
         $cabangs = Asrama::where('status_aktif', true)
             ->when(! empty($filters['cabang_id']), fn ($q) => $q->where('id', $filters['cabang_id']))
             ->when(! empty($filters['daerah']), fn ($q) => $q->where('wilayah', $filters['daerah']))
@@ -188,19 +224,11 @@ class MonitoringService
         $cabangRataNilai = [];
 
         foreach ($cabangs as $c) {
-            $subQ = EvaluasiDiniyah::where('asrama_id', $c->id)
-                ->when(
-                    ! empty($filters['materi']),
-                    fn ($q) => $q->where('jenis_evaluasi', $filters['materi']),
-                    fn ($q) => $q->whereIn('jenis_evaluasi', $kategoriPengetahuan)
-                );
+            $subQ = EvaluasiDiniyah::pengetahuanDiniyah()
+                ->where('asrama_id', $c->id)
+                ->whereNotNull('nilai');
 
-            if (! empty($filters['tanggal_mulai'])) {
-                $subQ->whereDate('tanggal_evaluasi', '>=', $filters['tanggal_mulai']);
-            }
-            if (! empty($filters['tanggal_selesai'])) {
-                $subQ->whereDate('tanggal_evaluasi', '<=', $filters['tanggal_selesai']);
-            }
+            $applyCommonFilters($subQ);
 
             $avg = $subQ->avg('nilai');
             $cabangLabels[] = $c->nama_asrama;
@@ -210,9 +238,12 @@ class MonitoringService
         // 2. Grafik Rata-rata Nilai per Materi (hanya kategori Pengetahuan)
         $materiLabels = [];
         $materiRataNilai = [];
+        $targetKategoriMateri = ! empty($filters['materi']) ? [$filters['materi']] : $kategoriPengetahuan;
 
-        foreach ($kategoriPengetahuan as $kat) {
-            $subMQ = EvaluasiDiniyah::where('jenis_evaluasi', $kat);
+        foreach ($targetKategoriMateri as $kat) {
+            $subMQ = EvaluasiDiniyah::pengetahuanDiniyah()
+                ->where('jenis_evaluasi', $kat)
+                ->whereNotNull('nilai');
 
             if (! empty($filters['cabang_id'])) {
                 $subMQ->where('asrama_id', $filters['cabang_id']);
@@ -220,12 +251,8 @@ class MonitoringService
             if (! empty($filters['daerah'])) {
                 $subMQ->whereHas('asrama', fn ($q) => $q->where('wilayah', $filters['daerah']));
             }
-            if (! empty($filters['tanggal_mulai'])) {
-                $subMQ->whereDate('tanggal_evaluasi', '>=', $filters['tanggal_mulai']);
-            }
-            if (! empty($filters['tanggal_selesai'])) {
-                $subMQ->whereDate('tanggal_evaluasi', '<=', $filters['tanggal_selesai']);
-            }
+
+            $applyCommonFilters($subMQ);
 
             $avgM = $subMQ->avg('nilai');
             $materiLabels[] = $kat;
@@ -249,6 +276,8 @@ class MonitoringService
     public function getEvaluasiRinganData(array $filters = [], float $kkm = 70.0): array
     {
         $query = EvaluasiDiniyah::with(['asrama', 'anakAsuh', 'penilai'])
+            ->pengetahuanDiniyah()
+            ->whereNotNull('nilai')
             ->where('nilai', '<', $kkm);
 
         if (! empty($filters['cabang_id'])) {

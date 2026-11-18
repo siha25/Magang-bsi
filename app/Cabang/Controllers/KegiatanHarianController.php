@@ -13,6 +13,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 
 class KegiatanHarianController extends Controller
@@ -56,10 +57,7 @@ class KegiatanHarianController extends Controller
         $cabang = CabangSession::getCabang();
 
         // Ambil kategori kegiatan aktif yang distandarisasi oleh Pengurus Pusat
-        $kategoriList = KategoriKegiatan::query()
-            ->active()
-            ->orderBy('nama')
-            ->get();
+        $kategoriList = KategoriKegiatan::safeActive();
 
         return view('cabang.views.kegiatan-harian.create', compact('cabang', 'kategoriList'));
     }
@@ -71,14 +69,17 @@ class KegiatanHarianController extends Controller
             abort(403, 'Akun cabang belum terhubung dengan asrama.');
         }
 
+        $hasKategoriTable = KategoriKegiatan::hasTable();
+        $kategoriRule = $hasKategoriTable
+            ? Rule::exists('kategori_kegiatan', 'kode')->where('is_active', true)->whereNull('deleted_at')
+            : Rule::in(['belajar', 'muhadhoroh', 'olahraga', 'acara_donatur', 'bersih_bersih']);
+
         $validated = $request->validate([
             'tanggal_kegiatan' => ['required', 'date'],
             'kategori' => [
                 'required',
                 'string',
-                Rule::exists('kategori_kegiatan', 'kode')
-                    ->where('is_active', true)
-                    ->whereNull('deleted_at'),
+                $kategoriRule,
             ],
             'nama_kegiatan' => ['required', 'string', 'max:255'],
             'jam_mulai' => ['required', 'date_format:H:i'],
@@ -104,9 +105,11 @@ class KegiatanHarianController extends Controller
             'foto_dokumentasi.*.max' => 'Ukuran setiap foto dokumentasi maksimal 2 MB.',
         ]);
 
-        $kategoriModel = KategoriKegiatan::where('kode', $validated['kategori'])->first();
-        if ($kategoriModel) {
-            $validated['kategori_kegiatan_id'] = $kategoriModel->id;
+        if ($hasKategoriTable && Schema::hasColumn('kegiatan_harian', 'kategori_kegiatan_id')) {
+            $kategoriModel = KategoriKegiatan::where('kode', $validated['kategori'])->first();
+            if ($kategoriModel) {
+                $validated['kategori_kegiatan_id'] = $kategoriModel->id;
+            }
         }
 
         $files = $request->hasFile('foto_dokumentasi') ? (array) $request->file('foto_dokumentasi') : [];

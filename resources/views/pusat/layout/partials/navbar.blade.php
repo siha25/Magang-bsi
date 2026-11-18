@@ -3,23 +3,30 @@
     $headerTitle = trim($__env->yieldContent('header_title'));
     if (empty($headerTitle)) {
         if (request()->routeIs('pusat.dashboard')) {
-            $headerTitle = 'Dashboard Analitik Pusat';
+            $headerTitle = __('Dashboard Analitik Pusat');
         } elseif (request()->routeIs('pusat.monitoring-kegiatan.*')) {
-            $headerTitle = 'Monitoring Kegiatan Seluruh Cabang';
+            $headerTitle = __('Monitoring Kegiatan Seluruh Cabang');
         } elseif (request()->routeIs('pusat.monitoring-diniyah.*')) {
-            $headerTitle = 'Monitoring Pengetahuan Diniyah';
+            $headerTitle = __('Monitoring Pengetahuan Diniyah');
         } elseif (request()->routeIs('pusat.evaluasi-diniyah.*')) {
-            $headerTitle = 'Evaluasi Diniyah Santri Bawah KKM';
+            $headerTitle = __('Evaluasi Diniyah Santri Bawah KKM');
         } elseif (request()->routeIs('pusat.kelola-cabang.*')) {
-            $headerTitle = 'Kelola Akun Cabang';
+            $headerTitle = __('Kelola Akun Cabang');
+        } elseif (request()->routeIs('pusat.laporan.*')) {
+            $headerTitle = __('Laporan & Rekapitulasi');
+        } elseif (request()->routeIs('pusat.profil.*')) {
+            $headerTitle = __('Profil Akun');
+        } elseif (request()->routeIs('pusat.pengaturan.*')) {
+            $headerTitle = __('Pengaturan');
         } else {
-            $headerTitle = trim($__env->yieldContent('title', 'Pusat'));
+            $headerTitle = trim($__env->yieldContent('title', __('Pusat')));
         }
     }
 
     $user = auth()->user();
     $userName = $user ? $user->name : 'Pengurus Pusat';
     $userRole = $user && $user->isAdminPusat() ? 'Admin Pendik' : ($user && $user->isPimpinanPusat() ? 'Manager' : 'Pengurus Pusat');
+    $currentLocale = app()->getLocale();
 @endphp
 
 <header class="sticky top-0 z-30 h-16 sm:h-20 bg-white/95 backdrop-blur-md border-b border-emerald-100/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-all">
@@ -27,8 +34,8 @@
     {{-- Sisi Kiri: Judul Halaman Dinamis --}}
     <div class="flex items-center min-w-0 gap-3">
         <button type="button" onclick="toggleSidebar()" aria-label="Buka/tutup sidebar"
-            style="display:flex; align-items:center; justify-content:center; width:42px; height:42px; border:1px solid #d1fae5; border-radius:12px; background:#ecfdf5; color:#047857; cursor:pointer; flex-shrink:0;">
-            <svg style="width:20px; height:20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            class="flex items-center justify-center w-[42px] h-[42px] border border-emerald-200 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors cursor-pointer shrink-0 focus:outline-none focus:ring-2 focus:ring-emerald-500/30">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
         </button>
@@ -102,26 +109,24 @@
                 {{-- Navigasi Item Menu --}}
                 <div class="space-y-1">
                     {{-- 1. Profil Akun --}}
-                    <a href="javascript:void(0)" 
+                    <a href="{{ route('pusat.profil.index') }}"
                        role="menuitem"
-                       onclick="alert('Fitur Profil Akun sedang dalam pengembangan')"
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/70 cursor-pointer">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors {{ request()->routeIs('pusat.profil.*') ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                        <svg class="w-4 h-4 {{ request()->routeIs('pusat.profil.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        <span>Profil Akun</span>
+                        <span>{{ __('Profil Akun') }}</span>
                     </a>
 
                     {{-- 2. Pengaturan --}}
-                    <a href="javascript:void(0)" 
+                    <a href="{{ route('pusat.pengaturan.index') }}"
                        role="menuitem"
-                       onclick="alert('Fitur Pengaturan sedang dalam pengembangan')"
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/70 cursor-pointer">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors {{ request()->routeIs('pusat.pengaturan.*') ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/70' }}">
+                        <svg class="w-4 h-4 {{ request()->routeIs('pusat.pengaturan.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span>Pengaturan</span>
+                        <span>{{ __('Pengaturan') }}</span>
                     </a>
                 </div>
 
@@ -131,7 +136,7 @@
                         <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                         </svg>
-                        Bahasa
+                        {{ __('Bahasa') }}
                     </span>
 
                     {{-- Switch Pill ID / EN --}}
@@ -140,7 +145,7 @@
                             @csrf
                             <input type="hidden" name="locale" value="id">
                             <button type="submit" 
-                                    class="px-2 py-0.5 rounded-md transition-all cursor-pointer {{ app()->getLocale() === 'id' ? 'bg-white text-emerald-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-800' }}">
+                                    class="px-2 py-0.5 rounded-md transition-all cursor-pointer {{ $currentLocale === 'id' ? 'bg-white text-emerald-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-800' }}">
                                 ID
                             </button>
                         </form>
@@ -148,7 +153,7 @@
                             @csrf
                             <input type="hidden" name="locale" value="en">
                             <button type="submit" 
-                                    class="px-2 py-0.5 rounded-md transition-all cursor-pointer {{ app()->getLocale() === 'en' ? 'bg-white text-emerald-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-800' }}">
+                                    class="px-2 py-0.5 rounded-md transition-all cursor-pointer {{ $currentLocale === 'en' ? 'bg-white text-emerald-800 shadow-2xs font-extrabold' : 'text-slate-500 hover:text-slate-800' }}">
                                 EN
                             </button>
                         </form>
@@ -165,7 +170,7 @@
                             <svg class="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                             </svg>
-                            <span>Keluar</span>
+                            <span>{{ __('Keluar') }}</span>
                         </button>
                     </form>
                 </div>

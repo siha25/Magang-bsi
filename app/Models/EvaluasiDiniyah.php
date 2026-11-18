@@ -28,6 +28,19 @@ class EvaluasiDiniyah extends Model
 
     public const KATEGORI_TAJWID = 'Tajwid & Tahsin';
 
+    /**
+     * Daftar kategori standar Pengetahuan Diniyah yang digunakan oleh modul cabang.
+     *
+     * @var list<string>
+     */
+    public const KATEGORI_LIST_PENGETAHUAN = [
+        'Aqidah',
+        'Fikih',
+        'Tahsin',
+        'Siroh',
+        'Akhlak',
+    ];
+
     protected $table = 'evaluasi_diniyah';
 
     protected $fillable = [
@@ -186,6 +199,20 @@ class EvaluasiDiniyah extends Model
         }
 
         return $query;
+    }
+
+    /**
+     * Scope khusus data Pengetahuan Diniyah (mengecualikan Hafalan Al-Qur'an & Hafalan Hadis).
+     *
+     * @param  Builder<EvaluasiDiniyah>  $query
+     * @return Builder<EvaluasiDiniyah>
+     */
+    public function scopePengetahuanDiniyah(Builder $query): Builder
+    {
+        return $query->whereNotIn('jenis_evaluasi', [
+            self::KATEGORI_QURAN,
+            self::KATEGORI_HADIS,
+        ]);
     }
 
     /**

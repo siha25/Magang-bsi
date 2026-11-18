@@ -9,14 +9,20 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class KegiatanHarianController extends Controller
 {
     public function index(Request $request): View
     {
+        $relations = ['asrama', 'penginput'];
+        if (KategoriKegiatan::hasTable() && Schema::hasColumn('kegiatan_harian', 'kategori_kegiatan_id')) {
+            $relations[] = 'kategoriKegiatan';
+        }
+
         $query = KegiatanHarian::query()
             ->byRole()
-            ->with(['asrama', 'penginput', 'kategoriKegiatan']);
+            ->with($relations);
 
         if ($request->filled('tanggal')) {
             $query->whereDate('tanggal_kegiatan', $request->date('tanggal'));
@@ -45,9 +51,14 @@ class KegiatanHarianController extends Controller
 
     public function show(int $kegiatanHarian): View
     {
+        $relations = ['asrama', 'penginput', 'dokumentasi'];
+        if (KategoriKegiatan::hasTable() && Schema::hasColumn('kegiatan_harian', 'kategori_kegiatan_id')) {
+            $relations[] = 'kategoriKegiatan';
+        }
+
         $kegiatan = KegiatanHarian::query()
             ->byRole()
-            ->with(['asrama', 'penginput', 'dokumentasi', 'kategoriKegiatan'])
+            ->with($relations)
             ->findOrFail($kegiatanHarian);
 
         return view('kegiatan-harian.show', compact('kegiatan'));
@@ -59,10 +70,7 @@ class KegiatanHarianController extends Controller
             ? Asrama::orderBy('nama_asrama')->get()
             : collect([Auth::user()?->asrama])->filter();
 
-        $kategoriList = KategoriKegiatan::query()
-            ->active()
-            ->orderBy('nama')
-            ->get();
+        $kategoriList = KategoriKegiatan::safeActive();
 
         return view('kegiatan-harian.create', compact('asramas', 'kategoriList'));
     }
@@ -91,9 +99,11 @@ class KegiatanHarianController extends Controller
             abort(403, 'Anda hanya dapat mengelola kegiatan asrama Anda sendiri.');
         }
 
-        $kategoriModel = KategoriKegiatan::where('kode', $validated['kategori'])->first();
-        if ($kategoriModel) {
-            $validated['kategori_kegiatan_id'] = $kategoriModel->id;
+        if (KategoriKegiatan::hasTable() && Schema::hasColumn('kegiatan_harian', 'kategori_kegiatan_id')) {
+            $kategoriModel = KategoriKegiatan::where('kode', $validated['kategori'])->first();
+            if ($kategoriModel) {
+                $validated['kategori_kegiatan_id'] = $kategoriModel->id;
+            }
         }
 
         if ($request->hasFile('foto_dokumentasi')) {

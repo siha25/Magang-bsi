@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class AnakAsuhController extends Controller
 {
@@ -159,7 +160,9 @@ class AnakAsuhController extends Controller
             );
 
             $validated['nomor_induk'] = $nomorIndukData['nomor_induk'];
-            $validated['nomor_urut'] = $nomorIndukData['nomor_urut'];
+            if (Schema::hasColumn('anak_asuh', 'nomor_urut')) {
+                $validated['nomor_urut'] = $nomorIndukData['nomor_urut'];
+            }
 
             return AnakAsuh::create($validated);
         });

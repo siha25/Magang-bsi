@@ -20,6 +20,32 @@ class KategoriKegiatanController extends Controller
     public function index(Request $request): JsonResponse|RedirectResponse
     {
         if ($request->wantsJson() || $request->ajax()) {
+            if (! KategoriKegiatan::hasTable()) {
+                $countsByKode = KegiatanHarian::query()
+                    ->selectRaw('kategori, count(*) as total')
+                    ->groupBy('kategori')
+                    ->pluck('total', 'kategori');
+
+                $kategoris = KategoriKegiatan::defaultCollection()
+                    ->map(function (KategoriKegiatan $item) use ($countsByKode) {
+                        return [
+                            'id' => $item->id,
+                            'nama' => $item->nama,
+                            'kode' => $item->kode,
+                            'deskripsi' => $item->deskripsi,
+                            'is_active' => (bool) $item->is_active,
+                            'kegiatan_harian_count' => (int) ($countsByKode[$item->kode] ?? 0),
+                            'created_at' => null,
+                        ];
+                    })
+                    ->values();
+
+                return response()->json([
+                    'success' => true,
+                    'data' => $kategoris,
+                ]);
+            }
+
             $kategoris = KategoriKegiatan::query()
                 ->withCount('kegiatanHarian')
                 ->orderBy('nama')

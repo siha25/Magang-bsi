@@ -22,9 +22,22 @@ class EvaluationStatus
 
     public const TINDAK_LANJUT_TUNTAS = 'tuntas';
 
+    public const KATEGORI_PENGETAHUAN_DINIYAH = [
+        'Aqidah',
+        'Fikih',
+        'Tahsin',
+        'Siroh',
+        'Akhlak',
+    ];
+
     public const DAFTAR_KATEGORI = [
         "Hafalan Al-Qur'an",
         'Hafalan Hadis',
+        'Aqidah',
+        'Fikih',
+        'Tahsin',
+        'Siroh',
+        'Akhlak',
         'Pengetahuan Diniyah',
         'Fiqih & Ibadah',
         'Aqidah & Akhlak',

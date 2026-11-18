@@ -33,11 +33,11 @@
 
     {{-- Filter Bar Multi-Kriteria --}}
     <div class="bg-white rounded-3xl p-5 border border-emerald-100/90 shadow-xs">
-        <form method="GET" action="{{ route('pusat.monitoring-kegiatan.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <form method="GET" action="{{ route('pusat.monitoring-kegiatan.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-12 gap-3.5 items-end">
             {{-- Filter Cabang --}}
-            <div>
-                <label for="cabang_id" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Cabang</label>
-                <select name="cabang_id" id="cabang_id" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none">
+            <div class="xl:col-span-2">
+                <label for="cabang_id" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Cabang</label>
+                <select name="cabang_id" id="cabang_id" class="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-colors">
                     <option value="">Semua Cabang</option>
                     @foreach($cabangOptions as $c)
                         <option value="{{ $c->id }}" {{ (string)$filters['cabang_id'] === (string)$c->id ? 'selected' : '' }}>
@@ -48,9 +48,9 @@
             </div>
 
             {{-- Filter Daerah --}}
-            <div>
-                <label for="daerah" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Wilayah / Daerah</label>
-                <select name="daerah" id="daerah" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none">
+            <div class="xl:col-span-2">
+                <label for="daerah" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Wilayah / Daerah</label>
+                <select name="daerah" id="daerah" class="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-colors">
                     <option value="">Semua Wilayah</option>
                     @foreach($daerahOptions as $d)
                         <option value="{{ $d }}" {{ $filters['daerah'] === $d ? 'selected' : '' }}>{{ $d }}</option>
@@ -59,9 +59,9 @@
             </div>
 
             {{-- Filter Kategori Kegiatan --}}
-            <div>
-                <label for="filter_kategori_kegiatan" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Kategori Kegiatan</label>
-                <select name="kategori" id="filter_kategori_kegiatan" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none">
+            <div class="xl:col-span-2">
+                <label for="filter_kategori_kegiatan" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Kategori Kegiatan</label>
+                <select name="kategori" id="filter_kategori_kegiatan" class="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-colors">
                     <option value="">Semua Kategori</option>
                     @foreach($kategoriList as $kat)
                         <option value="{{ $kat->kode }}" {{ (string)($filters['kategori'] ?? '') === $kat->kode ? 'selected' : '' }}>
@@ -71,27 +71,33 @@
                 </select>
             </div>
 
-            {{-- Filter Tanggal Mulai & Selesai --}}
-            <div>
-                <label for="tanggal_mulai" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Dari Tanggal</label>
+            {{-- Filter Tanggal Mulai --}}
+            <div class="xl:col-span-2">
+                <label for="tanggal_mulai" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Dari Tanggal</label>
                 <input type="date" name="tanggal_mulai" id="tanggal_mulai" value="{{ $filters['tanggal_mulai'] }}"
-                       class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none">
+                       class="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-colors">
             </div>
 
-            <div>
-                <label for="tanggal_selesai" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Sampai Tanggal</label>
-                <div class="flex items-center gap-2">
-                    <input type="date" name="tanggal_selesai" id="tanggal_selesai" value="{{ $filters['tanggal_selesai'] }}"
-                           class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none">
-                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors shrink-0">
-                        Filter
-                    </button>
-                    @if(array_filter($filters))
-                        <a href="{{ route('pusat.monitoring-kegiatan.index') }}" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold shrink-0" title="Reset Filter">
-                            &times;
-                        </a>
-                    @endif
-                </div>
+            {{-- Filter Tanggal Selesai --}}
+            <div class="xl:col-span-2">
+                <label for="tanggal_selesai" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Sampai Tanggal</label>
+                <input type="date" name="tanggal_selesai" id="tanggal_selesai" value="{{ $filters['tanggal_selesai'] }}"
+                       class="w-full h-10 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-colors">
+            </div>
+
+            {{-- Tombol Aksi --}}
+            <div class="xl:col-span-2 flex items-center gap-2">
+                <button type="submit" class="h-10 flex-1 inline-flex items-center justify-center gap-1.5 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors cursor-pointer whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    <span>Terapkan Filter</span>
+                </button>
+                @if(array_filter($filters))
+                    <a href="{{ route('pusat.monitoring-kegiatan.index') }}" class="h-10 inline-flex items-center justify-center px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition-colors shrink-0" title="Reset Filter">
+                        &times;
+                    </a>
+                @endif
             </div>
         </form>
     </div>
@@ -117,7 +123,7 @@
     <div class="bg-white rounded-3xl border border-emerald-100/90 shadow-xs overflow-hidden">
         <div class="p-5 border-b border-slate-100 flex items-center justify-between">
             <div>
-                <h3 class="text-sm font-bold text-slate-900">Tabel Rekapitulasi Kegiatan Nasional</h3>
+                <h3 class="text-sm font-bold text-slate-900">Tabel Rekapitulasi Kegiatan</h3>
                 <p class="text-xs text-slate-500 mt-0.5">Daftar kegiatan yang diinput oleh staff cabang masing-masing</p>
             </div>
             <span class="text-xs text-slate-500 font-medium">Halaman {{ $kegiatans->currentPage() }} dari {{ $kegiatans->lastPage() }}</span>
@@ -130,6 +136,7 @@
                         <th class="py-3.5 px-4">Cabang & Wilayah</th>
                         <th class="py-3.5 px-4">Nama Kegiatan</th>
                         <th class="py-3.5 px-4">Kategori</th>
+                        <th class="py-3.5 px-4 text-center">Dokumentasi</th>
                         <th class="py-3.5 px-4">Tanggal & Jam</th>
                         <th class="py-3.5 px-4 text-center">Kehadiran</th>
                         <th class="py-3.5 px-4">Penginput Cabang</th>
@@ -137,32 +144,40 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
                     @forelse($kegiatans as $keg)
+                        @php
+                            $daftarFoto = $keg->semua_foto;
+                        @endphp
                         <tr class="hover:bg-slate-50/60 transition-colors">
                             <td class="py-3.5 px-4">
                                 <span class="font-bold text-slate-900 block">{{ $keg->asrama?->nama_asrama ?? 'Cabang #' . $keg->asrama_id }}</span>
                                 <span class="text-[11px] text-slate-400">{{ $keg->asrama?->wilayah ?? '-' }}</span>
                             </td>
                             <td class="py-3.5 px-4">
-                                <div class="flex items-center gap-2.5">
-                                    @if($keg->foto_url)
-                                        <button type="button" onclick="openLightbox('{{ $keg->foto_url }}', '{{ addslashes($keg->nama_kegiatan) }}', '{{ $keg->tanggal_kegiatan?->format('d/m/Y') }}')" class="shrink-0 group relative block cursor-pointer" title="Lihat Foto Dokumentasi">
-                                            <img src="{{ $keg->foto_url }}" alt="Dokumentasi" class="w-8 h-8 object-cover rounded-lg border border-slate-200 group-hover:ring-2 group-hover:ring-emerald-500 transition-all shadow-2xs" onerror="this.style.display='none'">
-                                        </button>
-                                    @endif
-                                    <div>
-                                        <span class="font-semibold text-slate-800 block">{{ $keg->nama_kegiatan }}</span>
-                                        @if($keg->foto_url)
-                                            <span class="text-[10px] text-emerald-600 font-medium">Ada dokumentasi</span>
-                                        @elseif($keg->deskripsi)
-                                            <span class="text-[11px] text-slate-400 line-clamp-1">{{ Str::limit($keg->deskripsi, 40) }}</span>
-                                        @endif
-                                    </div>
-                                </div>
+                                <span class="font-semibold text-slate-800 block">{{ $keg->nama_kegiatan }}</span>
+                                @if($keg->deskripsi)
+                                    <span class="text-[11px] text-slate-400 line-clamp-1">{{ Str::limit($keg->deskripsi, 40) }}</span>
+                                @endif
                             </td>
-                            <td class="py-3.5 px-4">
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200 capitalize">
-                                    {{ $keg->kategoriKegiatan?->nama ?? $keg->kategori_label ?? $keg->kategori }}
+                            <td class="py-3.5 px-4 whitespace-nowrap">
+                                <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200 capitalize">
+                                    {{ $keg->kategori_label }}
                                 </span>
+                            </td>
+                            <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                @if(count($daftarFoto) > 0)
+                                    <button type="button"
+                                            onclick="openKegiatanLightbox(this)"
+                                            data-fotos="{{ json_encode($daftarFoto) }}"
+                                            data-title="{{ $keg->nama_kegiatan }}"
+                                            data-subtitle="{{ $keg->tanggal_kegiatan?->format('d/m/Y') ?? '' }}"
+                                            class="inline-flex items-center gap-2 px-2.5 py-1 rounded-2xl bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-300 text-emerald-800 text-[11px] font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer group"
+                                            title="Lihat Foto Dokumentasi">
+                                        <img src="{{ $daftarFoto[0]['url'] }}" alt="Dokumentasi" class="w-6 h-6 rounded-md object-cover border border-emerald-300 shrink-0 group-hover:scale-105 transition-transform" onerror="this.style.display='none'">
+                                        <span>{{ count($daftarFoto) > 1 ? 'Lihat (' . count($daftarFoto) . ' Foto)' : 'Lihat Foto' }}</span>
+                                    </button>
+                                @else
+                                    <span class="text-xs text-slate-300 font-medium">-</span>
+                                @endif
                             </td>
                             <td class="py-3.5 px-4">
                                 <div class="font-medium text-slate-800">{{ $keg->tanggal_kegiatan?->format('d M Y') }}</div>
@@ -179,7 +194,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-slate-500">
+                            <td colspan="7" class="py-12 text-center text-slate-500">
                                 Tidak ada catatan kegiatan harian yang cocok dengan filter.
                             </td>
                         </tr>
@@ -206,15 +221,28 @@
                 <h3 id="lightbox-title" class="text-sm font-bold text-slate-900">Dokumentasi Kegiatan</h3>
                 <p id="lightbox-subtitle" class="text-xs text-slate-500 mt-0.5"></p>
             </div>
-            <button type="button" onclick="closeLightbox()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer" title="Kembali">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                <span>Kembali</span>
-            </button>
+            <div class="flex items-center gap-2">
+                <span id="lightbox-counter" class="hidden text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-200/70 text-slate-700"></span>
+                <button type="button" onclick="closeLightbox()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer" title="Kembali">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Kembali</span>
+                </button>
+            </div>
         </div>
-        <div class="p-6 bg-slate-900/5 flex items-center justify-center max-h-[70vh] overflow-hidden">
+        <div class="relative p-6 bg-slate-900/5 flex items-center justify-center min-h-[280px] max-h-[70vh] overflow-hidden">
+            <button type="button" id="lightbox-prev-btn" onclick="prevLightboxImage()" class="hidden absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-slate-700 shadow-md flex items-center justify-center transition-all cursor-pointer z-10 disabled:opacity-30 disabled:cursor-not-allowed" title="Foto Sebelumnya">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
             <img id="lightbox-img" src="" alt="Dokumentasi Full" class="max-h-[65vh] w-auto max-w-full rounded-2xl object-contain shadow-lg">
+            <button type="button" id="lightbox-next-btn" onclick="nextLightboxImage()" class="hidden absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-slate-700 shadow-md flex items-center justify-center transition-all cursor-pointer z-10 disabled:opacity-30 disabled:cursor-not-allowed" title="Foto Berikutnya">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
         </div>
         <div class="px-6 py-3.5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
             <button type="button" onclick="closeLightbox()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer">
@@ -442,20 +470,47 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+window._lightboxItems = [];
+window._lightboxIndex = 0;
+window._lightboxDate = '';
+
+function openKegiatanLightbox(btn) {
+    let fotos = [];
+    try {
+        fotos = JSON.parse(btn.dataset.fotos || '[]');
+    } catch (e) {
+        fotos = [];
+    }
+    if (!fotos.length) return;
+
+    window._lightboxItems = fotos;
+    window._lightboxIndex = 0;
+    window._lightboxDate = btn.dataset.subtitle || '';
+
+    const titleEl = document.getElementById('lightbox-title');
+    if (titleEl) titleEl.textContent = btn.dataset.title || 'Dokumentasi Kegiatan';
+
+    updateLightboxGallery();
+    showLightboxModal();
+}
+
 function openLightbox(imageUrl, title, subtitle) {
+    if (!imageUrl) return;
+    window._lightboxItems = [{ url: imageUrl, nama: 'Dokumentasi Kegiatan' }];
+    window._lightboxIndex = 0;
+    window._lightboxDate = subtitle || '';
+
+    const titleEl = document.getElementById('lightbox-title');
+    if (titleEl) titleEl.textContent = title || 'Dokumentasi Kegiatan';
+
+    updateLightboxGallery();
+    showLightboxModal();
+}
+
+function showLightboxModal() {
     const modal = document.getElementById('lightbox-modal');
     const card = document.getElementById('lightbox-card');
-    const img = document.getElementById('lightbox-img');
-    const titleEl = document.getElementById('lightbox-title');
-    const subtitleEl = document.getElementById('lightbox-subtitle');
-    const downloadEl = document.getElementById('lightbox-download');
-
-    if (!modal || !img) return;
-
-    img.src = imageUrl;
-    if (downloadEl) downloadEl.href = imageUrl;
-    if (titleEl) titleEl.textContent = title || 'Dokumentasi Kegiatan';
-    if (subtitleEl) subtitleEl.textContent = subtitle ? ('Tanggal: ' + subtitle) : '';
+    if (!modal) return;
 
     modal.classList.remove('hidden');
     setTimeout(() => {
@@ -465,6 +520,66 @@ function openLightbox(imageUrl, title, subtitle) {
             card.classList.add('scale-100');
         }
     }, 10);
+}
+
+function updateLightboxGallery() {
+    const items = window._lightboxItems || [];
+    if (!items.length) return;
+
+    if (window._lightboxIndex < 0) window._lightboxIndex = 0;
+    if (window._lightboxIndex >= items.length) window._lightboxIndex = items.length - 1;
+
+    const current = items[window._lightboxIndex];
+    const img = document.getElementById('lightbox-img');
+    const subtitleEl = document.getElementById('lightbox-subtitle');
+    const counterEl = document.getElementById('lightbox-counter');
+    const downloadEl = document.getElementById('lightbox-download');
+    const prevBtn = document.getElementById('lightbox-prev-btn');
+    const nextBtn = document.getElementById('lightbox-next-btn');
+
+    if (img) {
+        img.src = current.url;
+        img.alt = current.nama || 'Dokumentasi Full';
+    }
+    if (downloadEl) downloadEl.href = current.url;
+
+    const parts = [];
+    if (window._lightboxDate) parts.push('Tanggal: ' + window._lightboxDate);
+    if (current.nama && items.length > 1) parts.push(current.nama + (current.ukuran ? ' (' + current.ukuran + ')' : ''));
+    if (subtitleEl) subtitleEl.textContent = parts.join(' • ');
+
+    if (items.length <= 1) {
+        if (counterEl) counterEl.classList.add('hidden');
+        if (prevBtn) prevBtn.classList.add('hidden');
+        if (nextBtn) nextBtn.classList.add('hidden');
+    } else {
+        if (counterEl) {
+            counterEl.textContent = (window._lightboxIndex + 1) + ' / ' + items.length;
+            counterEl.classList.remove('hidden');
+        }
+        if (prevBtn) {
+            prevBtn.classList.remove('hidden');
+            prevBtn.disabled = (window._lightboxIndex === 0);
+        }
+        if (nextBtn) {
+            nextBtn.classList.remove('hidden');
+            nextBtn.disabled = (window._lightboxIndex === items.length - 1);
+        }
+    }
+}
+
+function prevLightboxImage() {
+    if (window._lightboxIndex > 0) {
+        window._lightboxIndex--;
+        updateLightboxGallery();
+    }
+}
+
+function nextLightboxImage() {
+    if (window._lightboxIndex < (window._lightboxItems || []).length - 1) {
+        window._lightboxIndex++;
+        updateLightboxGallery();
+    }
 }
 
 function closeLightbox() {
@@ -485,6 +600,21 @@ function closeLightbox() {
 }
 
 document.addEventListener('keydown', function(e) {
+    const lightboxModal = document.getElementById('lightbox-modal');
+    if (lightboxModal && !lightboxModal.classList.contains('hidden')) {
+        if (e.key === 'Escape') {
+            closeLightbox();
+            return;
+        }
+        if (e.key === 'ArrowLeft') {
+            prevLightboxImage();
+            return;
+        }
+        if (e.key === 'ArrowRight') {
+            nextLightboxImage();
+            return;
+        }
+    }
     if (e.key === 'Escape') {
         closeLightbox();
         closeKategoriKegiatanModal();
